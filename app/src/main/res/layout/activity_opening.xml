@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5DC"
+    android:orientation="vertical" >
+
+    <LinearLayout
+    android:id="@+id/opening1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/brief1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/chinese_name"
+        android:textColor="#ff888888"
+        android:textSize="40sp">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/detail1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/description"
+        android:textColor="#4169E1"
+        android:textSize="14sp">
+
+    </TextView>
+</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/opening2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/brief2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/chinese_name"
+            android:textColor="#F5F5DC"
+            android:textSize="40sp">
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/detail2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/description"
+            android:textColor="#F5F5DC"
+            android:textSize="14sp">
+
+        </TextView>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/app_name"
+        android:src="@mipmap/ic_launcher"
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>
+

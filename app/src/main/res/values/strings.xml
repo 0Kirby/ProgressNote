@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ProgressNote</string>
+    <string name="chinese_name">天天笔记</string>
+    <string name="description">记录当下，规划未来</string>
 </resources>
