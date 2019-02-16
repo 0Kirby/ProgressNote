@@ -8,7 +8,7 @@
         android:fromXDelta="35%"
         android:fromYDelta="15%p"
         android:toXDelta="35%"
-        android:toYDelta="42%p"/>
+        android:toYDelta="44.5%p"/>
 
     <set>
         <alpha
