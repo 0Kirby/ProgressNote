@@ -3,4 +3,5 @@
     <string name="chinese_name">天天笔记</string>
     <string name="description">记录当下，规划未来</string>
     <string name="empty">（空）</string>
+    <string name="save">保存</string>
 </resources>
