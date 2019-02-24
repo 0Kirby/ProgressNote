@@ -1,42 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+
     <EditText
         android:id="@+id/noteTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:hint="请在此键入标题"
-        android:background="@null"
-        android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
-        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:hint="@string/please_title"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLength="12"
+        android:singleLine="true"
         android:textColor="#000000"
-        android:focusable="true" />
+        android:textSize="20sp"
+        android:importantForAutofill="no"
+        tools:targetApi="o" />
 
     <TextView
         android:id="@+id/noteTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:textSize="15sp"
-        android:text="2019年2月17日 23:33:33"/>
+        android:textSize="15sp" />
 
-    <EditText
-        android:id="@+id/mainText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="请在此键入文本"
-        android:background="@null"
-        android:layout_marginTop="5dp"
-        android:textColor="#000000"
-        android:text="test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本"/>
 
-    <ImageView
-        android:id="@+id/firstImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher_round" />
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <EditText
+                android:id="@+id/mainText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@null"
+                android:hint="@string/please_text"
+                android:inputType="none"
+                android:textColor="#000000"
+                android:importantForAutofill="no"
+                tools:targetApi="o" />
+
+            <ImageView
+                android:id="@+id/firstImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/empty"
+                android:src="@mipmap/ic_launcher_round" />
+        </LinearLayout>
+
+    </ScrollView>
+
 </LinearLayout>

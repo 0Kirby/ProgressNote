@@ -6,14 +6,19 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.view.View;
 
+import com.xqjtqy.progressnote.db.MyDatabaseHelper;
+
 public class MainActivity extends AppCompatActivity {
 
     private CardView cardView;
+    private MyDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dbHelper = new MyDatabaseHelper(this,"Note.db",null,1);
+        dbHelper.getWritableDatabase();
        cardView = findViewById(R.id.cardView);
        cardView.setOnClickListener(new View.OnClickListener(){
 
