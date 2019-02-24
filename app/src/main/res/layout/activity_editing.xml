@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#ffffff"
@@ -16,20 +17,21 @@
         android:background="@null"
         android:clickable="true"
         android:focusable="true"
-        android:hint="请在此键入标题"
+        android:hint="@string/please_title"
         android:inputType="text"
         android:lines="1"
         android:maxLength="12"
         android:singleLine="true"
         android:textColor="#000000"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:importantForAutofill="no"
+        tools:targetApi="o" />
 
     <TextView
         android:id="@+id/noteTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:text="2019年2月17日 23:33:33"
         android:textSize="15sp" />
 
 
@@ -41,7 +43,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
 
@@ -51,10 +53,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:background="@null"
-                android:hint="请在此键入文本"
+                android:hint="@string/please_text"
                 android:inputType="none"
-                android:text="test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本testtest测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本test测试文本"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:importantForAutofill="no"
+                tools:targetApi="o" />
 
             <ImageView
                 android:id="@+id/firstImage"
