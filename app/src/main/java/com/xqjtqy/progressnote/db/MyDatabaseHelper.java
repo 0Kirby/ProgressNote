@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import com.xqjtqy.progressnote.MainActivity;
+
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_NOTE = "create table Note ("
@@ -14,10 +16,9 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             + "content text, "
             + "image blob)"; //建表
 
-
     private Context mContext;
 
-    public MyDatabaseHelper(Context context, String name,
+    public MyDatabaseHelper(Context context, String name, 
                             SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext = context;
@@ -30,7 +31,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //升级
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //升级
         db.execSQL("drop table if exists Note");
         onCreate(db);
     }

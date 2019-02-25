@@ -3,6 +3,9 @@
     <string name="chinese_name">天天笔记</string>
     <string name="description">记录当下，规划未来</string>
     <string name="empty">（空）</string>
+    <string name="title">（空）</string>
+    <string name="body">（空）</string>
+    <string name="date">（空）</string>
     <string name="save">保存</string>
     <string name="please_title">请在此键入标题</string>
     <string name="please_text">请在此键入文本</string>
