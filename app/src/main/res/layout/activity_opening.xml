@@ -4,44 +4,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5DC"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <LinearLayout
-    android:id="@+id/opening1"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/brief1"
+        android:id="@+id/opening1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/chinese_name"
-        android:textColor="#ff888888"
-        android:textSize="40sp">
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
 
-    </TextView>
+        <TextView
+            android:id="@+id/brief1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/chinese_name"
+            android:textColor="#ff888888"
+            android:textSize="40sp">
 
-    <TextView
-        android:id="@+id/detail1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/description"
-        android:textColor="#4169E1"
-        android:textSize="14sp">
+        </TextView>
 
-    </TextView>
-</LinearLayout>
+        <TextView
+            android:id="@+id/detail1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/description"
+            android:textColor="#4169E1"
+            android:textSize="14sp">
+
+        </TextView>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/opening2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/brief2"
@@ -70,11 +70,10 @@
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/app_name"
-        android:src="@mipmap/ic_launcher"
-        android:layout_alignParentBottom="true"
-        />
+        android:src="@mipmap/ic_launcher" />
 
 </RelativeLayout>
 
