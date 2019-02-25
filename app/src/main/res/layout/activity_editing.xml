@@ -18,13 +18,14 @@
         android:clickable="true"
         android:focusable="true"
         android:hint="@string/please_title"
+        android:importantForAutofill="no"
         android:inputType="text"
         android:lines="1"
         android:maxLength="12"
         android:singleLine="true"
         android:textColor="#000000"
         android:textSize="20sp"
-        android:importantForAutofill="no"
+        android:textStyle="bold"
         tools:targetApi="o" />
 
     <TextView
@@ -54,9 +55,9 @@
                 android:layout_marginTop="5dp"
                 android:background="@null"
                 android:hint="@string/please_text"
+                android:importantForAutofill="no"
                 android:inputType="none"
                 android:textColor="#000000"
-                android:importantForAutofill="no"
                 tools:targetApi="o" />
 
             <ImageView
