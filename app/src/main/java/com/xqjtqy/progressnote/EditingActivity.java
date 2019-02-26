@@ -35,7 +35,6 @@ public class EditingActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +43,10 @@ public class EditingActivity extends AppCompatActivity {
         noteTime = findViewById(R.id.noteTime);
         noteTitle = findViewById(R.id.noteTitle);
         mainText = findViewById(R.id.mainText);
-        simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日    HH:mm:ss", Locale.getDefault()); //获取时间
+
+        //获取时间
+        simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日    HH:mm:ss", Locale.getDefault());
+
         date = new Date(System.currentTimeMillis());
         noteTime.setText(simpleDateFormat.format(date));
         dbHelper = new MyDatabaseHelper(this, "Note.db", null, 1);
@@ -59,7 +61,6 @@ public class EditingActivity extends AppCompatActivity {
          }
         cursor.close();
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -81,4 +82,5 @@ public class EditingActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
