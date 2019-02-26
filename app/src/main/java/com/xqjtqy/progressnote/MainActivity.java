@@ -6,10 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.xqjtqy.progressnote.db.MyDatabaseHelper;
@@ -20,7 +23,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private List<DataItem> dataList=new ArrayList<>();
-    private ListView listView;
+    private RecyclerView recyclerView;
     private Cursor cursor;
     private DataAdapter dataAdapter;
 
@@ -33,20 +36,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listView=(ListView)findViewById(R.id.listView);
-        dataAdapter=new DataAdapter(MainActivity.this,
-                R.layout.data_item,dataList);
-        listView.setAdapter(dataAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?>parent,View view,
-                                    int position,long id){
-                Intent it=new Intent(getApplicationContext(),EditingActivity.class);
-                //启动MainActivity
-                startActivity(it);
-            }
-        });
+        RecyclerView recyclerView=(RecyclerView)findViewById(R.id.recyclerView);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        DataAdapter adapter=new DataAdapter(dataList);
+        recyclerView.setAdapter(adapter);
 
         dbHelper = new MyDatabaseHelper(this,
                 "Note.db", null, 1);
