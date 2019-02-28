@@ -5,11 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-import com.xqjtqy.progressnote.MainActivity;
-
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String CREATE_NOTE = "create table Note ("
+    private static final String CREATE_NOTE = "create table Note ("
             + "id integer primary key autoincrement, "
             + "title text, "
             + "time text, "
@@ -18,7 +16,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private Context mContext;
 
-    public MyDatabaseHelper(Context context, String name, 
+    public MyDatabaseHelper(Context context, String name,
                             SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext = context;
@@ -27,7 +25,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) { //创建时调用
         db.execSQL(CREATE_NOTE); //创建表
-        Toast.makeText(mContext, "Create succeeded", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "创建数据库成功！", Toast.LENGTH_SHORT).show();
     }
 
     @Override
