@@ -1,22 +1,18 @@
-package com.xqjtqy.progressnote;
+package com.xqjtqy.progressnote.noteData;
 
-import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.xqjtqy.progressnote.EditingActivity;
+import com.xqjtqy.progressnote.R;
 
 import java.util.List;
+
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
@@ -28,7 +24,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         TextView body;
         TextView date;
 
-        public ViewHolder(View view){
+        ViewHolder(View view){
             super(view);
             dataView=view;
             title=view.findViewById(R.id.title);
@@ -52,8 +48,10 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             public void onClick(View v){
                 int position=holder.getAdapterPosition();
                 DataItem dataItem=mDataItemList.get(position);
-                Intent intent=new Intent(v.getContext(),EditingActivity.class);
-                //启动EditingActivity
+                int id = dataItem.getId();
+                Intent intent=new Intent(v.getContext(), EditingActivity.class);
+                //启动EditingActivity并传送数据的id
+                intent.putExtra("noteId",id);
                 v.getContext().startActivity(intent);
             }
         });
@@ -61,7 +59,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position){
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position){
         DataItem dataItem=mDataItemList.get(position);
         holder.title.setText(dataItem.getTitle());
         holder.body.setText(dataItem.getBody());
