@@ -18,6 +18,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     private List<DataItem> mDataItemList;
 
+    //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder{
         View dataView;
         TextView title;
@@ -37,6 +38,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         mDataItemList=dataItemList;
     }
 
+    //为recyclerView的每一个item设置点击事件
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,7 +52,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 DataItem dataItem=mDataItemList.get(position);
                 int id = dataItem.getId();
                 Intent intent=new Intent(v.getContext(), EditingActivity.class);
-                //启动EditingActivity并传送数据的id
+                //传送数据的id并启动EditingActivity
                 intent.putExtra("noteId",id);
                 v.getContext().startActivity(intent);
             }
@@ -58,6 +60,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         return holder;
     }
 
+    //获取DataItem的数据
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position){
         DataItem dataItem=mDataItemList.get(position);
@@ -66,6 +69,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         holder.date.setText(dataItem.getDate());
     }
 
+    //获取item数量
     @Override
     public int getItemCount(){
         return mDataItemList.size();
