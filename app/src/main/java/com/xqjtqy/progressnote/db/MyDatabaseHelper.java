@@ -10,7 +10,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_NOTE = "create table Note ("
             + "id integer primary key autoincrement, "
             + "title text, "
-            + "time text, "
+            + "time long, "
             + "content text, "
             + "image blob)"; //建表
 

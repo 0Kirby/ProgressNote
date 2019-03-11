@@ -19,8 +19,11 @@ import com.xqjtqy.progressnote.db.MyDatabaseHelper;
 import com.xqjtqy.progressnote.noteData.DataAdapter;
 import com.xqjtqy.progressnote.noteData.DataItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private MyDatabaseHelper dbHelper;
     private SQLiteDatabase db;
+    private SimpleDateFormat simpleDateFormat;
 
     private EditingActivity editingActivity;
 
@@ -110,9 +114,11 @@ public class MainActivity extends AppCompatActivity {
 
     //初始化从数据库中读取数据并填充dataItem
     private void initData() {
+        simpleDateFormat = new SimpleDateFormat(
+                "yyyy年MM月dd日    HH:mm:ss", Locale.getDefault());
         db = dbHelper.getReadableDatabase();
         cursor = db.query("Note", null, null,
-                null, null, null, null,
+                null, null, null, "time desc",
                 null);//查询对应的数据
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -121,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
                         .getColumnIndex("id"))));//读取编号，需从字符串型转换成整型
                 dataItem.setTitle(cursor.getString(cursor
                         .getColumnIndex("title")));//读取标题
-                dataItem.setDate(cursor.getString(cursor
-                        .getColumnIndex("time")));//读取时间
+                dataItem.setDate(simpleDateFormat.format(new Date(cursor.getLong(cursor
+                        .getColumnIndex("time")))));//读取时间
                 dataItem.setBody(cursor.getString(cursor
                         .getColumnIndex("content")));//读取文本
                 dataList.add(dataItem);
