@@ -72,8 +72,8 @@ public class EditingActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             noteTitle.setText(cursor.getString(cursor
                     .getColumnIndex("title")));  //读取标题
-            noteTime.setText(cursor.getString(cursor
-                    .getColumnIndex("time")));  //读取时间
+            noteTime.setText(simpleDateFormat.format(new Date(cursor.getLong(cursor
+                    .getColumnIndex("time")))));  //读取时间
             mainText.setText(cursor.getString(cursor
                     .getColumnIndex("content")));  //读取文本
         }
@@ -85,14 +85,14 @@ public class EditingActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.save:
                 //获取时间
-                simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日    HH:mm:ss", Locale.getDefault()); //获取时间
-                date = new Date(System.currentTimeMillis());
+                long currentTime = System.currentTimeMillis();
+                date = new Date(currentTime);
                 noteTime.setText(simpleDateFormat.format(date));
 
                 db = dbHelper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 values.put("title", noteTitle.getText().toString());
-                values.put("time", noteTime.getText().toString());
+                values.put("time", currentTime);
                 values.put("content", mainText.getText().toString());
                 if (type == 0)//新建，执行数据库插入操作
                     db.insert("Note", null, values);
