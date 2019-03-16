@@ -34,6 +34,8 @@ public class EditingActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar, menu);
+        if (type == 0)//新建时不显示删除按钮
+            menu.getItem(0).setVisible(false);
         return true;
     }
 
@@ -50,16 +52,16 @@ public class EditingActivity extends AppCompatActivity {
 
         type = flag;
         if (type == 0)
-            Objects.requireNonNull(getSupportActionBar()).setTitle("新建笔记");
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.newNote);
         else
-            Objects.requireNonNull(getSupportActionBar()).setTitle("编辑笔记");
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);
         noteTime = findViewById(R.id.noteTime);
         noteTitle = findViewById(R.id.noteTitle);
         mainText = findViewById(R.id.mainText);
 
         //获取时间
         simpleDateFormat = new SimpleDateFormat(
-                "yyyy年MM月dd日    HH:mm:ss", Locale.getDefault());
+                getString(R.string.formatDate), Locale.getDefault());
         date = new Date(System.currentTimeMillis());
         noteTime.setText(simpleDateFormat.format(date));
 
@@ -100,8 +102,16 @@ public class EditingActivity extends AppCompatActivity {
                     db.update("Note", values, "id = ?",
                             new String[]{String.valueOf(type)});
                 values.clear();
-                Toast.makeText(EditingActivity.this, "保存成功！",
+                Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
                         Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.delete:
+                dbHelper.getWritableDatabase();
+                db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
+                Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
+                        Toast.LENGTH_SHORT).show();
+                finish();//关闭当前活动并返回到主活动
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -7,6 +7,13 @@
     <string name="body">（空）</string>
     <string name="date">（空）</string>
     <string name="save">保存</string>
+    <string name="delete">删除</string>
+    <string name="newNote">新建笔记</string>
+    <string name="editNote">编辑笔记</string>
     <string name="please_title">请在此键入标题</string>
     <string name="please_text">请在此键入文本</string>
+    <string name="saveSuccess">保存成功！</string>
+    <string name="deleteSuccess">删除成功！</string>
+    <string name="exitApp">再按一次退出程序</string>
+    <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
 </resources>

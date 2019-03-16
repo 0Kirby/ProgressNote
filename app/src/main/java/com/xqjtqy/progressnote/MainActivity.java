@@ -8,7 +8,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     //初始化从数据库中读取数据并填充dataItem
     private void initData() {
         simpleDateFormat = new SimpleDateFormat(
-                "yyyy年MM月dd日    HH:mm:ss", Locale.getDefault());
+                getString(R.string.formatDate), Locale.getDefault());
         db = dbHelper.getReadableDatabase();
         cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if ((System.currentTimeMillis() - exitTime) > 2000) {
-                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
                 finish();
