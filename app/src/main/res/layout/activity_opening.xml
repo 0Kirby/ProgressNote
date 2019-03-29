@@ -73,7 +73,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/app_name"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@mipmap/note_icon" />
 
 </RelativeLayout>
 
