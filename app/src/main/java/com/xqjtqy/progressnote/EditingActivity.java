@@ -1,16 +1,19 @@
 package com.xqjtqy.progressnote;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.xqjtqy.progressnote.db.MyDatabaseHelper;
 
@@ -30,14 +33,17 @@ public class EditingActivity extends AppCompatActivity {
     private SQLiteDatabase db;
     private Cursor cursor;
     private static int type;
+    private Menu cMenu;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar, menu);
+        cMenu = menu;
         if (type == 0)//新建时不显示删除按钮
             menu.getItem(0).setVisible(false);
         return true;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +103,16 @@ public class EditingActivity extends AppCompatActivity {
                 values.put("time", currentTime);
                 values.put("content", mainText.getText().toString());
                 if (type == 0)//新建，执行数据库插入操作
+                {
                     db.insert("Note", null, values);
-                else//编辑，执行数据库更新操作
+                    Cursor cur = db.rawQuery("select LAST_INSERT_ROWID() ", null);//查询最新插入的
+                    cur.moveToFirst();
+                    type = cur.getInt(0);//获取新建记录的id
+                    cur.close();
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);
+                    cMenu.getItem(0).setVisible(true);
+
+                } else//编辑，执行数据库更新操作
                     db.update("Note", values, "id = ?",
                             new String[]{String.valueOf(type)});
                 values.clear();
@@ -107,11 +121,25 @@ public class EditingActivity extends AppCompatActivity {
                 break;
 
             case R.id.delete:
-                dbHelper.getWritableDatabase();
-                db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
-                Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
-                        Toast.LENGTH_SHORT).show();
-                finish();//关闭当前活动并返回到主活动
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
+                builder.setTitle("提示");
+                builder.setMessage("是否要删除该条记录？");
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                        dbHelper.getWritableDatabase();
+                        db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
+                        Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
+                                Toast.LENGTH_SHORT).show();
+                        finish();//关闭当前活动并返回到主活动
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                builder.show();
                 break;
         }
         return super.onOptionsItemSelected(item);

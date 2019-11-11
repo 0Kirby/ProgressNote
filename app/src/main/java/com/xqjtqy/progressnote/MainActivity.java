@@ -1,19 +1,21 @@
 package com.xqjtqy.progressnote;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.xqjtqy.progressnote.db.MyDatabaseHelper;
 import com.xqjtqy.progressnote.noteData.DataAdapter;
 import com.xqjtqy.progressnote.noteData.DataItem;
@@ -34,13 +36,20 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
     private long exitTime = 0;//实现再按一次退出的间隔时间
-
+    private boolean firstLaunch = false;
     private Cursor cursor;
     private MyDatabaseHelper dbHelper;
     private SQLiteDatabase db;
     private SimpleDateFormat simpleDateFormat;
 
     private EditingActivity editingActivity;
+
+    public static void restartActivity(Activity activity) {//刷新活动
+        Intent intent = new Intent();
+        intent.setClass(activity, activity.getClass());
+        activity.startActivity(intent);
+        activity.finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         //设置recyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         //实现瀑布流布局，将recyclerView改为两列
-        StaggeredGridLayoutManager layoutManager=new StaggeredGridLayoutManager
-                (2,StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager
+                (2, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         DataAdapter adapter = new DataAdapter(dataList);
         recyclerView.setAdapter(adapter);
@@ -72,11 +81,11 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshData();
-            }
-        });
+                    @Override
+                    public void onRefresh() {
+                        refreshData();
+                    }
+                });
 
         dbHelper = new MyDatabaseHelper(this,
                 "Note.db", null, 1);
@@ -87,14 +96,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //刷新数据
-    private void refreshData(){
+    private void refreshData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        initData();
+                        restartActivity(MainActivity.this);
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -102,13 +111,13 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    //恢复到本活动时先销毁再创建并运行
+    //恢复到本活动时先重启活动
     @Override
     protected void onResume() {
         super.onResume();
-        onDestroy();
-        onCreate(null);
-        onStart();
+        if (firstLaunch)
+            restartActivity(MainActivity.this);
+        firstLaunch = true;
     }
 
     //初始化从数据库中读取数据并填充dataItem

@@ -16,4 +16,5 @@
     <string name="deleteSuccess">删除成功！</string>
     <string name="exitApp">再按一次退出程序</string>
     <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
+    <string name="developers">由小0卡、蓝色的海设计</string>
 </resources>
