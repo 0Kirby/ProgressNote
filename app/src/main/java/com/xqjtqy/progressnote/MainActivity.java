@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -29,9 +28,6 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private List<DataItem> dataList = new ArrayList<>();
-    private RecyclerView recyclerView;
-    private CardView cardView;
-    private DataAdapter dataAdapter;
 
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
@@ -41,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private MyDatabaseHelper dbHelper;
     private SQLiteDatabase db;
     private SimpleDateFormat simpleDateFormat;
-
-    private EditingActivity editingActivity;
 
     public static void restartActivity(Activity activity) {//刷新活动
         Intent intent = new Intent();
@@ -66,13 +60,22 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         //为悬浮按钮设置点击事件
-        floatingActionButton = findViewById(R.id.floatButton);
+        floatingActionButton = findViewById(R.id.floatButton1);//新建笔记按钮
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), EditingActivity.class);
                 intent.putExtra("noteId", 0);//传递0，表示新建
                 v.getContext().startActivity(intent);
+            }
+        });
+
+        floatingActionButton = findViewById(R.id.floatButton2);//用户登录按钮
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
 
