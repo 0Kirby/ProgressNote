@@ -3,6 +3,8 @@ package com.xqjtqy.progressnote;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +13,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -54,6 +59,33 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        TextWatcher textWatcher = new TextWatcher() {//监测EditText文本变化
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {//当两个输入框同时不为空时，按钮生效
+                if (!(usernameEditText.getText().toString().equals("") || passwordEditText.getText().toString().equals(""))) {
+                    loginButton.setEnabled(true);
+                    registerButton.setEnabled(true);
+                } else//否则按钮失效
+                {
+                    loginButton.setEnabled(false);
+                    registerButton.setEnabled(false);
+                }
+            }
+        };
+
+        usernameEditText.addTextChangedListener(textWatcher);//给两个输入框增加监控
+        passwordEditText.addTextChangedListener(textWatcher);
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {//登录按钮事件处理
@@ -85,14 +117,13 @@ public class LoginActivity extends AppCompatActivity {
                     Request request = new Request.Builder().url("https://0kirby.cf:8443/progress_note_server/LoginServlet?username=" + username + "&password=" + password).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
+                    parseJSONWithJSONObject(responseData);//处理JSON
                     Message message = new Message();
                     message.what = LOGIN;
                     handler.sendMessage(message);//通过handler发送消息请求toast
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }).start();
     }
@@ -106,15 +137,23 @@ public class LoginActivity extends AppCompatActivity {
                     Request request = new Request.Builder().url("https://0kirby.cf:8443/progress_note_server/RegisterServlet?username=" + username + "&password=" + password).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
+                    parseJSONWithJSONObject(responseData);//处理JSON
                     Message message = new Message();
                     message.what = LOGIN;
                     handler.sendMessage(message);//通过handler发送消息请求toast
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }).start();
+    }
+
+    private void parseJSONWithJSONObject(String jsonData) {//处理JSON
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            responseData = jsonObject.getString("Result");//取出Result字段
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
