@@ -1,5 +1,7 @@
 package com.xqjtqy.progressnote;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +15,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.xqjtqy.progressnote.db.UserDatabaseHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
     static final int LOGIN = 1;//登录
     static final int REGISTER = 2;//注册
+    String userId;
     String responseData;
     String username;
     String password;
@@ -51,8 +56,20 @@ public class LoginActivity extends AppCompatActivity {
                 switch (msg.what) {
                     case LOGIN:
                     case REGISTER:
-                        Toast.makeText(LoginActivity.this, responseData, Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);//显示解析到的内容
+                        Toast.makeText(LoginActivity.this, responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        progressBar.setVisibility(View.GONE);
+                        if (responseData.equals("登录成功！") || responseData.equals("注册成功！")) {
+                            UserDatabaseHelper userDbHelper = new UserDatabaseHelper(LoginActivity.this, "User.db", null, 1);
+                            SQLiteDatabase db = userDbHelper.getWritableDatabase();
+                            ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
+                            values.put("userId", userId);
+                            values.put("username", username);
+                            values.put("password", password);
+                            if (responseData.equals("注册成功！"))
+                                values.put("registerTime", System.currentTimeMillis());//生成注册时间
+                            db.update("User", values, "rowid = ?", new String[]{"1"});
+                            finish();
+                        }
                         break;
                 }
                 return false;
@@ -152,6 +169,8 @@ public class LoginActivity extends AppCompatActivity {
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
             responseData = jsonObject.getString("Result");//取出Result字段
+            if (responseData.equals("登录成功！") || responseData.equals("注册成功！"))
+                userId = jsonObject.getString("Id");//取出ID字段
         } catch (JSONException e) {
             e.printStackTrace();
         }

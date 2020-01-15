@@ -15,7 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.xqjtqy.progressnote.db.MyDatabaseHelper;
+import com.xqjtqy.progressnote.db.NoteDatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,7 +29,7 @@ public class EditingActivity extends AppCompatActivity {
     private TextView mainText;
     private Date date;
     private SimpleDateFormat simpleDateFormat;
-    private MyDatabaseHelper dbHelper;
+    private NoteDatabaseHelper dbHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
     private static int type;
@@ -71,7 +71,7 @@ public class EditingActivity extends AppCompatActivity {
         date = new Date(System.currentTimeMillis());
         noteTime.setText(simpleDateFormat.format(date));
 
-        dbHelper = new MyDatabaseHelper(this,
+        dbHelper = new NoteDatabaseHelper(this,
                 "Note.db", null, 1);
         db = dbHelper.getReadableDatabase();
         cursor = db.query("Note", null, "id = ?",

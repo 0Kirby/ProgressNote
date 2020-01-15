@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".UserActivity"
+            android:label="@string/title_activity_user" />
+        <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />
         <activity

@@ -1,6 +1,7 @@
 package com.xqjtqy.progressnote;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,9 +16,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.xqjtqy.progressnote.db.MyDatabaseHelper;
+import com.xqjtqy.progressnote.db.NoteDatabaseHelper;
+import com.xqjtqy.progressnote.db.UserDatabaseHelper;
 import com.xqjtqy.progressnote.noteData.DataAdapter;
 import com.xqjtqy.progressnote.noteData.DataItem;
+import com.xqjtqy.progressnote.userData.SystemUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
     private long exitTime = 0;//实现再按一次退出的间隔时间
     private boolean firstLaunch = false;
+    private int userId;
     private Cursor cursor;
-    private MyDatabaseHelper dbHelper;
+    private ContentValues values;
+    private NoteDatabaseHelper noteDbHelper;
+    private UserDatabaseHelper userDbHelper;
     private SQLiteDatabase db;
     private SimpleDateFormat simpleDateFormat;
 
@@ -74,7 +80,20 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                UserDatabaseHelper dbHelper = new UserDatabaseHelper(MainActivity.this,
+                        "User.db", null, 1);
+                SQLiteDatabase db = dbHelper.getReadableDatabase();
+                Cursor cursor = db.query("User", null, "rowid = ?",
+                        new String[]{"1"}, null, null, null,
+                        null);//查询对应的数据
+                if (cursor.moveToFirst())
+                    userId = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
+                cursor.close();
+                Intent intent;
+                if (userId == 0)//如果用户未登录
+                    intent = new Intent(MainActivity.this, LoginActivity.class);//启动登录与注册
+                else
+                    intent = new Intent(MainActivity.this, UserActivity.class);//启动用户管理
                 startActivity(intent);
             }
         });
@@ -90,9 +109,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        dbHelper = new MyDatabaseHelper(this,
+        noteDbHelper = new NoteDatabaseHelper(this,
                 "Note.db", null, 1);
-        dbHelper.getWritableDatabase();
+        noteDbHelper.getWritableDatabase();
+
+        userDbHelper = new UserDatabaseHelper(this, "User.db", null, 1);
+        SQLiteDatabase db = userDbHelper.getWritableDatabase();
+        SystemUtil systemUtil = new SystemUtil();//获取手机信息
+        values = new ContentValues();
+        values.put("language", systemUtil.getSystemLanguage());
+        values.put("version", systemUtil.getSystemVersion());
+        values.put("display", systemUtil.getSystemDisplay());
+        values.put("model", systemUtil.getSystemModel());
+        values.put("brand", systemUtil.getDeviceBrand());
+        cursor = db.rawQuery("SELECT COUNT(*) FROM User", null);
+        cursor.moveToFirst();
+        long num = cursor.getLong(0);
+
+        if (num == 0) {//如果不存在记录
+            values.put("userId", 0);
+            db.insert("User", null, values);//插入
+        } else
+            db.update("user", values, "rowid = ?", new String[]{"1"});//更新
 
         dataList.clear();//刷新dataList
         initData();//初始化数据
@@ -127,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     private void initData() {
         simpleDateFormat = new SimpleDateFormat(
                 getString(R.string.formatDate), Locale.getDefault());
-        db = dbHelper.getReadableDatabase();
+        db = noteDbHelper.getReadableDatabase();
         cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
                 null);//查询对应的数据
@@ -158,6 +196,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
+                db = userDbHelper.getWritableDatabase();
+                values = new ContentValues();
+                values.put("lastUse", System.currentTimeMillis());
+                db.update("User", values, "rowid = ?", new String[]{"1"});
                 finish();
                 System.exit(0);
             }

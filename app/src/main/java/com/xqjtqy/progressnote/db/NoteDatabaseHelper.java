@@ -5,19 +5,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-public class MyDatabaseHelper extends SQLiteOpenHelper {
+public class NoteDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_NOTE = "create table Note ("
             + "id integer primary key autoincrement, "
             + "title text, "
             + "time long, "
-            + "content text, "
-            + "image blob)"; //建表
+            + "content text) ";
+    //建表
 
     private Context mContext;
 
-    public MyDatabaseHelper(Context context, String name,
-                            SQLiteDatabase.CursorFactory factory, int version) {
+    public NoteDatabaseHelper(Context context, String name,
+                              SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext = context;
     }
