@@ -17,14 +17,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.xqjtqy.progressnote.db.UserDatabaseHelper;
+import com.xqjtqy.progressnote.userData.SystemUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
 
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
@@ -65,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
                             values.put("userId", userId);
                             values.put("username", username);
                             values.put("password", password);
+                            values.put("lastUse", System.currentTimeMillis());
                             if (responseData.equals("注册成功！"))
                                 values.put("registerTime", System.currentTimeMillis());//生成注册时间
                             db.update("User", values, "rowid = ?", new String[]{"1"});
@@ -131,7 +135,8 @@ public class LoginActivity extends AppCompatActivity {
             public void run() {//在子线程中进行网络操作
                 try {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
-                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/LoginServlet?username=" + username + "&password=" + password).build();
+                    RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password).build();
+                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/LoginServlet").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON
@@ -150,8 +155,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {//在子线程中进行网络操作
                 try {
+                    SystemUtil systemUtil = new SystemUtil();
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端注册servlet
-                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/RegisterServlet?username=" + username + "&password=" + password).build();
+                    RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password)
+                            .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
+                            .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
+                            .add("brand", systemUtil.getDeviceBrand()).build();
+                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/RegisterServlet").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON

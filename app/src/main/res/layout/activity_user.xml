@@ -23,7 +23,7 @@
         android:id="@+id/login_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="40dp"
         android:text="@string/login_username"
         android:textColor="#000000"
@@ -32,11 +32,11 @@
         app:layout_constraintTop_toBottomOf="@+id/login_userId" />
 
     <TextView
-        android:id="@+id/register_time"
+        android:id="@+id/last_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="@string/register_time"
+        android:text="@string/last_login"
         android:textColor="#000000"
         android:textSize="40sp"
         app:layout_constraintStart_toStartOf="@+id/login_username"
@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_time"
+        app:layout_constraintTop_toBottomOf="@+id/last_login"
         app:layout_constraintVertical_bias="0.392" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,7 +21,7 @@
         android:digits="@string/filter_username"
         android:hint="@string/username"
         android:importantForAutofill="no"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

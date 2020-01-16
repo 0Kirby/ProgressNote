@@ -196,10 +196,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
-                db = userDbHelper.getWritableDatabase();
-                values = new ContentValues();
-                values.put("lastUse", System.currentTimeMillis());
-                db.update("User", values, "rowid = ?", new String[]{"1"});
                 finish();
                 System.exit(0);
             }

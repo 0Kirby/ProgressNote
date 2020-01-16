@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.xqjtqy.progressnote.db.UserDatabaseHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class UserActivity extends AppCompatActivity {
@@ -25,7 +26,7 @@ public class UserActivity extends AppCompatActivity {
 
         final TextView userId = findViewById(R.id.login_userId);
         final TextView username = findViewById(R.id.login_username);
-        //final TextView registerTime = findViewById(R.id.register_time);
+        final TextView lastLogin = findViewById(R.id.last_login);
         final Button exitLogin = findViewById(R.id.exit_login);
 
         exitLogin.setOnClickListener(new View.OnClickListener() {
@@ -41,7 +42,7 @@ public class UserActivity extends AppCompatActivity {
         });
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                getString(R.string.formatDate), Locale.getDefault());
+                getString(R.string.formatDate_User), Locale.getDefault());
 
         UserDatabaseHelper dbHelper = new UserDatabaseHelper(this,
                 "User.db", null, 1);
@@ -51,11 +52,12 @@ public class UserActivity extends AppCompatActivity {
                 null);//查询对应的数据
         if (cursor.moveToFirst()) {
             userId.setText(String.format(getResources().getString(R.string.login_userId), cursor.getInt(cursor
-                    .getColumnIndex("userId"))));  //读取标题
-            //registerTime.setText(String.format(getResources().getString(R.string.register_time), simpleDateFormat.format(new Date(cursor.getLong(cursor
-            //.getColumnIndex("time"))))));  //读取时间
+                    .getColumnIndex("userId"))));  //读取ID
             username.setText(String.format(getResources().getString(R.string.login_username), cursor.getString(cursor
-                    .getColumnIndex("username"))));  //读取文本
+                    .getColumnIndex("username"))));  //读取用户名
+            lastLogin.setText(String.format(getResources().getString(R.string.last_login), simpleDateFormat.format(new Date(cursor.getLong(cursor
+                    .getColumnIndex("lastUse"))))));  //读取上次登录时间
+
         }
         cursor.close();
 
