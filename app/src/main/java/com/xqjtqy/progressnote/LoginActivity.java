@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
             public void run() {//在子线程中进行网络操作
                 try {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
-                    Request request = new Request.Builder().url("https://0kirby.cf:8443/progress_note_server/LoginServlet?username=" + username + "&password=" + password).build();
+                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/LoginServlet?username=" + username + "&password=" + password).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON
@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
             public void run() {//在子线程中进行网络操作
                 try {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端注册servlet
-                    Request request = new Request.Builder().url("https://0kirby.cf:8443/progress_note_server/RegisterServlet?username=" + username + "&password=" + password).build();
+                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/RegisterServlet?username=" + username + "&password=" + password).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON
