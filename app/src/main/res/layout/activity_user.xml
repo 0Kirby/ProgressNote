@@ -13,7 +13,7 @@
         android:layout_marginTop="40dp"
         android:text="@string/login_userId"
         android:textColor="#000000"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="@+id/login_username"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/login_username"
@@ -27,7 +27,7 @@
         android:layout_marginTop="40dp"
         android:text="@string/login_username"
         android:textColor="#000000"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_userId" />
 
@@ -38,7 +38,7 @@
         android:layout_marginTop="40dp"
         android:text="@string/last_login"
         android:textColor="#000000"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintStart_toStartOf="@+id/login_username"
         app:layout_constraintTop_toBottomOf="@+id/login_username" />
 
@@ -57,5 +57,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/last_login"
         app:layout_constraintVertical_bias="0.392" />
+
+    <Button
+        android:id="@+id/sync_SC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginTop="20dp"
+
+        android:text="@string/sync_SC"
+        app:layout_constraintEnd_toEndOf="@+id/exit_login"
+        app:layout_constraintStart_toStartOf="@+id/exit_login"
+        app:layout_constraintTop_toBottomOf="@+id/exit_login" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/sync_SC"
+        app:layout_constraintStart_toStartOf="@+id/sync_SC"
+        app:layout_constraintTop_toBottomOf="@+id/sync_SC" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,7 +16,7 @@
     <string name="deleteSuccess">删除成功！</string>
     <string name="exitApp">再按一次退出程序</string>
     <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
-    <string name="formatDate_User">yyyy年\nMM月dd日    HH:mm:ss</string>
+    <string name="formatDate_User">\nyyyy年MM月dd日\nHH:mm:ss</string>
     <string name="developers">代码：小0卡、蓝色的海 图标：Yoshi1999</string>
     <string name="title_activity_login">登录与注册</string>
     <string name="username">用户名</string>
@@ -33,4 +33,5 @@
     <string name="login_username">用户名：%1$s</string>
     <string name="last_login">上次登录：%1$s</string>
     <string name="exit_login">退出登录</string>
+    <string name="sync_SC">云端→本地</string>
 </resources>
