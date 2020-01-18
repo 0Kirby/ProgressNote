@@ -10,12 +10,12 @@
         android:id="@+id/login_userId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:text="@string/login_userId"
         android:textColor="#000000"
-        android:textSize="32sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@+id/login_username"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="@+id/login_username"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,62 +23,88 @@
         android:id="@+id/login_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:text="@string/login_username"
         android:textColor="#000000"
-        android:textSize="32sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_userId" />
+
 
     <TextView
         android:id="@+id/last_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:text="@string/last_login"
         android:textColor="#000000"
-        android:textSize="32sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@+id/login_username"
         app:layout_constraintTop_toBottomOf="@+id/login_username" />
 
+    <TextView
+        android:id="@+id/last_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/last_sync"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/last_login"
+        app:layout_constraintTop_toBottomOf="@+id/last_login" />
+
     <Button
-        android:id="@+id/exit_login"
+        android:id="@+id/sync_CS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="48dp"
+
         android:layout_marginBottom="64dp"
-        android:text="@string/exit_login"
+
+        android:text="@string/sync_CS"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/last_login"
-        app:layout_constraintVertical_bias="0.392" />
+        app:layout_constraintTop_toBottomOf="@+id/last_sync"
+        app:layout_constraintVertical_bias="0.451" />
 
     <Button
         android:id="@+id/sync_SC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_marginTop="20dp"
-
+        android:layout_marginTop="24dp"
         android:text="@string/sync_SC"
-        app:layout_constraintEnd_toEndOf="@+id/exit_login"
-        app:layout_constraintStart_toStartOf="@+id/exit_login"
-        app:layout_constraintTop_toBottomOf="@+id/exit_login" />
+        app:layout_constraintEnd_toEndOf="@+id/sync_CS"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/sync_CS"
+        app:layout_constraintTop_toBottomOf="@+id/sync_CS" />
+
+    <Button
+        android:id="@+id/exit_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginTop="24dp"
+        android:text="@string/exit_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sync_SC" />
 
     <ProgressBar
         android:id="@+id/loading"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="bottom"
+        android:layout_marginBottom="12dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/sync_SC"
-        app:layout_constraintStart_toStartOf="@+id/sync_SC"
-        app:layout_constraintTop_toBottomOf="@+id/sync_SC" />
+        app:layout_constraintBottom_toTopOf="@+id/sync_CS"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/last_sync"
+        app:layout_constraintVertical_bias="0.872" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

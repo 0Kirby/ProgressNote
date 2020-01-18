@@ -32,6 +32,8 @@
     <string name="login_userId">用户ID：%1$d</string>
     <string name="login_username">用户名：%1$s</string>
     <string name="last_login">上次登录：%1$s</string>
+    <string name="last_sync">上次同步：%1$s</string>
     <string name="exit_login">退出登录</string>
-    <string name="sync_SC">云端→本地</string>
+    <string name="sync_SC">笔记同步（云端→本地）</string>
+    <string name="sync_CS">笔记同步（本地→云端）</string>
 </resources>

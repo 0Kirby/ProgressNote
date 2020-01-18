@@ -36,9 +36,11 @@ public class LoginActivity extends AppCompatActivity {
     static final int LOGIN = 1;//登录
     static final int REGISTER = 2;//注册
     String userId;
-    String responseData;
-    String username;
-    String password;
+    private String responseData;
+    private String username;
+    private String password;
+    private long registerTime;
+    private long syncTime;
     private Handler handler;//用于进程间异步消息传递
 
     @Override
@@ -71,6 +73,10 @@ public class LoginActivity extends AppCompatActivity {
                             values.put("lastUse", System.currentTimeMillis());
                             if (responseData.equals("注册成功！"))
                                 values.put("registerTime", System.currentTimeMillis());//生成注册时间
+                            else {
+                                values.put("registerTime", registerTime);
+                                values.put("lastSync", syncTime);
+                            }
                             db.update("User", values, "rowid = ?", new String[]{"1"});
                             finish();
                         }
@@ -179,8 +185,11 @@ public class LoginActivity extends AppCompatActivity {
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
             responseData = jsonObject.getString("Result");//取出Result字段
-            if (responseData.equals("登录成功！") || responseData.equals("注册成功！"))
-                userId = jsonObject.getString("Id");//取出ID字段
+            if (responseData.equals("登录成功！")) {
+                registerTime = jsonObject.getLong("RegisterTime");
+                syncTime = jsonObject.getLong("SyncTime");
+            }
+            userId = jsonObject.getString("Id");//取出ID字段
         } catch (JSONException e) {
             e.printStackTrace();
         }
