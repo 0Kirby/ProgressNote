@@ -8,6 +8,7 @@
     <string name="date">（空）</string>
     <string name="save">保存</string>
     <string name="delete">删除</string>
+    <string name="about_us">关于我们</string>
     <string name="newNote">新建笔记</string>
     <string name="editNote">编辑笔记</string>
     <string name="please_title">请在此键入标题</string>
@@ -17,7 +18,7 @@
     <string name="exitApp">再按一次退出程序</string>
     <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
     <string name="formatDate_User">\nyyyy年MM月dd日\nHH:mm:ss</string>
-    <string name="developers">代码：小0卡&#160;&#160;&#160;&#160;GitHub:0Kirby\n&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;蓝色的海&#160;&#160;&#160;&#160;GitHub:BlueEra\n图标：Yoshi1999</string>
+    <string name="developers">代码：小0卡&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;GitHub:0Kirby\nUI：&#160;&#160;&#160;&#160;&#160;蓝色的海&#160;&#160;&#160;GitHub:BlueEra\n图标：Yoshi1999</string>
     <string name="title_activity_login">登录与注册</string>
     <string name="username">用户名</string>
     <string name="password">密码</string>

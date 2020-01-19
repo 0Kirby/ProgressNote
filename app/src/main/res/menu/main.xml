@@ -5,7 +5,7 @@
     <item
         android:id="@+id/about"
         android:icon="@drawable/ic_info_outline_white_24dp"
-        android:title="@string/delete"
+        android:title="@string/about_us"
         app:showAsAction="ifRoom" />
 
 
