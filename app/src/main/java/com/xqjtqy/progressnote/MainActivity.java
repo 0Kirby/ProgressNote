@@ -2,8 +2,10 @@ package com.xqjtqy.progressnote;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -58,6 +60,13 @@ public class MainActivity extends AppCompatActivity {
         activity.finish();
     }
 
+    //判断是否是平板模式
+    public static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >=
+                Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +77,17 @@ public class MainActivity extends AppCompatActivity {
 
         //设置recyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        StaggeredGridLayoutManager layoutManager;
+
         //实现瀑布流布局，将recyclerView改为两列
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager
+        layoutManager = new StaggeredGridLayoutManager
                 (2, StaggeredGridLayoutManager.VERTICAL);
+        //如果是平板模式，则改为三列
+        if(isTablet(MainActivity.this)){
+            layoutManager = new StaggeredGridLayoutManager
+                    (3, StaggeredGridLayoutManager.VERTICAL);
+        }
+
         recyclerView.setLayoutManager(layoutManager);
         DataAdapter adapter = new DataAdapter(dataList);
         recyclerView.setAdapter(adapter);
