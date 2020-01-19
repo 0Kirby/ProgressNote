@@ -17,7 +17,7 @@
     <string name="exitApp">再按一次退出程序</string>
     <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
     <string name="formatDate_User">\nyyyy年MM月dd日\nHH:mm:ss</string>
-    <string name="developers">代码：小0卡、蓝色的海 图标：Yoshi1999</string>
+    <string name="developers">代码：小0卡&#160;&#160;&#160;&#160;GitHub:0Kirby\n&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;蓝色的海&#160;&#160;&#160;&#160;GitHub:BlueEra\n图标：Yoshi1999</string>
     <string name="title_activity_login">登录与注册</string>
     <string name="username">用户名</string>
     <string name="password">密码</string>

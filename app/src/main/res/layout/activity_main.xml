@@ -35,10 +35,4 @@
         android:src="@drawable/ic_account_circle_white_24dp"
         app:elevation="8dp"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        android:text="@string/developers"
-        android:textColor="@color/design_default_color_primary" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
