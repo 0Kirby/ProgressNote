@@ -13,7 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.xqjtqy.progressnote.db.NoteDatabaseHelper;
 
@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
-public class EditingActivity extends AppCompatActivity {
+public class EditingActivity extends BaseActivity {
 
     private EditText noteTitle;
     private TextView noteTime;
@@ -49,7 +49,8 @@ public class EditingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editing);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         //获取点击的数据id并将id转换为字符串数组
         Intent intent = getIntent();

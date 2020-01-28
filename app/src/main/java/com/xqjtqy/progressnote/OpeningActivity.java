@@ -6,9 +6,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class OpeningActivity extends AppCompatActivity {
+public class OpeningActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

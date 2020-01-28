@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".UserActivity">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/mainAppBarLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include layout="@layout/layout_toolbar" />
+
+    </com.google.android.material.appbar.AppBarLayout>
     <TextView
         android:id="@+id/login_userId"
         android:layout_width="wrap_content"

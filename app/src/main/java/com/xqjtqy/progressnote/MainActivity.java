@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -35,9 +35,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+import cn.endureblaze.theme.ThemeUtil;
+
+public class MainActivity extends BaseActivity {
 
     private List<DataItem> dataList = new ArrayList<>();
 
@@ -72,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Objects.requireNonNull(getSupportActionBar());
-        // 是否显示应用程序图标，默认为true
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //显示toolBar
 
         //设置recyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         layoutManager = new StaggeredGridLayoutManager
                 (2, StaggeredGridLayoutManager.VERTICAL);
         //如果是平板模式，则改为三列
-        if(isTablet(MainActivity.this)){
+        if (isTablet(MainActivity.this)) {
             layoutManager = new StaggeredGridLayoutManager
                     (3, StaggeredGridLayoutManager.VERTICAL);
         }
@@ -240,17 +242,23 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.about) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
-            builder.setTitle("关于我们");
-            builder.setMessage(R.string.developers);
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+        switch (item.getItemId()) {
+            case R.id.about:
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                builder.setTitle("关于我们");
+                builder.setMessage(R.string.developers);
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
 
-                }
-            });
-            builder.show();
+                    }
+                });
+                builder.show();
+                break;
+
+            case R.id.theme:
+                ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

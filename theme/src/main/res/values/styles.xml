@@ -1,0 +1,186 @@
+<resources>
+
+    <style name="BaseLightTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="color_view_background">@android:color/white</item>
+        <item name="color_windows_background">#FFF5F5F5</item>
+        <item name="text_high">#CC000000</item>
+        <item name="text_medium">#77000000</item>
+        <item name="text_hint">#38000000</item>
+        <item name="text_error">#FFB00020</item>
+        <item name="icon_color">#FF202020</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="android:textColorSecondary">?attr/text_medium</item>
+        <item name="android:textColorPrimary">?attr/text_high</item>
+        <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="toolbar_icon_color">#FFFEFEFE</item>
+        <item name="fab_color">?attr/colorAccent</item>
+        <item name="alertDialogTheme">@style/LightAlertDialog</item>
+        <item name="btn_text_color">#FFFFFFFF</item>
+        <item name="android:fontFamily">@font/bamboo</item>
+
+        <item name="m_calendar_background_color">?attr/colorPrimary</item>
+        <item name="m_calendar_text_color">#FFFFFFFF</item>
+        <item name="m_calendar_selected_text_color">?attr/colorPrimary</item>
+        <item name="m_calendar_week_bar_text_color">#ABFFFFFF</item>
+        <item name="m_calendar_selected_background_color">#fff</item>
+        <item name="m_calendar_note_background_color">?attr/colorPrimaryDark</item>
+        <item name="android:popupMenuStyle">@style/Widget.AppCompat.Light.PopupMenu</item>
+
+    </style>
+
+    <style name="BaseDarkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">#FF303030</item>
+        <item name="color_view_background">#FF303030</item>
+        <item name="color_windows_background">#FF202020</item>
+        <item name="text_high">#85FFFFFF</item>
+        <item name="text_medium">#65FFFFFF</item>
+        <item name="text_hint">#45FFFFFF</item>
+        <item name="text_error">#FFB00020</item>
+        <item name="icon_color">#FFF5F5F5</item>
+        <item name="floatingActionButtonStyle">
+            @style/Widget.MaterialComponents.FloatingActionButton
+        </item>
+        <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="toolbar_icon_color">#FFFEFEFE</item>
+        <item name="android:textColorSecondary">?attr/text_medium</item>
+        <item name="android:textColorPrimary">?attr/text_high</item>
+        <item name="fab_color">?attr/color_view_background</item>
+        <item name="alertDialogTheme">@style/DarkAlertDialog</item>
+        <item name="btn_text_color">#FFFFFFFF</item>
+        <item name="android:fontFamily">@font/bamboo</item>
+
+        <item name="m_calendar_background_color">?attr/colorPrimary</item>
+        <item name="m_calendar_text_color">#FFFFFFFF</item>
+        <item name="m_calendar_selected_text_color">?attr/colorPrimary</item>
+        <item name="m_calendar_week_bar_text_color">#ABFFFFFF</item>
+        <item name="m_calendar_selected_background_color">#fff</item>
+        <item name="m_calendar_note_background_color">?attr/colorAccent</item>
+
+        <item name="android:popupMenuStyle">@style/Widget.AppCompat.PopupWindow</item>
+    </style>
+
+    <style name="WhiteAppTheme" parent="BaseLightTheme">
+        <item name="color_windows_background">@color/whiteColorPrimary</item>
+        <item name="colorPrimary">@color/whiteColorPrimary</item>
+        <item name="colorPrimaryDark">@color/whiteColorPrimary</item>
+        <item name="colorAccent">@color/whiteColorAccent</item>
+        <item name="color_nav">@color/whiteColorPrimary</item>
+        <item name="dialog_button_color">@color/whiteColorAccent</item>
+        <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.ActionBar</item>
+        <item name="toolbar_icon_color">#FF606060</item>
+        <item name="android:textColorSecondary">#FF606060</item>
+        <item name="android:textColorPrimary">#FF606060</item>
+        <item name="btn_text_color">#CC000000</item>
+
+        <item name="m_calendar_background_color">?attr/colorPrimary</item>
+        <item name="m_calendar_text_color">#000000</item>
+        <item name="m_calendar_selected_text_color">?attr/colorPrimary</item>
+        <item name="m_calendar_week_bar_text_color">?attr/text_medium</item>
+        <item name="m_calendar_selected_background_color">?attr/colorAccent</item>
+        <item name="m_calendar_note_background_color">#4A000000</item>
+    </style>
+
+
+    <style name="BlueAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/blueColorPrimary</item>
+        <item name="colorPrimaryDark">@color/blueColorPrimaryDark</item>
+        <item name="colorAccent">@color/blueColorAccent</item>
+        <item name="color_nav">@color/blueColorPrimary</item>
+        <item name="dialog_button_color">@color/blueColorAccent</item>
+    </style>
+
+    <style name="RedAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/redColorPrimary</item>
+        <item name="colorPrimaryDark">@color/redColorPrimaryDark</item>
+        <item name="colorAccent">@color/redColorAccent</item>
+        <item name="color_nav">@color/redColorPrimary</item>
+        <item name="dialog_button_color">@color/redColorAccent</item>
+    </style>
+
+    <style name="PurpleAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/purpleColorPrimary</item>
+        <item name="colorPrimaryDark">@color/purpleColorPrimaryDark</item>
+        <item name="colorAccent">@color/purpleColorAccent</item>
+        <item name="color_nav">@color/purpleColorPrimary</item>
+        <item name="dialog_button_color">@color/purpleColorAccent</item>
+    </style>
+
+    <style name="IndigoAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/indigoColorPrimary</item>
+        <item name="colorPrimaryDark">@color/indigoColorPrimaryDark</item>
+        <item name="colorAccent">@color/indigoColorAccent</item>
+        <item name="color_nav">@color/indigoColorPrimary</item>
+        <item name="dialog_button_color">@color/indigoColorAccent</item>
+    </style>
+
+    <style name="TealAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/tealColorPrimary</item>
+        <item name="colorPrimaryDark">@color/tealColorPrimaryDark</item>
+        <item name="colorAccent">@color/tealColorAccent</item>
+        <item name="color_nav">@color/tealColorPrimary</item>
+        <item name="dialog_button_color">@color/tealColorAccent</item>
+    </style>
+
+    <style name="GreenAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/greenColorPrimary</item>
+        <item name="colorPrimaryDark">@color/greenColorPrimaryDark</item>
+        <item name="colorAccent">@color/greenColorAccent</item>
+        <item name="color_nav">@color/greenColorPrimary</item>
+        <item name="dialog_button_color">@color/greenColorAccent</item>
+    </style>
+
+    <style name="OrangeAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/orangeColorPrimary</item>
+        <item name="colorPrimaryDark">@color/orangeColorPrimaryDark</item>
+        <item name="colorAccent">@color/orangeColorAccent</item>
+        <item name="color_nav">@color/orangeColorPrimary</item>
+        <item name="dialog_button_color">@color/orangeColorAccent</item>
+    </style>
+
+    <style name="BrownAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/brownColorPrimary</item>
+        <item name="colorPrimaryDark">@color/brownColorPrimaryDark</item>
+        <item name="colorAccent">@color/brownColorAccent</item>
+        <item name="color_nav">@color/brownColorPrimary</item>
+        <item name="dialog_button_color">@color/brownColorAccent</item>
+    </style>
+
+    <style name="BlueGreyAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/blueGreyColorPrimary</item>
+        <item name="colorPrimaryDark">@color/blueGreyColorPrimaryDark</item>
+        <item name="colorAccent">@color/blueGreyColorAccent</item>
+        <item name="color_nav">@color/blueGreyColorAccent</item>
+        <item name="dialog_button_color">@color/blueGreyColorAccent</item>
+    </style>
+
+    <style name="YellowAppTheme" parent="BaseLightTheme">
+        <item name="colorPrimary">@color/yellowColorPrimary</item>
+        <item name="colorPrimaryDark">@color/yellowColorPrimaryDark</item>
+        <item name="colorAccent">@color/yellowColorAccent</item>
+        <item name="color_nav">@color/yellowColorPrimary</item>
+        <item name="dialog_button_color">@color/yellowColorAccent</item>
+    </style>
+
+    <style name="DarkAppTheme" parent="BaseDarkTheme">
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="colorAccent">@color/darkColorAccent</item>
+        <item name="color_nav">@color/darkColorAccent</item>
+        <item name="dialog_button_color">@color/darkColorAccent</item>
+    </style>
+
+    <style name="LightAlertDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="buttonBarButtonStyle">@style/DialogTextButton</item>
+    </style>
+
+    <style name="DarkAlertDialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarButtonStyle">@style/DialogTextButton</item>
+    </style>
+
+    <style name="DialogTextButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog.Flush">
+        <item name="android:textColor">?attr/dialog_button_color</item>
+        <item name="rippleColor">?attr/dialog_button_color</item>
+    </style>
+
+</resources>

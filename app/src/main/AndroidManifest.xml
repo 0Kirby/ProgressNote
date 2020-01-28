@@ -11,7 +11,8 @@
         android:label="@string/chinese_name"
         android:roundIcon="@mipmap/note_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/BlueAppTheme">
+        <activity android:name=".BaseActivity" />
         <activity
             android:name=".UserActivity"
             android:label="@string/title_activity_user" />
