@@ -51,6 +51,7 @@ public class EditingActivity extends BaseActivity {
         setContentView(R.layout.activity_editing);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         //获取点击的数据id并将id转换为字符串数组
         Intent intent = getIntent();

@@ -38,7 +38,7 @@ public class ThemeUtil {
         SharedPreferences theme_id = activity.getSharedPreferences(ThemeUtil.FILE_NAME, 0);
         final int itemSelected = theme_id.getInt("themeId", 0);
         AlertDialog.Builder theme = new AlertDialog.Builder(activity);
-        theme.setTitle("theme");
+        theme.setTitle("主题");
         Integer[] res = new Integer[]{
                 R.drawable.theme_blue,
                 R.drawable.theme_red,

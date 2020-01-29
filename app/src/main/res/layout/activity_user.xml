@@ -15,6 +15,7 @@
         <include layout="@layout/layout_toolbar" />
 
     </com.google.android.material.appbar.AppBarLayout>
+
     <TextView
         android:id="@+id/login_userId"
         android:layout_width="wrap_content"
@@ -24,9 +25,9 @@
         android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@+id/login_username"
-        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/login_username"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/mainAppBarLayout1" />
 
     <TextView
         android:id="@+id/login_username"
@@ -70,7 +71,7 @@
         android:layout_gravity="start"
 
         android:layout_marginBottom="64dp"
-
+        android:textColor="?attr/toolbar_icon_color"
         android:text="@string/sync_CS"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,7 +85,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_marginTop="24dp"
+        android:textColor="?attr/toolbar_icon_color"
         android:text="@string/sync_SC"
+
         app:layout_constraintEnd_toEndOf="@+id/sync_CS"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/sync_CS"
@@ -96,6 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_marginTop="24dp"
+        android:textColor="?attr/toolbar_icon_color"
         android:text="@string/exit_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
