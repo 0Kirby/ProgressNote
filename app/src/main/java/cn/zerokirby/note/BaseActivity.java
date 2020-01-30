@@ -1,4 +1,4 @@
-package com.xqjtqy.progressnote;
+package cn.zerokirby.note;
 
 import android.os.Bundle;
 import android.view.View;

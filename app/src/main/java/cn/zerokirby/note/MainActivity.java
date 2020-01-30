@@ -1,4 +1,4 @@
-package com.xqjtqy.progressnote;
+package cn.zerokirby.note;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -24,11 +24,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.xqjtqy.progressnote.db.NoteDatabaseHelper;
-import com.xqjtqy.progressnote.db.UserDatabaseHelper;
-import com.xqjtqy.progressnote.noteData.DataAdapter;
-import com.xqjtqy.progressnote.noteData.DataItem;
-import com.xqjtqy.progressnote.userData.SystemUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +32,11 @@ import java.util.List;
 import java.util.Locale;
 
 import cn.endureblaze.theme.ThemeUtil;
+import cn.zerokirby.note.db.NoteDatabaseHelper;
+import cn.zerokirby.note.db.UserDatabaseHelper;
+import cn.zerokirby.note.noteData.DataAdapter;
+import cn.zerokirby.note.noteData.DataItem;
+import cn.zerokirby.note.userData.SystemUtil;
 
 public class MainActivity extends BaseActivity {
 

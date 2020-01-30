@@ -1,4 +1,4 @@
-package com.xqjtqy.progressnote;
+package cn.zerokirby.note;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -17,9 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
-import com.xqjtqy.progressnote.db.NoteDatabaseHelper;
-import com.xqjtqy.progressnote.db.UserDatabaseHelper;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +26,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
+import cn.zerokirby.note.db.NoteDatabaseHelper;
+import cn.zerokirby.note.db.UserDatabaseHelper;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

@@ -1,4 +1,4 @@
-package com.xqjtqy.progressnote.db;
+package cn.zerokirby.note.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

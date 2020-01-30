@@ -1,4 +1,4 @@
-package com.xqjtqy.progressnote.noteData;
+package cn.zerokirby.note.noteData;
 
 public class DataItem {
     private int id;

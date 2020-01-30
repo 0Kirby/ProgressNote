@@ -1,4 +1,4 @@
-package com.xqjtqy.progressnote.noteData;
+package cn.zerokirby.note.noteData;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -9,10 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.xqjtqy.progressnote.EditingActivity;
-import com.xqjtqy.progressnote.R;
-
 import java.util.List;
+
+import cn.zerokirby.note.EditingActivity;
+import cn.zerokirby.note.R;
 
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
