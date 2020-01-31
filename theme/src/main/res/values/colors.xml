@@ -42,8 +42,8 @@
     <color name="yellowColorPrimaryDark">#FBC02D</color>
     <color name="yellowColorAccent">#FFF59D</color>
     <!--WhiteAppTheme 主题-->
-    <color name="whiteColorPrimary">#FEFEFE</color>
-    <color name="whiteColorPrimaryDark">#FEFEFE</color>
+    <color name="whiteColorPrimary">#FFFFFF</color>
+    <color name="whiteColorPrimaryDark">#90CAF9</color>
     <color name="whiteColorAccent">#00bdd5</color>
     <!--DarkAppTheme 主题-->
     <color name="darkColorPrimary">#FF212121</color>

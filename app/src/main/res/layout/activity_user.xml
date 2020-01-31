@@ -66,12 +66,13 @@
 
     <Button
         android:id="@+id/sync_CS"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
 
+        android:background="@drawable/btn_bg_selector"
+        android:textColor="@drawable/btn_text_selector"
         android:layout_marginBottom="64dp"
-        android:textColor="?attr/toolbar_icon_color"
         android:text="@string/sync_CS"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,13 +82,14 @@
 
     <Button
         android:id="@+id/sync_SC"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_marginTop="24dp"
-        android:textColor="?attr/toolbar_icon_color"
         android:text="@string/sync_SC"
+        android:background="@drawable/btn_bg_selector"
 
+        android:textColor="@drawable/btn_text_selector"
         app:layout_constraintEnd_toEndOf="@+id/sync_CS"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/sync_CS"
@@ -99,8 +101,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_marginTop="24dp"
-        android:textColor="?attr/toolbar_icon_color"
         android:text="@string/exit_login"
+        android:background="@drawable/btn_bg_selector"
+        android:textColor="@drawable/btn_text_selector"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
