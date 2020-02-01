@@ -5,21 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f2f2f2"
-    tools:context=".LoginActivity">
+    tools:context=".RegisterActivity">
 
     <ImageView
-        android:id="@+id/close"
+        android:id="@+id/back"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:contentDescription="@string/close"
-        android:src="@drawable/ic_close_black_24dp" />
+        android:contentDescription="@string/back"
+        android:src="@drawable/ic_arrow_back_black_24dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,7 +34,7 @@
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="32dp"
                 android:gravity="center_horizontal"
-                android:text="@string/action_sign_in"
+                android:text="@string/register"
                 android:textColor="#333232"
                 android:textSize="30sp" />
 
@@ -175,14 +176,14 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/login"
+                android:id="@+id/register_btn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="#00000000"
                 android:enabled="false"
                 android:gravity="center"
-                android:text="@string/action_sign_in"
+                android:text="@string/register"
                 android:textColor="#ffffff"
                 android:textSize="15sp" />
 
@@ -194,43 +195,6 @@
             android:layout_height="36dp"
             android:layout_gravity="center"
             android:visibility="gone" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="@string/register_hint"
-                android:textColor="#333232"
-                android:textSize="13.3sp" />
-
-            <TextView
-                android:id="@+id/register_link"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:gravity="center_horizontal"
-                android:text="@string/action_register"
-                android:textColor="#38b5f2"
-                android:textSize="13.3sp" />
-
-        </LinearLayout>
-
-
     </LinearLayout>
 
 

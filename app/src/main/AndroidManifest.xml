@@ -12,13 +12,12 @@
         android:roundIcon="@mipmap/note_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".RegisterActivity" />
         <activity android:name=".BaseActivity" />
         <activity
             android:name=".UserActivity"
             android:label="@string/title_activity_user" />
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login" />
+        <activity android:name=".LoginActivity" />
         <activity
             android:name=".EditingActivity"
             android:parentActivityName=".MainActivity" />

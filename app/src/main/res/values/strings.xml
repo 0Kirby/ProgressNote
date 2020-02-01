@@ -2,7 +2,6 @@
     <string name="app_name">ProgressNote</string>
     <string name="chinese_name">天天笔记</string>
     <string name="description">记录当下，规划未来</string>
-    <string name="empty">（空）</string>
     <string name="title">（空）</string>
     <string name="body">（空）</string>
     <string name="date">（空）</string>
@@ -19,15 +18,12 @@
     <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
     <string name="formatDate_User">\nyyyy年MM月dd日\nHH:mm:ss</string>
     <string name="developers">代码：小0卡&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;GitHub:0Kirby\nUI：&#160;&#160;&#160;&#160;&#160;蓝色的海&#160;&#160;&#160;GitHub:BlueEra\n主题：汝南京&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;GitHub:EndureBlaze\n图标：Yoshi1999</string>
-    <string name="title_activity_login">登录与注册</string>
+    <string name="register">注册</string>
     <string name="username">用户名</string>
     <string name="password">密码</string>
     <string name="action_sign_in">登录</string>
-    <string name="action_register">注册</string>
-    <string name="invalid_username">请输入用户名</string>
-    <string name="invalid_password">请输入密码</string>
+    <string name="action_register">点此注册</string>
     <string name="filter_username">0123456789abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
-    <string name="login_hint">使用已有账号</string>
     <string name="register_hint">还没有账号？</string>
     <string name="title_activity_user">当前用户</string>
     <string name="login_userId">用户ID：%1$d</string>
@@ -38,4 +34,6 @@
     <string name="sync_SC">笔记同步（云端→本地）</string>
     <string name="sync_CS">笔记同步（本地→云端）</string>
     <string name="theme">主题</string>
+    <string name="close">关闭</string>
+    <string name="back">返回</string>
 </resources>

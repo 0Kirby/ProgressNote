@@ -184,8 +184,4 @@
         <item name="rippleColor">?attr/dialog_button_color</item>
     </style>
 
-    <style name="MyEditText" parent="Theme.MaterialComponents.Light.NoActionBar">
-
-    </style>
-
 </resources>
