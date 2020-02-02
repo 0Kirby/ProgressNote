@@ -38,4 +38,7 @@
     <string name="back">返回</string>
     <string name="welcome">欢迎</string>
     <string name="share">分享</string>
+    <string name="num_count">字数统计：%1$d字</string>
+    <string name="settings">设置</string>
+    <string name="help">帮助</string>
 </resources>

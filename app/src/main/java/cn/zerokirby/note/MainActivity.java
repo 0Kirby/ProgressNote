@@ -19,17 +19,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.db.NoteDatabaseHelper;
@@ -42,6 +46,8 @@ public class MainActivity extends BaseActivity {
 
     private List<DataItem> dataList = new ArrayList<>();
 
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
     private long exitTime = 0;//实现再按一次退出的间隔时间
@@ -73,13 +79,29 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //显示侧滑菜单的三横
+        drawerLayout = findViewById(R.id.drawer_layout);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
         //显示toolBar
 
         //设置recyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         StaggeredGridLayoutManager layoutManager;
+
+        //设置navigationView
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
 
         //实现瀑布流布局，将recyclerView改为两列
         layoutManager = new StaggeredGridLayoutManager
@@ -243,6 +265,10 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+
             case R.id.about:
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
                 builder.setTitle("关于我们");

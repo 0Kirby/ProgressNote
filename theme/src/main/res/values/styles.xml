@@ -66,7 +66,7 @@
         <item name="colorPrimary">@color/whiteColorPrimary</item>
         <item name="colorPrimaryDark">@color/whiteColorPrimaryDark</item>
         <item name="colorAccent">@color/whiteColorAccent</item>
-        <item name="color_nav">@color/whiteColorPrimary</item>
+        <item name="color_nav">@color/whiteColorPrimaryDark</item>
         <item name="dialog_button_color">@color/whiteColorAccent</item>
         <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.ActionBar</item>
         <item name="toolbar_icon_color">#FF606060</item>
