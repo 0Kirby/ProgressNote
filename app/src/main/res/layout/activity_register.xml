@@ -180,7 +180,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="#00000000"
+                android:background="@drawable/login_button_selector"
                 android:enabled="false"
                 android:gravity="center"
                 android:text="@string/register"

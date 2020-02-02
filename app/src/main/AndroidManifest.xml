@@ -20,7 +20,11 @@
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".EditingActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".OpeningActivity"
             android:screenOrientation="portrait"

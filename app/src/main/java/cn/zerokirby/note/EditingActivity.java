@@ -1,6 +1,7 @@
 package cn.zerokirby.note;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -90,6 +91,16 @@ public class EditingActivity extends BaseActivity {
         cursor.close();
     }
 
+    public static void shareText(Context context, String extraText) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share));
+        intent.putExtra(Intent.EXTRA_TEXT, extraText);//extraText为文本的内容
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//为Activity新建一个任务栈
+        context.startActivity(
+                Intent.createChooser(intent, context.getString(R.string.share)));//R.string.action_share同样是标题
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -142,6 +153,9 @@ public class EditingActivity extends BaseActivity {
                     }
                 });
                 builder.show();
+                break;
+            case R.id.share:
+                shareText(this, noteTitle.getText() + "\n" + noteTime.getText() + "\n" + mainText.getText());
                 break;
         }
         return super.onOptionsItemSelected(item);

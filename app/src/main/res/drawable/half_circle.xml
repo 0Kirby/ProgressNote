@@ -9,7 +9,7 @@
                 android:height="80dp" />
             <gradient
                 android:endColor="?attr/colorPrimary"
-                android:startColor="?attr/colorAccent" />
+                android:startColor="?attr/colorPrimaryDark" />
         </shape>
     </item>
 </layer-list>

@@ -5,7 +5,7 @@
 
     <gradient
         android:endColor="?attr/colorPrimary"
-        android:startColor="?attr/colorAccent" />
+        android:startColor="?attr/colorPrimaryDark" />
     <size
         android:width="50dp"
         android:height="50dp" />
