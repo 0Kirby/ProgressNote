@@ -1,6 +1,7 @@
 package cn.zerokirby.note;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,11 +10,14 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +32,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,26 +49,52 @@ import cn.zerokirby.note.db.UserDatabaseHelper;
 import cn.zerokirby.note.noteData.DataAdapter;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.SystemUtil;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MainActivity extends BaseActivity {
 
     private List<DataItem> dataList = new ArrayList<>();
 
+    static final int SC = 1;//服务器同步到客户端
+    static final int CS = 2;//客户端同步到服务器
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
     private long exitTime = 0;//实现再按一次退出的间隔时间
     private boolean firstLaunch = false;
-    private int userId;
+    private int isLogin;
     private Cursor cursor;
     private ContentValues values;
     private NoteDatabaseHelper noteDbHelper;
     private UserDatabaseHelper userDbHelper;
     private SQLiteDatabase db;
     private SimpleDateFormat simpleDateFormat;
+    private String responseData;
+    private int noteId;
+    private long time;
+    private String title;
+    private String content;
+    private TextView userId;
+    private TextView username;
+    private TextView lastLogin;
+    private TextView lastSync;
+    private Handler handler;
+    private ProgressDialog progressDialog;
 
-    public static void restartActivity(Activity activity) {//刷新活动
+    public void restartActivityNoAnimation(Activity activity) {//刷新活动
+        Intent intent = new Intent();
+        intent.setClass(activity, activity.getClass());
+        activity.startActivity(intent);
+        activity.finish();
+        overridePendingTransition(0, 0);
+    }
+
+    public void restartActivity(Activity activity) {//刷新活动
         Intent intent = new Intent();
         intent.setClass(activity, activity.getClass());
         activity.startActivity(intent);
@@ -81,23 +115,121 @@ public class MainActivity extends BaseActivity {
 
         //显示侧滑菜单的三横
         drawerLayout = findViewById(R.id.drawer_layout);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
-        //显示toolBar
+
+        //初始化ProgressDialog
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setCancelable(true);
+        progressDialog.setTitle("请稍后");
+        progressDialog.setMessage("同步中...");
+        handler = new Handler(new Handler.Callback() {//用于异步消息处理
+
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case SC:
+                    case CS:
+                        progressDialog.dismiss();
+                        drawerLayout.closeDrawers();
+                        Toast.makeText(MainActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(MainActivity.this, "User.db", null, 1);
+                        SQLiteDatabase db = userDbHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
+                        values.put("lastSync", System.currentTimeMillis());
+                        db.update("User", values, "rowid = ?", new String[]{"1"});
+                        restartActivityNoAnimation(MainActivity.this);
+                        break;
+                }
+                return false;
+            }
+        });
 
         //设置recyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         StaggeredGridLayoutManager layoutManager;
 
+        //检查登录状态，确定隐藏哪些文字和按钮
+        checkLoginStatus();
+
         //设置navigationView
-        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                drawerLayout.closeDrawers();
+                switch (item.getItemId()) {
+                    case R.id.login_btn:
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);//启动登录
+                        startActivity(intent);
+                        break;
+                    case R.id.sync_SC:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                        builder.setTitle("警告");
+                        builder.setMessage("这将导致本地数据被云端数据替换\n是否继续？");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                                progressDialog.show();
+                                sendRequestWithOkHttpSC(isLogin);//根据已登录的ID发送查询请求
+                            }
+                        });
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        builder.show();
+                        break;
+                    case R.id.sync_CS:
+                        builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                        builder.setTitle("警告");
+                        builder.setMessage("这将导致云端数据被本地数据替换\n是否继续？");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                                progressDialog.show();
+                                sendRequestWithOkHttpCS(isLogin);//根据已登录的ID发送更新请求
+                            }
+                        });
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        builder.show();
+                        break;
+                    case R.id.settings:
+                        break;
+                    case R.id.exit_login:
+                        builder = new AlertDialog.Builder(MainActivity.this);//显示提示
+                        builder.setTitle("提示");
+                        builder.setMessage("是否退出登录？");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                UserDatabaseHelper userDbHelper = new UserDatabaseHelper(MainActivity.this, "User.db", null, 1);
+                                SQLiteDatabase db = userDbHelper.getWritableDatabase();
+                                ContentValues values = new ContentValues();
+                                values.put("userId", 0);
+                                values.put("lastSync", 0);
+                                db.update("user", values, "rowid = ?", new String[]{"1"});
+                                Toast.makeText(MainActivity.this, "已退出登录！", Toast.LENGTH_SHORT).show();
+                                drawerLayout.closeDrawers();
+                                checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
+                            }
+                        });
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        builder.show();
+                        break;
+                    case R.id.help:
+                        break;
+                }
                 return true;
             }
         });
@@ -117,35 +249,13 @@ public class MainActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         //为悬浮按钮设置点击事件
-        floatingActionButton = findViewById(R.id.floatButton1);//新建笔记按钮
+        floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), EditingActivity.class);
                 intent.putExtra("noteId", 0);//传递0，表示新建
                 v.getContext().startActivity(intent);
-            }
-        });
-
-        floatingActionButton = findViewById(R.id.floatButton2);//用户登录按钮
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserDatabaseHelper dbHelper = new UserDatabaseHelper(MainActivity.this,
-                        "User.db", null, 1);
-                SQLiteDatabase db = dbHelper.getReadableDatabase();
-                Cursor cursor = db.query("User", null, "rowid = ?",
-                        new String[]{"1"}, null, null, null,
-                        null);//查询对应的数据
-                if (cursor.moveToFirst())
-                    userId = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
-                cursor.close();
-                Intent intent;
-                if (userId == 0)//如果用户未登录
-                    intent = new Intent(MainActivity.this, LoginActivity.class);//启动登录与注册
-                else
-                    intent = new Intent(MainActivity.this, UserActivity.class);//启动用户管理
-                startActivity(intent);
             }
         });
 
@@ -270,12 +380,12 @@ public class MainActivity extends BaseActivity {
                 break;
 
             case R.id.about:
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
                 builder.setTitle("关于我们");
                 builder.setMessage(R.string.developers);
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
                     }
                 });
@@ -287,5 +397,182 @@ public class MainActivity extends BaseActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
+        UserDatabaseHelper dbHelper = new UserDatabaseHelper(MainActivity.this,
+                "User.db", null, 1);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("User", null, "rowid = ?",
+                new String[]{"1"}, null, null, null,
+                null);//查询对应的数据
+        if (cursor.moveToFirst())
+            isLogin = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
+        cursor.close();
+        navigationView = findViewById(R.id.nav_view);
+        View headView = navigationView.getHeaderView(0);//获取头部布局
+
+        //实例化TextView，以便填入具体数据
+        userId = headView.findViewById(R.id.login_userId);
+        username = headView.findViewById(R.id.login_username);
+        lastLogin = headView.findViewById(R.id.last_login);
+        lastSync = headView.findViewById(R.id.last_sync);
+
+        //获取菜单
+        Menu menu = navigationView.getMenu();
+        menu.getItem(3).setEnabled(false);//“设置”尚未实现
+        menu.getItem(5).setEnabled(false);//“帮助”尚未实现
+        if (isLogin == 0) {//用户没有登录
+
+            username.setVisibility(View.GONE);//隐藏“用户名”
+            userId.setVisibility(View.GONE);//隐藏“用户ID”
+            lastLogin.setText("尚未登陆！");//显示“尚未登陆！”
+            lastLogin.setTextSize(32);
+            lastSync.setVisibility(View.GONE);//隐藏“上次同步”
+
+            menu.getItem(0).setVisible(true);//显示“登录”
+            menu.getItem(1).setVisible(false);//隐藏“同步（服务器->客户端）”
+            menu.getItem(2).setVisible(false);//隐藏“同步（客户端->服务器）”
+            menu.getItem(4).setVisible(false);//隐藏“退出登录”
+        } else {//用户已经登录
+
+            updateTextView();//更新TextView
+
+            menu.getItem(0).setVisible(false);//隐藏“登录”
+            menu.getItem(1).setVisible(true);//显示“同步（服务器->客户端）”
+            menu.getItem(2).setVisible(true);//显示“同步（客户端->服务器）”
+            menu.getItem(4).setVisible(true);//显示“退出登录”
+        }
+    }
+
+    //笔记同步用方法
+    private void sendRequestWithOkHttpSC(final int userId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {//在子线程中进行网络操作
+                try {
+                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
+                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
+                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/SyncServlet_SC").post(requestBody).build();
+                    Response response = client.newCall(request).execute();
+                    responseData = Objects.requireNonNull(response.body()).string();
+                    parseJSONWithJSONArray(responseData);//处理JSON
+                    Message message = new Message();
+                    message.what = SC;
+                    handler.sendMessage(message);//通过handler发送消息请求toast
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void sendRequestWithOkHttpCS(final int userId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {//在子线程中进行网络操作
+                try {
+                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
+                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
+                            .add("json", Objects.requireNonNull(makeJSONArray(userId))).build();
+                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
+                    Response response = client.newCall(request).execute();
+                    Message message = new Message();
+                    message.what = CS;
+                    handler.sendMessage(message);//通过handler发送消息请求toast
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void parseJSONWithJSONArray(String jsonData) {//处理JSON
+        try {
+            JSONArray jsonArray = new JSONArray(jsonData);
+            NoteDatabaseHelper noteDbHelper = new NoteDatabaseHelper(MainActivity.this, "Note.db", null, 1);
+            SQLiteDatabase db = noteDbHelper.getWritableDatabase();
+            db.execSQL("Delete from Note");//清空笔记表
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                noteId = jsonObject.getInt("NoteId");
+                time = jsonObject.getLong("Time");
+                title = jsonObject.getString("Title");
+                content = jsonObject.getString("Content");
+
+                ContentValues values = new ContentValues();//将笔记ID、标题、修改时间和内容存储到本地
+                values.put("id", noteId);
+                values.put("title", title);
+                values.put("time", time);
+                values.put("content", content);
+
+                db.insert("Note", null, values);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String makeJSONArray(final int userId) {//生成JSON数组的字符串
+        try {
+            JSONArray jsonArray = new JSONArray();
+            NoteDatabaseHelper noteDbHelper = new NoteDatabaseHelper(MainActivity.this, "Note.db", null, 1);
+            SQLiteDatabase db = noteDbHelper.getReadableDatabase();
+            Cursor cursor = db.query("Note", null, null,
+                    null, null, null, null,
+                    null);//查询对应的数据
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    JSONObject jsonObject = new JSONObject();
+
+                    jsonObject.put("NoteId", cursor.getString(cursor
+                            .getColumnIndex("id")));//读取编号
+                    jsonObject.put("Title", cursor.getString(cursor
+                            .getColumnIndex("title")));//读取标题
+                    jsonObject.put("Time", cursor.getLong(cursor
+                            .getColumnIndex("time")));//读取修改时间
+                    jsonObject.put("Content", cursor.getString(cursor
+                            .getColumnIndex("content")));//读取正文
+
+                    jsonArray.put(jsonObject);
+                } while (cursor.moveToNext());
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+            return jsonArray.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void updateTextView() {//更新TextView显示用户信息
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+                getString(R.string.formatDate_User), Locale.getDefault());
+
+        UserDatabaseHelper dbHelper = new UserDatabaseHelper(this,
+                "User.db", null, 1);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("User", null, "rowid = ?",
+                new String[]{"1"}, null, null, null,
+                null);//查询对应的数据
+        if (cursor.moveToFirst()) {
+            userId.setText(String.format(getResources().getString(R.string.login_userId), cursor.getInt(cursor
+                    .getColumnIndex("userId"))));  //读取ID
+            username.setText(String.format(getResources().getString(R.string.login_username), cursor.getString(cursor
+                    .getColumnIndex("username"))));  //读取用户名
+            lastLogin.setText(String.format(getResources().getString(R.string.last_login), simpleDateFormat.format(new Date(cursor.getLong(cursor
+                    .getColumnIndex("lastUse"))))));  //读取上次登录时间
+            long time = cursor.getLong(cursor.getColumnIndex("lastSync"));//读取上次同步时间
+            if (time != 0)
+                lastSync.setText(String.format(getResources().getString(R.string.last_sync), simpleDateFormat.format(new Date(cursor.getLong(cursor
+                        .getColumnIndex("lastSync"))))));
+            else
+                lastSync.setText(String.format(getResources().getString(R.string.last_sync), "无"));
+        }
+        isLogin = cursor.getInt(cursor.getColumnIndex("userId"));
+        cursor.close();
     }
 }

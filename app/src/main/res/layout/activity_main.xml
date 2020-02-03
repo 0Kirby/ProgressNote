@@ -33,23 +33,12 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatButton1"
+            android:id="@+id/floatButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:src="@drawable/ic_note_add_white_24dp"
-            app:backgroundTint="?attr/colorAccent"
-            app:elevation="8dp"
-            app:tint="@android:color/white" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatButton2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_account_circle_white_24dp"
             app:backgroundTint="?attr/colorAccent"
             app:elevation="8dp"
             app:tint="@android:color/white" />

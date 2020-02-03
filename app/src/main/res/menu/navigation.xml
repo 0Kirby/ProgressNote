@@ -2,18 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group>
         <item
-            android:id="@+id/download"
+            android:id="@+id/login_btn"
+            android:icon="@drawable/ic_person_black_24dp"
+            android:title="@string/action_sign_in" />
+        <item
+            android:id="@+id/sync_SC"
             android:icon="@drawable/ic_cloud_download_black_24dp"
             android:title="@string/sync_SC" />
         <item
-            android:id="@+id/upload"
+            android:id="@+id/sync_CS"
             android:icon="@drawable/ic_cloud_upload_black_24dp"
             android:title="@string/sync_CS" />
         <item
             android:id="@+id/settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/settings" />
-
+        <item
+            android:id="@+id/exit_login"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="@string/exit_login" />
         <item
             android:id="@+id/help"
             android:icon="@drawable/ic_help_black_24dp"

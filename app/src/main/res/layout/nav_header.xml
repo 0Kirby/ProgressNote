@@ -6,29 +6,47 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <ImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_gravity="center"
-        android:contentDescription="@string/title_activity_user"
-        android:src="@drawable/ic_person_add_black_24dp" />
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_person_add_black_24dp"
+        android:transitionName="userAvatar" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/login_username"
+        android:layout_gravity="center"
+        android:text="@string/login_username"
+        android:textColor="#FFF" />
 
     <TextView
         android:id="@+id/login_userId"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:text="@string/login_userId"
+        android:layout_height="wrap_content"
         android:textColor="#FFF"
-        android:textSize="20sp" />
+        android:layout_gravity="center" />
 
     <TextView
-        android:id="@+id/login_username"
+        android:id="@+id/last_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/login_username"
+        android:layout_gravity="center"
+        android:text="@string/last_login"
+        android:textColor="#FFF" />
+
+    <TextView
+        android:id="@+id/last_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:textColor="#FFF"
-        android:textSize="20sp" />
+        android:layout_marginBottom="10dp"
+        android:text="@string/last_sync" />
 
 </LinearLayout>

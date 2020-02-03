@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "2.2.2"
+        versionName "2.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -35,6 +35,7 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.3.1'
     implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation project(path: ':theme')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:core:1.2.0'
