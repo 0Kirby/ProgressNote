@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -411,6 +412,15 @@ public class MainActivity extends BaseActivity {
         cursor.close();
         navigationView = findViewById(R.id.nav_view);
         View headView = navigationView.getHeaderView(0);//获取头部布局
+
+        final ImageView imageView = headView.findViewById(R.id.user_avatar);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), IconActivity.class);
+                startActivity(intent);
+            }
+        });
 
         //实例化TextView，以便填入具体数据
         userId = headView.findViewById(R.id.login_userId);

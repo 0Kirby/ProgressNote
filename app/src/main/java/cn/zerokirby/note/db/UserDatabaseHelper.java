@@ -18,7 +18,8 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
             + "brand text, "
             + "registerTime long, "
             + "lastUse long, "
-            + "lastSync long)"; //建表
+            + "lastSync long, "
+            + "avatar blob)"; //建表
 
     private Context mContext;
 
