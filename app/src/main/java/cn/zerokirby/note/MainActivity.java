@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -45,6 +47,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
+import cn.zerokirby.note.db.AvatarDatabaseUtil;
 import cn.zerokirby.note.db.NoteDatabaseHelper;
 import cn.zerokirby.note.db.UserDatabaseHelper;
 import cn.zerokirby.note.noteData.DataAdapter;
@@ -63,6 +66,7 @@ public class MainActivity extends BaseActivity {
     static final int SC = 1;//服务器同步到客户端
     static final int CS = 2;//客户端同步到服务器
     private NavigationView navigationView;
+    private View headView;
     private DrawerLayout drawerLayout;
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
@@ -113,6 +117,9 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        navigationView = findViewById(R.id.nav_view);
+        headView = navigationView.getHeaderView(0);//获取头部布局
 
         //显示侧滑菜单的三横
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -292,7 +299,7 @@ public class MainActivity extends BaseActivity {
             values.put("userId", 0);
             db.insert("User", null, values);//插入
         } else
-            db.update("user", values, "rowid = ?", new String[]{"1"});//更新
+            db.update("User", values, "rowid = ?", new String[]{"1"});//更新
 
         dataList.clear();//刷新dataList
         initData();//初始化数据
@@ -410,17 +417,9 @@ public class MainActivity extends BaseActivity {
         if (cursor.moveToFirst())
             isLogin = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
         cursor.close();
-        navigationView = findViewById(R.id.nav_view);
-        View headView = navigationView.getHeaderView(0);//获取头部布局
+
 
         final ImageView imageView = headView.findViewById(R.id.user_avatar);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), IconActivity.class);
-                startActivity(intent);
-            }
-        });
 
         //实例化TextView，以便填入具体数据
         userId = headView.findViewById(R.id.login_userId);
@@ -434,6 +433,24 @@ public class MainActivity extends BaseActivity {
         menu.getItem(5).setEnabled(false);//“帮助”尚未实现
         if (isLogin == 0) {//用户没有登录
 
+            //设置头像未待添加，并禁用修改头像按钮
+            imageView.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
+                    builder.setTitle("提示");
+                    builder.setMessage("请先登陆后再使用！");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    builder.show();
+                }
+            });
+
             username.setVisibility(View.GONE);//隐藏“用户名”
             userId.setVisibility(View.GONE);//隐藏“用户ID”
             lastLogin.setText("尚未登陆！");//显示“尚未登陆！”
@@ -445,6 +462,25 @@ public class MainActivity extends BaseActivity {
             menu.getItem(2).setVisible(false);//隐藏“同步（客户端->服务器）”
             menu.getItem(4).setVisible(false);//隐藏“退出登录”
         } else {//用户已经登录
+
+
+            //显示头像，并启用修改头像按钮
+            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, dbHelper);
+            byte[] imgData = avatarDatabaseUtil.readImage();
+            if (imgData != null) {
+                //将字节数组转化为位图
+                Bitmap imagebitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
+                //将位图显示为图片
+                imageView.setImageBitmap(imagebitmap);
+            }
+
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), IconActivity.class);
+                    startActivity(intent);
+                }
+            });
 
             updateTextView();//更新TextView
 

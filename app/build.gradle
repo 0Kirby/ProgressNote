@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "2.3.1"
+        versionName "2.3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -23,6 +23,14 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+
+    android.applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                outputFileName = "ProgressNote-v${variant.versionName}.apk"
+            }
+    }
+
 }
 
 dependencies {

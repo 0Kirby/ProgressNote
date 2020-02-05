@@ -3,7 +3,6 @@ package cn.zerokirby.note;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -22,6 +21,8 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Objects;
 
+import cn.zerokirby.note.db.AvatarDatabaseUtil;
+import cn.zerokirby.note.db.UserDatabaseHelper;
 import cn.zerokirby.note.userData.UriUtil;
 
 public class IconActivity extends BaseActivity {
@@ -38,6 +39,16 @@ public class IconActivity extends BaseActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         imageView = findViewById(R.id.user_icon);
+
+        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(IconActivity.this, "User.db", null, 1);
+        AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
+        byte[] imgData = avatarDatabaseUtil.readImage();
+        if (imgData != null) {
+            //将字节数组转化为位图
+            Bitmap imagebitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
+            //将位图显示为图片
+            imageView.setImageBitmap(imagebitmap);
+        }
 
         final Button button = findViewById(R.id.change_icon);
         button.setOnClickListener(new View.OnClickListener() {
@@ -96,24 +107,13 @@ public class IconActivity extends BaseActivity {
         displayImage(imagePath);
     }
 
-    private String getImagePath(Uri uri, String selection) {
-        String path = null;
-        //通过uri和selection来获取真实的图片路径
-        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-            }
-            cursor.close();
-        }
-        return path;
-    }
-
-
-    private void displayImage(String imagePath) {//解码并显示图片
+    private void displayImage(String imagePath) {//解码并显示图片,同时将图片写入本地数据库
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
             imageView.setImageBitmap(bitmap);
+            UserDatabaseHelper userDbHelper = new UserDatabaseHelper(IconActivity.this, "User.db", null, 1);
+            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
+            avatarDatabaseUtil.saveImage(bitmap);
         } else
             Toast.makeText(this, "打开失败", Toast.LENGTH_SHORT).show();
     }
