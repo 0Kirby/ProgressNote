@@ -46,8 +46,8 @@ public class AvatarDatabaseUtil {
         //创建一个字节数组输出流,流的大小为size
         ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
         try {
-            //设置位图的压缩格式，质量为100%，并放入字节数组输出流中
-            bitmap.compress(Bitmap.CompressFormat.PNG, 50, baos);
+            //设置位图的压缩格式，质量为80%，并放入字节数组输出流中
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             //将字节数组输出流转化为字节数组byte[]
             byte[] imagedata = baos.toByteArray();
             return imagedata;
