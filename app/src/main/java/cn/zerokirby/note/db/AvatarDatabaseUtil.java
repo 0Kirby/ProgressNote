@@ -62,4 +62,14 @@ public class AvatarDatabaseUtil {
         return new byte[0];
     }
 
+    public int getUserId() {//获取用户id
+        int id = 0;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cur = db.query("User", new String[]{"userId"}, null, null, null, null, null);
+        if (cur.moveToNext()) {
+            id = cur.getInt(cur.getColumnIndex("userId"));
+        }
+        cur.close();
+        return id;
+    }
 }

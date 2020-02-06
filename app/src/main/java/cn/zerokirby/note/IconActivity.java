@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
@@ -27,11 +29,19 @@ import java.util.Objects;
 import cn.zerokirby.note.db.AvatarDatabaseUtil;
 import cn.zerokirby.note.db.UserDatabaseHelper;
 import cn.zerokirby.note.userData.UriUtil;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class IconActivity extends BaseActivity {
 
-    public static final int CHOOSE_PHOTO = 1;
+    private static final int UPLOAD = 0;
+    private static final int CHOOSE_PHOTO = 1;
     private static final int PHOTO_REQUEST_CUT = 2;
+    private Handler handler;
     private ImageView imageView;
     private Uri cropImageUri;
 
@@ -67,6 +77,20 @@ public class IconActivity extends BaseActivity {
                     openAlbum();
             }
         });
+
+        handler = new Handler(new Handler.Callback() {//用于异步消息处理
+
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case UPLOAD:
+                        Toast.makeText(IconActivity.this, "上传成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        break;
+                }
+                return false;
+            }
+        });
+
     }
 
     private void openAlbum() {
@@ -86,9 +110,10 @@ public class IconActivity extends BaseActivity {
                     Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
                 break;
             case PHOTO_REQUEST_CUT:
-                if (resultCode == RESULT_OK)
+                if (resultCode == RESULT_OK) {
                     displayImage(UriUtil.getPath(this, cropImageUri));
-                else
+                    uploadImage();
+                } else
                     Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
             default:
                 break;
@@ -113,7 +138,6 @@ public class IconActivity extends BaseActivity {
     private void handleImage(Intent data) {//处理接收到的图片
         String imagePath = null;
         Uri uri = data.getData();
-        //imagePath = UriUtil.getPath(this, uri);
         startPhotoZoom(uri);
     }
 
@@ -162,5 +186,33 @@ public class IconActivity extends BaseActivity {
             avatarDatabaseUtil.saveImage(bitmap);
         } else
             Toast.makeText(this, "打开失败", Toast.LENGTH_SHORT).show();
+    }
+
+    public void uploadImage() {//上传头像
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(Objects.requireNonNull(UriUtil.getPath(IconActivity.this, cropImageUri)));
+                final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
+                UserDatabaseHelper userDbHelper = new UserDatabaseHelper(IconActivity.this, "User.db", null, 1);
+                AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(IconActivity.this, userDbHelper);
+                final int id = avatarDatabaseUtil.getUserId();//获取用户id
+                OkHttpClient client = new OkHttpClient();
+                RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型未jpg
+                RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart("userId", String.valueOf(id))
+                        .addFormDataPart("file", id + ".jpg", fileBody).build();
+                Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/AvatarServlet").post(requestBody).build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    Message message = new Message();//发送消息
+                    message.what = UPLOAD;
+                    handler.sendMessage(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 }
