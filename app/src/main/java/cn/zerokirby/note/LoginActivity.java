@@ -23,6 +23,8 @@ import androidx.appcompat.widget.Toolbar;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.UserDatabaseHelper;
@@ -36,7 +38,7 @@ import okhttp3.Response;
 public class LoginActivity extends BaseActivity {
 
     static final int LOGIN = 1;//登录
-    String userId;
+    String userId = "0";
     private String responseData;
     private String username;
     private String password;
@@ -143,12 +145,38 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void run() {//在子线程中进行网络操作
                 try {
+                    //基础登录
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
                     RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password).build();
                     Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/LoginServlet").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON
+
+                    //获取头像
+                    if (responseData.equals("登录成功！"))//登陆成功的情况下才处理头像
+                    {
+                        client = new OkHttpClient();
+                        requestBody = new FormBody.Builder().add("userId", userId).build();
+                        request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
+                        response = client.newCall(request).execute();
+                        InputStream inputStream = response.body().byteStream();
+                        ByteArrayOutputStream output = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[1024];//缓冲区大小
+                        int n = 0;
+                        while (-1 != (n = inputStream.read(buffer))) {
+                            output.write(buffer, 0, n);
+                        }
+                        byte[] bytes = output.toByteArray();
+                        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(LoginActivity.this, "User.db", null, 1);
+                        SQLiteDatabase db = userDbHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
+                        if (bytes.length != 0)
+                            values.put("avatar", bytes);
+                        else
+                            values.putNull("avatar");
+                        db.update("User", values, "rowid = ?", new String[]{"1"});
+                    }
                     Message message = new Message();
                     message.what = LOGIN;
                     handler.sendMessage(message);//通过handler发送消息请求toast
