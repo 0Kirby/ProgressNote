@@ -25,29 +25,30 @@
 
         </TextView>
 
-        <TextView
-            android:id="@+id/detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/brief"
-            app:layout_constraintHorizontal_bias="0.75"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/brief"
-            app:layout_constraintVertical_bias="1.5"
-            android:text="@string/description"
-            android:textColor="#4169E1"
-            android:textSize="14sp">
+    <TextView
+        android:id="@+id/detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/description"
+        android:textColor="#4169E1"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/brief"
+        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintStart_toStartOf="@+id/brief"
+        app:layout_constraintTop_toBottomOf="@+id/brief">
 
-        </TextView>
+    </TextView>
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="87dp"
         android:layout_height="125dp"
+        android:layout_marginEnd="44dp"
         android:contentDescription="@string/app_name"
-        android:src="@mipmap/note_icon"
+        android:src="@mipmap/icon"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/brief"
         app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

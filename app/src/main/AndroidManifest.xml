@@ -10,15 +10,16 @@
     <application
         android:requestLegacyExternalStorage="true"
         android:allowBackup="false"
-        android:icon="@mipmap/note_icon"
+        android:icon="@mipmap/icon"
         android:label="@string/chinese_name"
-        android:roundIcon="@mipmap/note_icon"
+        android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".IconActivity"
             android:label="@string/change_icon"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".GuideActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".LoginActivity" />

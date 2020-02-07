@@ -54,15 +54,15 @@ public class IconActivity extends BaseActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         imageView = findViewById(R.id.user_icon);
-
+        //每次先从数据库中读取头像
         DatabaseHelper userDbHelper = new DatabaseHelper(IconActivity.this, "ProgressNote.db", null, 1);
         AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
         byte[] imgData = avatarDatabaseUtil.readImage();
         if (imgData != null) {
             //将字节数组转化为位图
-            Bitmap imagebitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
             //将位图显示为图片
-            imageView.setImageBitmap(imagebitmap);
+            imageView.setImageBitmap(bitmap);
         }
 
         final Button button = findViewById(R.id.change_icon);

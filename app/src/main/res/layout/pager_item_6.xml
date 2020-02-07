@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/guide_image_6">
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/btn_bg_selector"
+        android:paddingStart="25dp"
+        android:paddingEnd="25dp"
+        android:text="@string/have_a_try"
+        android:textColor="?attr/toolbar_icon_color"
+        android:textSize="20sp" />
+
+</RelativeLayout>

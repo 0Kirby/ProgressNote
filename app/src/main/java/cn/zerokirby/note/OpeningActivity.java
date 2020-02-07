@@ -6,7 +6,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import cn.zerokirby.note.sharedPref.ShareUtils;
+
 public class OpeningActivity extends BaseActivity {
+
+    private static final String IS_FIRST = "isFirst";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +27,10 @@ public class OpeningActivity extends BaseActivity {
             public void run() {
                 try{
                     sleep(1000);//使程序休眠一秒，显示一秒开屏界面
-                    Intent it=new Intent(getApplicationContext(),MainActivity.class);//启动MainActivity
-                    startActivity(it);
+                    if (isFirst())
+                        startActivity(new Intent(OpeningActivity.this, GuideActivity.class));
+                    else
+                        startActivity(new Intent(OpeningActivity.this, MainActivity.class));
                     finish();//关闭当前活动
                 }catch (Exception e){
                     e.printStackTrace();
@@ -35,5 +41,17 @@ public class OpeningActivity extends BaseActivity {
 
     }
 
+    //判断程序是否第一次运行
+    private boolean isFirst() {
+        boolean isFirst = ShareUtils.getBoolean(this, IS_FIRST, true);
+        if (isFirst) {
+            ShareUtils.putBoolean(this, IS_FIRST, false);
+            //是第一次运行
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 
 }

@@ -234,6 +234,8 @@ public class MainActivity extends BaseActivity {
                         builder.show();
                         break;
                     case R.id.help:
+                        intent = new Intent(MainActivity.this, GuideActivity.class);//启动引导页
+                        startActivity(intent);
                         break;
                 }
                 return true;
@@ -425,7 +427,6 @@ public class MainActivity extends BaseActivity {
         //获取菜单
         Menu menu = navigationView.getMenu();
         menu.getItem(3).setEnabled(false);//“设置”尚未实现
-        menu.getItem(5).setEnabled(false);//“帮助”尚未实现
         if (isLogin == 0) {//用户没有登录
 
             //设置头像未待添加，并禁用修改头像按钮
