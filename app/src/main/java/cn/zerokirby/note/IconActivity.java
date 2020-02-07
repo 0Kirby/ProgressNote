@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.AvatarDatabaseUtil;
-import cn.zerokirby.note.db.UserDatabaseHelper;
+import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.userData.UriUtil;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -55,7 +55,7 @@ public class IconActivity extends BaseActivity {
 
         imageView = findViewById(R.id.user_icon);
 
-        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(IconActivity.this, "User.db", null, 1);
+        DatabaseHelper userDbHelper = new DatabaseHelper(IconActivity.this, "ProgressNote.db", null, 1);
         AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
         byte[] imgData = avatarDatabaseUtil.readImage();
         if (imgData != null) {
@@ -181,7 +181,7 @@ public class IconActivity extends BaseActivity {
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
             imageView.setImageBitmap(bitmap);
-            UserDatabaseHelper userDbHelper = new UserDatabaseHelper(IconActivity.this, "User.db", null, 1);
+            DatabaseHelper userDbHelper = new DatabaseHelper(IconActivity.this, "ProgressNote.db", null, 1);
             AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
             avatarDatabaseUtil.saveImage(bitmap);
         } else
@@ -194,7 +194,7 @@ public class IconActivity extends BaseActivity {
             public void run() {
                 File file = new File(Objects.requireNonNull(UriUtil.getPath(IconActivity.this, cropImageUri)));
                 final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
-                UserDatabaseHelper userDbHelper = new UserDatabaseHelper(IconActivity.this, "User.db", null, 1);
+                DatabaseHelper userDbHelper = new DatabaseHelper(IconActivity.this, "ProgressNote.db", null, 1);
                 AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(IconActivity.this, userDbHelper);
                 final int id = avatarDatabaseUtil.getUserId();//获取用户id
                 OkHttpClient client = new OkHttpClient();

@@ -48,8 +48,7 @@ import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.db.AvatarDatabaseUtil;
-import cn.zerokirby.note.db.NoteDatabaseHelper;
-import cn.zerokirby.note.db.UserDatabaseHelper;
+import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.noteData.DataAdapter;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.SystemUtil;
@@ -75,8 +74,7 @@ public class MainActivity extends BaseActivity {
     private int isLogin;
     private Cursor cursor;
     private ContentValues values;
-    private NoteDatabaseHelper noteDbHelper;
-    private UserDatabaseHelper userDbHelper;
+    private DatabaseHelper databaseHelper;
     private SQLiteDatabase db;
     private SimpleDateFormat simpleDateFormat;
     private String responseData;
@@ -143,8 +141,8 @@ public class MainActivity extends BaseActivity {
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
                         Toast.makeText(MainActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(MainActivity.this, "User.db", null, 1);
-                        SQLiteDatabase db = userDbHelper.getWritableDatabase();
+                        databaseHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
+                        SQLiteDatabase db = databaseHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
                         values.put("lastSync", System.currentTimeMillis());
                         db.update("User", values, "rowid = ?", new String[]{"1"});
@@ -216,7 +214,7 @@ public class MainActivity extends BaseActivity {
                         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                UserDatabaseHelper userDbHelper = new UserDatabaseHelper(MainActivity.this, "User.db", null, 1);
+                                DatabaseHelper userDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
                                 SQLiteDatabase db = userDbHelper.getWritableDatabase();
                                 ContentValues values = new ContentValues();
                                 values.put("userId", 0);
@@ -278,12 +276,9 @@ public class MainActivity extends BaseActivity {
                     }
                 });
 
-        noteDbHelper = new NoteDatabaseHelper(this,
-                "Note.db", null, 1);
-        noteDbHelper.getWritableDatabase();
 
-        userDbHelper = new UserDatabaseHelper(this, "User.db", null, 1);
-        SQLiteDatabase db = userDbHelper.getWritableDatabase();
+        databaseHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         SystemUtil systemUtil = new SystemUtil();//获取手机信息
         values = new ContentValues();
         values.put("language", systemUtil.getSystemLanguage());
@@ -334,7 +329,7 @@ public class MainActivity extends BaseActivity {
     private void initData() {
         simpleDateFormat = new SimpleDateFormat(
                 getString(R.string.formatDate), Locale.getDefault());
-        db = noteDbHelper.getReadableDatabase();
+        db = databaseHelper.getReadableDatabase();
         cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
                 null);//查询对应的数据
@@ -408,8 +403,8 @@ public class MainActivity extends BaseActivity {
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        UserDatabaseHelper dbHelper = new UserDatabaseHelper(MainActivity.this,
-                "User.db", null, 1);
+        DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this,
+                "ProgressNote.db", null, 1);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query("User", null, "rowid = ?",
                 new String[]{"1"}, null, null, null,
@@ -536,7 +531,7 @@ public class MainActivity extends BaseActivity {
     private void parseJSONWithJSONArray(String jsonData) {//处理JSON
         try {
             JSONArray jsonArray = new JSONArray(jsonData);
-            NoteDatabaseHelper noteDbHelper = new NoteDatabaseHelper(MainActivity.this, "Note.db", null, 1);
+            DatabaseHelper noteDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
             SQLiteDatabase db = noteDbHelper.getWritableDatabase();
             db.execSQL("Delete from Note");//清空笔记表
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -563,7 +558,7 @@ public class MainActivity extends BaseActivity {
     private String makeJSONArray(final int userId) {//生成JSON数组的字符串
         try {
             JSONArray jsonArray = new JSONArray();
-            NoteDatabaseHelper noteDbHelper = new NoteDatabaseHelper(MainActivity.this, "Note.db", null, 1);
+            DatabaseHelper noteDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
             SQLiteDatabase db = noteDbHelper.getReadableDatabase();
             Cursor cursor = db.query("Note", null, null,
                     null, null, null, null,
@@ -598,8 +593,8 @@ public class MainActivity extends BaseActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
                 getString(R.string.formatDate_User), Locale.getDefault());
 
-        UserDatabaseHelper dbHelper = new UserDatabaseHelper(this,
-                "User.db", null, 1);
+        DatabaseHelper dbHelper = new DatabaseHelper(this,
+                "ProgressNote.db", null, 1);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query("User", null, "rowid = ?",
                 new String[]{"1"}, null, null, null,

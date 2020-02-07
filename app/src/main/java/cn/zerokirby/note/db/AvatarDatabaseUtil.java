@@ -10,11 +10,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class AvatarDatabaseUtil {
-    private UserDatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
     private Context context;
 
     //要操作数据库操作实例首先得得到数据库操作实例
-    public AvatarDatabaseUtil(Context context, UserDatabaseHelper dbHelper) {
+    public AvatarDatabaseUtil(Context context, DatabaseHelper dbHelper) {
         this.context = context;
         this.dbHelper = dbHelper;
     }

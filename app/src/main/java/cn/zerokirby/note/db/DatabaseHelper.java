@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-public class UserDatabaseHelper extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_USER = "create table User ("
             + "userId integer, "
@@ -21,10 +21,16 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
             + "lastSync long, "
             + "avatar blob)"; //建表
 
+    private static final String CREATE_NOTE = "create table Note ("
+            + "id integer primary key autoincrement, "
+            + "title text, "
+            + "time long, "
+            + "content text) ";//建表
+
     private Context mContext;
 
-    public UserDatabaseHelper(Context context, String name,
-                              SQLiteDatabase.CursorFactory factory, int version) {
+    public DatabaseHelper(Context context, String name,
+                          SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext = context;
     }
@@ -32,6 +38,7 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) { //创建时调用
         db.execSQL(CREATE_USER); //创建表
+        db.execSQL(CREATE_NOTE); //创建表
         Toast.makeText(mContext, "创建数据库成功！", Toast.LENGTH_SHORT).show();
     }
 
@@ -39,6 +46,7 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //升级
         db.execSQL("drop table if exists User");
+        db.execSQL("drop table if exists Note");
         onCreate(db);
     }
 

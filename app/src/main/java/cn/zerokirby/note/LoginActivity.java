@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Objects;
 
-import cn.zerokirby.note.db.UserDatabaseHelper;
+import cn.zerokirby.note.db.DatabaseHelper;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -71,7 +71,7 @@ public class LoginActivity extends BaseActivity {
                     Toast.makeText(LoginActivity.this, responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     progressBar.setVisibility(View.GONE);
                     if (responseData.equals("登录成功！")) {
-                        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(LoginActivity.this, "User.db", null, 1);
+                        DatabaseHelper userDbHelper = new DatabaseHelper(LoginActivity.this, "ProgressNote.db", null, 1);
                         SQLiteDatabase db = userDbHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
                         values.put("userId", userId);
@@ -167,8 +167,10 @@ public class LoginActivity extends BaseActivity {
                         while (-1 != (n = inputStream.read(buffer))) {
                             output.write(buffer, 0, n);
                         }
+                        inputStream.close();
+                        output.close();
                         byte[] bytes = output.toByteArray();
-                        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(LoginActivity.this, "User.db", null, 1);
+                        DatabaseHelper userDbHelper = new DatabaseHelper(LoginActivity.this, "ProgressNote.db", null, 1);
                         SQLiteDatabase db = userDbHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
                         if (bytes.length != 0)

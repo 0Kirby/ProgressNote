@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
-import cn.zerokirby.note.db.NoteDatabaseHelper;
+import cn.zerokirby.note.db.DatabaseHelper;
 
 public class EditingActivity extends BaseActivity {
 
@@ -48,7 +48,7 @@ public class EditingActivity extends BaseActivity {
     };
     private Date date;
     private SimpleDateFormat simpleDateFormat;
-    private NoteDatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
     private static int type;
@@ -166,8 +166,8 @@ public class EditingActivity extends BaseActivity {
         date = new Date(System.currentTimeMillis());
         noteTime.setText(simpleDateFormat.format(date));
 
-        dbHelper = new NoteDatabaseHelper(this,
-                "Note.db", null, 1);
+        dbHelper = new DatabaseHelper(this,
+                "ProgressNote.db", null, 1);
         db = dbHelper.getReadableDatabase();
         cursor = db.query("Note", null, "id = ?",
                 noteId, null, null, null,

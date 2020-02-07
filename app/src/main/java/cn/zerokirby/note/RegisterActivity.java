@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-import cn.zerokirby.note.db.UserDatabaseHelper;
+import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.userData.SystemUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -38,8 +38,6 @@ public class RegisterActivity extends BaseActivity {
     private String responseData;
     private String username;
     private String password;
-    private long registerTime;
-    private long syncTime;
     private Handler handler;//用于进程间异步消息传递
 
     @Override
@@ -64,7 +62,7 @@ public class RegisterActivity extends BaseActivity {
                     Toast.makeText(RegisterActivity.this, responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     progressBar.setVisibility(View.GONE);
                     if (responseData.equals("注册成功！")) {
-                        UserDatabaseHelper userDbHelper = new UserDatabaseHelper(RegisterActivity.this, "User.db", null, 1);
+                        DatabaseHelper userDbHelper = new DatabaseHelper(RegisterActivity.this, "ProgressNote.db", null, 1);
                         SQLiteDatabase db = userDbHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
                         values.put("userId", userId);
