@@ -1,0 +1,97 @@
+<!--
+  ~ Copyright 2018 The app Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="当前版本">
+        <Preference
+            android:icon="@mipmap/icon"
+            android:key="version" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:summaryOff="仅使用手动同步"
+            app:summaryOn="在满足以下项时进行同步"
+            app:title="@string/sync_title" />
+
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="launch_sync"
+            app:title="@string/attachment_title" />
+
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="modify_sync"
+            app:summary="包括新增、编辑、保存、删除等"
+            app:title="修改笔记时" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="数据">
+
+        <Preference
+            app:key="delete_note"
+            app:title="清除所有笔记" />
+
+        <Preference
+            app:key="delete_all"
+            app:title="清除所有数据" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="关于">
+
+        <Preference
+            android:key="homepage"
+            android:summary="zerokirby.cn"
+            android:title="主页" />
+
+        <Preference
+            android:key="github"
+            android:summary="ProgressNote"
+            android:title="GitHub" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="开发者">
+
+        <Preference
+            android:key="code"
+            android:summary="小林卡比 GitHub@0Kirby"
+            android:title="代码" />
+
+        <Preference
+            android:key="ui"
+            android:summary="蓝色的海 GitHub@BlueEra"
+            android:title="UI" />
+
+        <Preference
+            android:key="theme"
+            android:summary="汝南京 GitHub@EndureBlaze"
+            android:title="主题" />
+
+        <Preference
+            android:key="icon"
+            android:summary="Yoshi1999"
+            android:title="图标" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

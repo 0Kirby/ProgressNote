@@ -1,4 +1,4 @@
-package cn.zerokirby.note.sharedPref;
+package cn.zerokirby.note.util;
 
 
 import android.content.Context;

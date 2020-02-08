@@ -81,6 +81,7 @@ public class LoginActivity extends BaseActivity {
                         values.put("registerTime", registerTime);
                         values.put("lastSync", syncTime);
                         db.update("User", values, "rowid = ?", new String[]{"1"});
+                        db.close();
                         finish();
                     }
                 }
@@ -178,10 +179,12 @@ public class LoginActivity extends BaseActivity {
                         else
                             values.putNull("avatar");
                         db.update("User", values, "rowid = ?", new String[]{"1"});
+                        db.close();
                     }
                     Message message = new Message();
                     message.what = LOGIN;
                     handler.sendMessage(message);//通过handler发送消息请求toast
+                    response.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

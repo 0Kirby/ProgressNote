@@ -62,8 +62,8 @@ public class MainActivity extends BaseActivity {
 
     private List<DataItem> dataList = new ArrayList<>();
 
-    static final int SC = 1;//服务器同步到客户端
-    static final int CS = 2;//客户端同步到服务器
+    private final int SC = 1;//服务器同步到客户端
+    private final int CS = 2;//客户端同步到服务器
     private NavigationView navigationView;
     private View headView;
     private DrawerLayout drawerLayout;
@@ -146,6 +146,7 @@ public class MainActivity extends BaseActivity {
                         ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
                         values.put("lastSync", System.currentTimeMillis());
                         db.update("User", values, "rowid = ?", new String[]{"1"});
+                        db.close();
                         restartActivityNoAnimation(MainActivity.this);
                         break;
                 }
@@ -206,6 +207,8 @@ public class MainActivity extends BaseActivity {
                         builder.show();
                         break;
                     case R.id.settings:
+                        intent = new Intent(MainActivity.this, SettingsActivity.class);//启动设置
+                        startActivity(intent);
                         break;
                     case R.id.exit_login:
                         builder = new AlertDialog.Builder(MainActivity.this);//显示提示
@@ -221,6 +224,7 @@ public class MainActivity extends BaseActivity {
                                 values.put("lastSync", 0);
                                 db.update("user", values, "rowid = ?", new String[]{"1"});
                                 Toast.makeText(MainActivity.this, "已退出登录！", Toast.LENGTH_SHORT).show();
+                                db.close();
                                 drawerLayout.closeDrawers();
                                 checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
                             }
@@ -299,6 +303,7 @@ public class MainActivity extends BaseActivity {
             db.update("User", values, "rowid = ?", new String[]{"1"});//更新
 
         dataList.clear();//刷新dataList
+        db.close();
         initData();//初始化数据
     }
 
@@ -352,6 +357,7 @@ public class MainActivity extends BaseActivity {
         if (cursor != null) {
             cursor.close();
         }
+        db.close();
     }
 
     //重写，实现再按一次退出
@@ -384,19 +390,6 @@ public class MainActivity extends BaseActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
 
-            case R.id.about:
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                builder.setTitle("关于我们");
-                builder.setMessage(R.string.developers);
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-                builder.show();
-                break;
-
             case R.id.theme:
                 ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
                 break;
@@ -426,7 +419,6 @@ public class MainActivity extends BaseActivity {
 
         //获取菜单
         Menu menu = navigationView.getMenu();
-        menu.getItem(3).setEnabled(false);//“设置”尚未实现
         if (isLogin == 0) {//用户没有登录
 
             //设置头像未待添加，并禁用修改头像按钮
@@ -461,6 +453,7 @@ public class MainActivity extends BaseActivity {
 
 
             //显示头像，并启用修改头像按钮
+            db = dbHelper.getReadableDatabase();
             AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, dbHelper);
             byte[] imgData = avatarDatabaseUtil.readImage();
             if (imgData != null) {
@@ -468,6 +461,7 @@ public class MainActivity extends BaseActivity {
                 Bitmap imagebitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
                 //将位图显示为图片
                 imageView.setImageBitmap(imagebitmap);
+                imagebitmap = null;
             }
 
             imageView.setOnClickListener(new View.OnClickListener() {
@@ -485,6 +479,7 @@ public class MainActivity extends BaseActivity {
             menu.getItem(2).setVisible(true);//显示“同步（客户端->服务器）”
             menu.getItem(4).setVisible(true);//显示“退出登录”
         }
+        db.close();
     }
 
     //笔记同步用方法
@@ -502,6 +497,7 @@ public class MainActivity extends BaseActivity {
                     Message message = new Message();
                     message.what = SC;
                     handler.sendMessage(message);//通过handler发送消息请求toast
+                    response.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -522,6 +518,7 @@ public class MainActivity extends BaseActivity {
                     Message message = new Message();
                     message.what = CS;
                     handler.sendMessage(message);//通过handler发送消息请求toast
+                    response.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -550,7 +547,7 @@ public class MainActivity extends BaseActivity {
 
                 db.insert("Note", null, values);
             }
-
+            db.close();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -582,6 +579,7 @@ public class MainActivity extends BaseActivity {
             }
             if (cursor != null) {
                 cursor.close();
+                db.close();
             }
             return jsonArray.toString();
         } catch (JSONException e) {
@@ -616,5 +614,6 @@ public class MainActivity extends BaseActivity {
         }
         isLogin = cursor.getInt(cursor.getColumnIndex("userId"));
         cursor.close();
+        db.close();
     }
 }

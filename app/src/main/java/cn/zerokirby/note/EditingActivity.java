@@ -105,6 +105,7 @@ public class EditingActivity extends BaseActivity {
                 values.clear();
                 Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
                         Toast.LENGTH_SHORT).show();
+                db.close();
                 break;
 
             case R.id.delete:
@@ -114,10 +115,11 @@ public class EditingActivity extends BaseActivity {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        dbHelper.getWritableDatabase();
+                        db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
                                 Toast.LENGTH_SHORT).show();
+                        db.close();
                         finish();//关闭当前活动并返回到主活动
                     }
                 });
@@ -181,5 +183,6 @@ public class EditingActivity extends BaseActivity {
                     .getColumnIndex("content")));  //读取文本
         }
         cursor.close();
+        db.close();
     }
 }

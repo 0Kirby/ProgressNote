@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import cn.zerokirby.note.sharedPref.ShareUtils;
+import cn.zerokirby.note.util.ShareUtils;
 
 public class OpeningActivity extends BaseActivity {
 

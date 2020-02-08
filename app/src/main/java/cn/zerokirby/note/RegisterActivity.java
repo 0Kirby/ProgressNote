@@ -70,7 +70,9 @@ public class RegisterActivity extends BaseActivity {
                         values.put("password", password);
                         values.put("lastUse", System.currentTimeMillis());
                         values.put("registerTime", System.currentTimeMillis());//生成注册时间
+                        values.putNull("avatar");
                         db.update("User", values, "rowid = ?", new String[]{"1"});
+                        db.close();
                         LoginActivity.loginActivity.finish();
                         finish();
                     }
@@ -140,6 +142,7 @@ public class RegisterActivity extends BaseActivity {
                     Message message = new Message();
                     message.what = REGISTER;
                     handler.sendMessage(message);//通过handler发送消息请求toast
+                    response.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -25,6 +25,7 @@ public class AvatarDatabaseUtil {
         cv.put("avatar", bitmabToBytes(context, bitmap));//图片转为二进制
         db.update("User", cv, "rowid = ?", new String[]{"1"});
         db.close();
+        bitmap = null;
     }
 
     public byte[] readImage() {
@@ -55,6 +56,7 @@ public class AvatarDatabaseUtil {
         } finally {
             try {
                 baos.close();
+                bitmap = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -70,6 +72,7 @@ public class AvatarDatabaseUtil {
             id = cur.getInt(cur.getColumnIndex("userId"));
         }
         cur.close();
+        db.close();
         return id;
     }
 }

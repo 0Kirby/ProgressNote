@@ -63,7 +63,10 @@ public class IconActivity extends BaseActivity {
             Bitmap bitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
             //将位图显示为图片
             imageView.setImageBitmap(bitmap);
+            bitmap = null;
         }
+
+        userDbHelper.close();
 
         final Button button = findViewById(R.id.change_icon);
         button.setOnClickListener(new View.OnClickListener() {
@@ -184,6 +187,7 @@ public class IconActivity extends BaseActivity {
             DatabaseHelper userDbHelper = new DatabaseHelper(IconActivity.this, "ProgressNote.db", null, 1);
             AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
             avatarDatabaseUtil.saveImage(bitmap);
+            bitmap = null;
         } else
             Toast.makeText(this, "打开失败", Toast.LENGTH_SHORT).show();
     }
@@ -197,6 +201,7 @@ public class IconActivity extends BaseActivity {
                 DatabaseHelper userDbHelper = new DatabaseHelper(IconActivity.this, "ProgressNote.db", null, 1);
                 AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(IconActivity.this, userDbHelper);
                 final int id = avatarDatabaseUtil.getUserId();//获取用户id
+                userDbHelper.close();
                 OkHttpClient client = new OkHttpClient();
                 RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型未jpg
                 RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
