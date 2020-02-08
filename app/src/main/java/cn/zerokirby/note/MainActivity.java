@@ -512,7 +512,7 @@ public class MainActivity extends BaseActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
                     RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
-                            .add("json", Objects.requireNonNull(makeJSONArray(userId))).build();
+                            .add("json", Objects.requireNonNull(makeJSONArray())).build();
                     Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     Message message = new Message();
@@ -553,7 +553,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private String makeJSONArray(final int userId) {//生成JSON数组的字符串
+    private String makeJSONArray() {//生成JSON数组的字符串
         try {
             JSONArray jsonArray = new JSONArray();
             DatabaseHelper noteDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
