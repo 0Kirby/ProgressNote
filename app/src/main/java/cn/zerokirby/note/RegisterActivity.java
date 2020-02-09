@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -24,6 +25,7 @@ import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.userData.SystemUtil;
+import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,12 +35,16 @@ import okhttp3.Response;
 
 public class RegisterActivity extends BaseActivity {
 
-    static final int REGISTER = 2;//注册
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final int REGISTER = 2;//注册
     String userId;
     private String responseData;
     private String username;
     private String password;
     private Handler handler;//用于进程间异步消息传递
+    private CheckBox usernameCheckBox;
+    private CheckBox passwordCheckBox;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,6 +59,10 @@ public class RegisterActivity extends BaseActivity {
         final Button registerButton = findViewById(R.id.register_btn);
         final ImageView imageView = findViewById(R.id.back);
         final ProgressBar progressBar = findViewById(R.id.loading);
+        usernameCheckBox = findViewById(R.id.username_checkbox);
+        passwordCheckBox = findViewById(R.id.password_checkbox);
+
+        setRemember();//初始化复选框
 
         handler = new Handler(new Handler.Callback() {
 
@@ -78,6 +88,30 @@ public class RegisterActivity extends BaseActivity {
                     }
                 }
                 return false;
+            }
+        });
+
+        //设置复选框的点击事件
+        usernameCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameCheckBox.isChecked()) {
+                    passwordCheckBox.setEnabled(true);
+                    ShareUtil.putBoolean(RegisterActivity.this, USERNAME, true);
+                } else {
+                    passwordCheckBox.setEnabled(false);
+                    ShareUtil.putBoolean(RegisterActivity.this, USERNAME, false);
+                }
+            }
+        });
+
+        passwordCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordCheckBox.isChecked())
+                    ShareUtil.putBoolean(RegisterActivity.this, PASSWORD, true);
+                else
+                    ShareUtil.putBoolean(RegisterActivity.this, PASSWORD, false);
             }
         });
 
@@ -159,4 +193,14 @@ public class RegisterActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+
+    private void setRemember() {//设定CheckBox
+        boolean username = ShareUtil.getBoolean(this, USERNAME, false);//从SharedPreferences里取布尔值
+        boolean password = ShareUtil.getBoolean(this, PASSWORD, false);
+        usernameCheckBox.setChecked(username);//根据用户设定来显示复选框的勾
+        passwordCheckBox.setChecked(password);
+        if (!username)
+            passwordCheckBox.setEnabled(false);//当未勾选“记住用户名”时，“记住密码”不可用
+    }
+
 }

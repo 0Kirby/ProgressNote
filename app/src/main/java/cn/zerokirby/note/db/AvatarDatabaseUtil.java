@@ -22,7 +22,7 @@ public class AvatarDatabaseUtil {
     public void saveImage(Bitmap bitmap) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("avatar", bitmabToBytes(context, bitmap));//图片转为二进制
+        cv.put("avatar", bitmapToBytes(context, bitmap));//图片转为二进制
         db.update("User", cv, "rowid = ?", new String[]{"1"});
         db.close();
         bitmap = null;
@@ -41,7 +41,8 @@ public class AvatarDatabaseUtil {
     }
 
     //图片转为二进制数据
-    private byte[] bitmabToBytes(Context context, Bitmap bitmap) {
+    private byte[] bitmapToBytes(Context context, Bitmap bitmap) {
+
         //将图片转化为位图
         int size = bitmap.getWidth() * bitmap.getHeight();
         //创建一个字节数组输出流,流的大小为size

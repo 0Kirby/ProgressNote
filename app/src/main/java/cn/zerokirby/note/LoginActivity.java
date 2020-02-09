@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -28,6 +29,8 @@ import java.io.InputStream;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,15 +40,27 @@ import okhttp3.Response;
 
 public class LoginActivity extends BaseActivity {
 
-    static final int LOGIN = 1;//登录
-    String userId = "0";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final int LOGIN = 1;//登录
+    private String userId = "0";
     private String responseData;
     private String username;
     private String password;
     private long registerTime;
     private long syncTime;
     private Handler handler;//用于进程间异步消息传递
+    private EditText usernameEditText;
+    private EditText passwordEditText;
+    private CheckBox usernameCheckBox;
+    private CheckBox passwordCheckBox;
     static Activity loginActivity;
+
+    @Override
+    protected void onResume() {//保证复选框的一致性
+        setRemember();
+        super.onResume();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,12 +71,16 @@ public class LoginActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         loginActivity = this;
 
-        final EditText usernameEditText = findViewById(R.id.username);
-        final EditText passwordEditText = findViewById(R.id.password);
+        usernameEditText = findViewById(R.id.username);
+        passwordEditText = findViewById(R.id.password);
+        usernameCheckBox = findViewById(R.id.username_checkbox);
+        passwordCheckBox = findViewById(R.id.password_checkbox);
         final Button loginButton = findViewById(R.id.login);
         final TextView register = findViewById(R.id.register_link);
         final ImageView imageView = findViewById(R.id.close);
         final ProgressBar progressBar = findViewById(R.id.loading);
+
+        setRemember();//初始化复选框
 
         handler = new Handler(new Handler.Callback() {
 
@@ -86,6 +105,30 @@ public class LoginActivity extends BaseActivity {
                     }
                 }
                 return false;
+            }
+        });
+
+        //设置复选框的点击事件
+        usernameCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (usernameCheckBox.isChecked()) {
+                    passwordCheckBox.setEnabled(true);
+                    ShareUtil.putBoolean(LoginActivity.this, USERNAME, true);
+                } else {
+                    passwordCheckBox.setEnabled(false);
+                    ShareUtil.putBoolean(LoginActivity.this, USERNAME, false);
+                }
+            }
+        });
+
+        passwordCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordCheckBox.isChecked())
+                    ShareUtil.putBoolean(LoginActivity.this, PASSWORD, true);
+                else
+                    ShareUtil.putBoolean(LoginActivity.this, PASSWORD, false);
             }
         });
 
@@ -204,5 +247,20 @@ public class LoginActivity extends BaseActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setRemember() {//记住用户名、密码模块
+        boolean username = ShareUtil.getBoolean(this, USERNAME, false);//从SharedPreferences里取布尔值
+        boolean password = ShareUtil.getBoolean(this, PASSWORD, false);
+        usernameCheckBox.setChecked(username);//根据用户设定来显示复选框的勾
+        passwordCheckBox.setChecked(password);
+        if (username) {
+            DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+            String[] string = databaseOperateUtil.getLogin();//获取用户名和密码
+            usernameEditText.setText(string[0]);
+            if (password)
+                passwordEditText.setText(string[1]);
+        } else
+            passwordCheckBox.setEnabled(false);//当未勾选“记住用户名”时，“记住密码”不可用
     }
 }

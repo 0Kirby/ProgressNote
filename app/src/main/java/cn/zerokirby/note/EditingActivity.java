@@ -4,9 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -15,8 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,12 +29,15 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
 
 public class EditingActivity extends BaseActivity {
 
     private EditText noteTitle;
     private TextView noteTime;
     private TextView wordNum;
+    private final int CS = 2;//客户端同步到服务器
+
     TextWatcher textWatcher = new TextWatcher() {//监测EditText文本变化，用于字数统计
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -106,6 +114,7 @@ public class EditingActivity extends BaseActivity {
                 Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
                         Toast.LENGTH_SHORT).show();
                 db.close();
+                modifySync();
                 break;
 
             case R.id.delete:
@@ -120,6 +129,7 @@ public class EditingActivity extends BaseActivity {
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
                                 Toast.LENGTH_SHORT).show();
                         db.close();
+                        modifySync();
                         finish();//关闭当前活动并返回到主活动
                     }
                 });
@@ -184,5 +194,26 @@ public class EditingActivity extends BaseActivity {
         }
         cursor.close();
         db.close();
+    }
+
+    private void modifySync() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean sync = sharedPreferences.getBoolean("sync", false);
+        if (sync) {
+            boolean launch = sharedPreferences.getBoolean("launch_sync", false);
+            if (launch) {
+                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
+                    @Override
+                    public boolean handleMessage(@NonNull Message msg) {
+                        if (msg.what == CS) {
+                            Toast.makeText(EditingActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        }
+                        return true;
+                    }
+                });
+                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+                databaseOperateUtil.sendRequestWithOkHttpCS(handler);
+            }
+        }
     }
 }

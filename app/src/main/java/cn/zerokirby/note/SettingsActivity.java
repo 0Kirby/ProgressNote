@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -49,14 +50,14 @@ public class SettingsActivity extends BaseActivity {
         if (cursor.moveToFirst())
             userId = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
         cursor.close();
-        dbHelper.close();
+        db.close();
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
-            findPreference("version").setSummary(String.format("%s (Build %d) (%s)", AppUtil.getVersionName(getActivity()), AppUtil.getVersionCode(getActivity()), AppUtil.getPackageName(getActivity())));
+            findPreference("version").setSummary(String.format("版本号：%s\n构建日期：%d\n包名：%s", AppUtil.getVersionName(getActivity()), AppUtil.getVersionCode(getActivity()), AppUtil.getPackageName(getActivity())));
         }
 
         @Override
@@ -75,6 +76,7 @@ public class SettingsActivity extends BaseActivity {
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
                             db.execSQL("Delete from Note");//清空笔记表
                             db.close();
+                            Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
                     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -111,6 +113,7 @@ public class SettingsActivity extends BaseActivity {
                                     }
                                 }
                             }).start();
+                            Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
                     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做

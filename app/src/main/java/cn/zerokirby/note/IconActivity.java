@@ -213,6 +213,7 @@ public class IconActivity extends BaseActivity {
                     Message message = new Message();//发送消息
                     message.what = UPLOAD;
                     handler.sendMessage(message);
+                    response.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

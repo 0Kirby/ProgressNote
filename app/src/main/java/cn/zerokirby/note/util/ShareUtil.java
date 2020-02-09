@@ -4,7 +4,7 @@ package cn.zerokirby.note.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class ShareUtils {
+public class ShareUtil {
 
     private static final String SETTINGS = "settings";
 

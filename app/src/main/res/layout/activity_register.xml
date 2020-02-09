@@ -165,13 +165,36 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="41dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/username_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="75dp"
+                android:text="@string/remember_username" />
+
+            <CheckBox
+                android:id="@+id/password_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="75dp"
+                android:text="@string/remember_password" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/linear"
             android:layout_width="200dp"
             android:layout_height="41dp"
             android:layout_gravity="center"
-            android:layout_marginTop="40.3dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="16.7dp"
-            android:background="@drawable/half_roundshape"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -188,7 +211,6 @@
                 android:textSize="15sp" />
 
         </LinearLayout>
-
         <ProgressBar
             android:id="@+id/loading"
             android:layout_width="36dp"
