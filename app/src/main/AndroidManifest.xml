@@ -31,9 +31,7 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".LoginActivity" />
-        <activity
-            android:name=".EditingActivity"
-            android:parentActivityName=".MainActivity">
+        <activity android:name=".EditingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
             </intent-filter>

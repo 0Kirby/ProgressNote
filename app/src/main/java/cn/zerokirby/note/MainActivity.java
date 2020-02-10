@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +62,7 @@ import okhttp3.Response;
 public class MainActivity extends BaseActivity {
 
     private List<DataItem> dataList = new ArrayList<>();
+    private DataAdapter dataAdapter;
 
     private final int SC = 1;//服务器同步到客户端
     private final int CS = 2;//客户端同步到服务器
@@ -89,6 +91,7 @@ public class MainActivity extends BaseActivity {
     private Handler handler;
     private ProgressDialog progressDialog;
 
+    /*已弃用
     public void restartActivityNoAnimation(Activity activity) {//刷新活动
         Intent intent = new Intent();
         intent.setClass(activity, activity.getClass());
@@ -96,12 +99,21 @@ public class MainActivity extends BaseActivity {
         activity.finish();
         overridePendingTransition(0, 0);
     }
-
     public void restartActivity(Activity activity) {//刷新活动
         Intent intent = new Intent();
         intent.setClass(activity, activity.getClass());
         activity.startActivity(intent);
         activity.finish();
+    }
+    */
+
+    //刷新数据
+    private void refreshData() {
+        dataAdapter.notifyDataSetChanged();//通知adapter更新
+        //初始化Journal数据
+        dataList.clear();
+        initData();
+        checkLoginStatus();//检查登录状态
     }
 
     //判断是否是平板模式
@@ -115,6 +127,21 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //设置recyclerView
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        StaggeredGridLayoutManager layoutManager;
+        //实现瀑布流布局，将recyclerView改为两列
+        layoutManager = new StaggeredGridLayoutManager
+                (2, StaggeredGridLayoutManager.VERTICAL);
+        //如果是平板模式，则改为三列
+        if (isTablet(MainActivity.this)) {
+            layoutManager = new StaggeredGridLayoutManager
+                    (3, StaggeredGridLayoutManager.VERTICAL);
+        }
+        recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+        dataAdapter = new DataAdapter(dataList);//初始化适配器
+        recyclerView.setAdapter(dataAdapter);//设置适配器
 
         navigationView = findViewById(R.id.nav_view);
         headView = navigationView.getHeaderView(0);//获取头部布局
@@ -147,16 +174,13 @@ public class MainActivity extends BaseActivity {
                         values.put("lastSync", System.currentTimeMillis());
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
-                        restartActivityNoAnimation(MainActivity.this);
+                        refreshData();
+                        //restartActivityNoAnimation(MainActivity.this);
                         break;
                 }
                 return false;
             }
         });
-
-        //设置recyclerView
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        StaggeredGridLayoutManager layoutManager;
 
         //检查登录状态，确定隐藏哪些文字和按钮
         checkLoginStatus();
@@ -246,20 +270,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-
-        //实现瀑布流布局，将recyclerView改为两列
-        layoutManager = new StaggeredGridLayoutManager
-                (2, StaggeredGridLayoutManager.VERTICAL);
-        //如果是平板模式，则改为三列
-        if (isTablet(MainActivity.this)) {
-            layoutManager = new StaggeredGridLayoutManager
-                    (3, StaggeredGridLayoutManager.VERTICAL);
-        }
-
-        recyclerView.setLayoutManager(layoutManager);
-        DataAdapter adapter = new DataAdapter(dataList);
-        recyclerView.setAdapter(adapter);
-
         //为悬浮按钮设置点击事件
         floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -278,7 +288,7 @@ public class MainActivity extends BaseActivity {
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        refreshData();
+                        refreshDataLayout();
                     }
                 });
 
@@ -308,15 +318,17 @@ public class MainActivity extends BaseActivity {
     }
 
     //刷新数据
-    private void refreshData() {
+    private void refreshDataLayout() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        restartActivity(MainActivity.this);
+                        //restartActivity(MainActivity.this);
+                        refreshData();
                         swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(MainActivity.this,"刷新数据",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -327,9 +339,12 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshData();
+        /*
         if (firstLaunch)
             restartActivity(MainActivity.this);
         firstLaunch = true;
+        */
     }
 
     //初始化从数据库中读取数据并填充dataItem
@@ -442,7 +457,7 @@ public class MainActivity extends BaseActivity {
             username.setVisibility(View.GONE);//隐藏“用户名”
             userId.setVisibility(View.GONE);//隐藏“用户ID”
             lastLogin.setText("尚未登陆！");//显示“尚未登陆！”
-            lastLogin.setTextSize(32);
+            lastLogin.setTextSize(32);//设置文字大小
             lastSync.setVisibility(View.GONE);//隐藏“上次同步”
 
             menu.getItem(0).setVisible(true);//显示“登录”
@@ -450,7 +465,6 @@ public class MainActivity extends BaseActivity {
             menu.getItem(2).setVisible(false);//隐藏“同步（客户端->服务器）”
             menu.getItem(4).setVisible(false);//隐藏“退出登录”
         } else {//用户已经登录
-
 
             //显示头像，并启用修改头像按钮
             db = dbHelper.getReadableDatabase();
@@ -599,12 +613,16 @@ public class MainActivity extends BaseActivity {
                 new String[]{"1"}, null, null, null,
                 null);//查询对应的数据
         if (cursor.moveToFirst()) {
+            userId.setVisibility(View.VISIBLE);//显示“用户ID”
+            username.setVisibility(View.VISIBLE);//显示“用户名”
+            lastSync.setVisibility(View.VISIBLE);//显示“上次同步”
             userId.setText(String.format(getResources().getString(R.string.login_userId), cursor.getInt(cursor
                     .getColumnIndex("userId"))));  //读取ID
             username.setText(String.format(getResources().getString(R.string.login_username), cursor.getString(cursor
                     .getColumnIndex("username"))));  //读取用户名
             lastLogin.setText(String.format(getResources().getString(R.string.last_login), simpleDateFormat.format(new Date(cursor.getLong(cursor
                     .getColumnIndex("lastUse"))))));  //读取上次登录时间
+            lastLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);//设置文字大小
             long time = cursor.getLong(cursor.getColumnIndex("lastSync"));//读取上次同步时间
             if (time != 0)
                 lastSync.setText(String.format(getResources().getString(R.string.last_sync), simpleDateFormat.format(new Date(cursor.getLong(cursor
