@@ -6,8 +6,8 @@ android {
         applicationId "cn.zerokirby.note"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 20200210
-        versionName "2.6.0"
+        versionCode Integer.valueOf(getDate())
+        versionName "2.6.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,7 +30,10 @@ android {
                 outputFileName = "ProgressNote-v${variant.versionName}.apk"
             }
     }
+}
 
+static def getDate() {
+    return new Date().format("yyyyMMdd")
 }
 
 dependencies {

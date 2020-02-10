@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
@@ -38,7 +39,7 @@ public class RegisterActivity extends BaseActivity {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final int REGISTER = 2;//注册
-    String userId;
+    private String userId;
     private String responseData;
     private String username;
     private String password;
@@ -98,8 +99,11 @@ public class RegisterActivity extends BaseActivity {
                 if (usernameCheckBox.isChecked()) {
                     passwordCheckBox.setEnabled(true);
                     ShareUtil.putBoolean(RegisterActivity.this, USERNAME, true);
-                } else {
+                } else {//取消复选框时删除存储在本地的用户名和密码
                     passwordCheckBox.setEnabled(false);
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(RegisterActivity.this);
+                    databaseOperateUtil.setUserColumnNull("username");
+                    databaseOperateUtil.setUserColumnNull("password");
                     ShareUtil.putBoolean(RegisterActivity.this, USERNAME, false);
                 }
             }
@@ -110,8 +114,11 @@ public class RegisterActivity extends BaseActivity {
             public void onClick(View v) {
                 if (passwordCheckBox.isChecked())
                     ShareUtil.putBoolean(RegisterActivity.this, PASSWORD, true);
-                else
+                else {//取消复选框时删除存储在本地的密码
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(RegisterActivity.this);
+                    databaseOperateUtil.setUserColumnNull("password");
                     ShareUtil.putBoolean(RegisterActivity.this, PASSWORD, false);
+                }
             }
         });
 

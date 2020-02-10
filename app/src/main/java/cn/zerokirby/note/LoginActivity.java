@@ -115,8 +115,11 @@ public class LoginActivity extends BaseActivity {
                 if (usernameCheckBox.isChecked()) {
                     passwordCheckBox.setEnabled(true);
                     ShareUtil.putBoolean(LoginActivity.this, USERNAME, true);
-                } else {
+                } else {//取消复选框时删除存储在本地的用户名和密码
                     passwordCheckBox.setEnabled(false);
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(LoginActivity.this);
+                    databaseOperateUtil.setUserColumnNull("username");
+                    databaseOperateUtil.setUserColumnNull("password");
                     ShareUtil.putBoolean(LoginActivity.this, USERNAME, false);
                 }
             }
@@ -127,8 +130,11 @@ public class LoginActivity extends BaseActivity {
             public void onClick(View v) {
                 if (passwordCheckBox.isChecked())
                     ShareUtil.putBoolean(LoginActivity.this, PASSWORD, true);
-                else
+                else {//取消复选框时删除存储在本地的密码
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(LoginActivity.this);
+                    databaseOperateUtil.setUserColumnNull("password");
                     ShareUtil.putBoolean(LoginActivity.this, PASSWORD, false);
+                }
             }
         });
 

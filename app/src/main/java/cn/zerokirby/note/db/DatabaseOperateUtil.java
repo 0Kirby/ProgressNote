@@ -170,4 +170,12 @@ public class DatabaseOperateUtil {
         return str;
     }
 
+    public void setUserColumnNull(String column) {//将User数据库的某个字段置为空
+        DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
+        SQLiteDatabase db = noteDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.putNull(column);//将该字段置为空
+        db.update("User", values, "rowid = ?", new String[]{"1"});
+        db.close();
+    }
 }
