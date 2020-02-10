@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -50,8 +49,8 @@ public class EditingActivity extends BaseActivity {
     ContentValues values;
     private static int type;
     private Menu cMenu;
-
-    private int WARNING_NUM=1;//点击返回弹出警告的最少输入字数
+    private String title = "";
+    private String content = "";
 
     TextWatcher textWatcher = new TextWatcher() {//监测EditText文本变化，用于字数统计
         @Override
@@ -132,12 +131,7 @@ public class EditingActivity extends BaseActivity {
                 shareText(this, noteTitle.getText() + "\n" + noteTime.getText() + "\n" + mainText.getText());
                 break;
             case android.R.id.home:
-                int textLength = noteTitle.getText().toString().length()
-                        + mainText.getText().toString().length();
-                if(textLength<WARNING_NUM)
-                    finish();
-                else
-                    backWarning();
+                backWarning();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -181,12 +175,14 @@ public class EditingActivity extends BaseActivity {
                 noteId, null, null, null,
                 null);//查询对应的数据
         if (cursor.moveToFirst()) {
-            noteTitle.setText(cursor.getString(cursor
-                    .getColumnIndex("title")));  //读取标题
+
+            title = cursor.getString(cursor.getColumnIndex("title"));//读取标题并保留一份
+            noteTitle.setText(title);
             noteTime.setText(simpleDateFormat.format(new Date(cursor.getLong(cursor
                     .getColumnIndex("time")))));  //读取时间
-            mainText.setText(cursor.getString(cursor
-                    .getColumnIndex("content")));  //读取文本
+            content = cursor.getString(cursor.getColumnIndex("content"));//读取文本并保留一份
+            mainText.setText(content);
+
         }
         cursor.close();
         db.close();
@@ -222,17 +218,15 @@ public class EditingActivity extends BaseActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    //有输入内容时点击后退键弹出警告
-    private void backWarning(){
-        int textLength = noteTitle.getText().toString().length()
-                + mainText.getText().toString().length();
-        if(type == 0 && (textLength>=WARNING_NUM)){
+    //笔记有未保存的修改点击后退键弹出警告
+    private void backWarning() {
+        if (!title.equals(noteTitle.getText().toString()) || !content.equals(mainText.getText().toString())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
-            builder.setTitle("警告！");
-            builder.setMessage("你输入了" + String.valueOf(textLength) + "个字，确定不要了吗？");
-            builder.setPositiveButton("保留它", new DialogInterface.OnClickListener() {
+            builder.setTitle("提示");
+            builder.setMessage("有尚未保存的修改\n是否保存？");
+            builder.setNeutralButton("保存", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行保存操作
                     getData();
                     insertData();
                     Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
@@ -240,18 +234,28 @@ public class EditingActivity extends BaseActivity {
                     finish();
                 }
             });
-            builder.setNegativeButton("不要了", new DialogInterface.OnClickListener() {//关闭活动
+
+            builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {//取消操作
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            builder.setNegativeButton("不保存", new DialogInterface.OnClickListener() {//关闭活动
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     finish();
                 }
             });
+
             builder.show();
-        }
+        } else
+            finish();
     }
 
     //获取数据
-    private void getData(){
+    private void getData() {
         //获取时间
         long currentTime = System.currentTimeMillis();
         date = new Date(currentTime);
@@ -267,7 +271,7 @@ public class EditingActivity extends BaseActivity {
     }
 
     //添加数据
-    private void insertData(){
+    private void insertData() {
         db.insert("Note", null, values);
         Cursor cur = db.rawQuery("select LAST_INSERT_ROWID() ", null);//查询最新插入的
         cur.moveToFirst();
