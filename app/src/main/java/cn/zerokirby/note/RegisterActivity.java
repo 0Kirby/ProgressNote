@@ -176,7 +176,7 @@ public class RegisterActivity extends BaseActivity {
                             .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
                             .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
                             .add("brand", systemUtil.getDeviceBrand()).build();
-                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/RegisterServlet").post(requestBody).build();
+                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/RegisterServlet").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON

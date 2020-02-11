@@ -207,7 +207,7 @@ public class IconActivity extends BaseActivity {
                 RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                         .addFormDataPart("userId", String.valueOf(id))
                         .addFormDataPart("file", id + ".jpg", fileBody).build();
-                Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/UploadAvatarServlet").post(requestBody).build();
+                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/UploadAvatarServlet").post(requestBody).build();
                 try {
                     Response response = client.newCall(request).execute();
                     Message message = new Message();//发送消息

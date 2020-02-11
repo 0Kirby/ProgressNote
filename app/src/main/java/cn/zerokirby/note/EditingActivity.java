@@ -214,6 +214,7 @@ public class EditingActivity extends BaseActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             backWarning();
+            return false;//防止用户按键过快无法响应
         }
         return super.onKeyDown(keyCode, event);
     }

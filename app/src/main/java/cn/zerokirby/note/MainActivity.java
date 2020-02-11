@@ -1,6 +1,5 @@
 package cn.zerokirby.note;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -328,7 +327,7 @@ public class MainActivity extends BaseActivity {
                         //restartActivity(MainActivity.this);
                         refreshData();
                         swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(MainActivity.this,"刷新数据",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -379,14 +378,19 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if ((System.currentTimeMillis() - exitTime) > 2000) {
-                Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
-                exitTime = System.currentTimeMillis();
-            } else {
-                finish();
-                System.exit(0);
+            if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                if ((System.currentTimeMillis() - exitTime) > 2000) {
+                    Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
+                    exitTime = System.currentTimeMillis();
+                } else {
+                    finish();
+                    System.exit(0);
+                }
+                return true;
+            } else {//抽屉打开时先关闭抽屉
+                drawerLayout.closeDrawers();
+                return false;
             }
-            return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -504,7 +508,7 @@ public class MainActivity extends BaseActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
                     RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
-                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/SyncServlet_SC").post(requestBody).build();
+                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONArray(responseData);//处理JSON
@@ -527,7 +531,7 @@ public class MainActivity extends BaseActivity {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
                     RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
                             .add("json", Objects.requireNonNull(makeJSONArray())).build();
-                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
+                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     Message message = new Message();
                     message.what = CS;

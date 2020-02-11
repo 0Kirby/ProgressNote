@@ -198,7 +198,7 @@ public class LoginActivity extends BaseActivity {
                     //基础登录
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
                     RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password).build();
-                    Request request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/LoginServlet").post(requestBody).build();
+                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/LoginServlet").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONObject(responseData);//处理JSON
@@ -208,7 +208,7 @@ public class LoginActivity extends BaseActivity {
                     {
                         client = new OkHttpClient();
                         requestBody = new FormBody.Builder().add("userId", userId).build();
-                        request = new Request.Builder().url("https://0kirby.ga:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
+                        request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
                         response = client.newCall(request).execute();
                         InputStream inputStream = response.body().byteStream();
                         ByteArrayOutputStream output = new ByteArrayOutputStream();
