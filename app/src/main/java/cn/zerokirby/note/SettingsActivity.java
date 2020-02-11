@@ -132,6 +132,9 @@ public class SettingsActivity extends BaseActivity {
                     browser.setData(Uri.parse("https://github.com/0Kirby/ProgressNote"));
                     Objects.requireNonNull(getActivity()).startActivity(browser);
                     break;
+                case "feedback":
+                    startActivity(new Intent(getActivity(), FeedbackActivity.class));
+                    break;
                 case "code":
                     browser.setData(Uri.parse("https://github.com/0Kirby"));
                     Objects.requireNonNull(getActivity()).startActivity(browser);

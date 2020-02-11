@@ -60,6 +60,11 @@
             android:summary="ProgressNote"
             android:title="GitHub" />
 
+        <Preference
+            android:key="feedback"
+            android:summary="遇到bug或者有建议请告诉我们"
+            android:title="反馈" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

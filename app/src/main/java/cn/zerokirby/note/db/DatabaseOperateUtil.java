@@ -50,6 +50,20 @@ public class DatabaseOperateUtil {
         return id;
     }
 
+    public String getUsername() {
+        String username = "";
+        DatabaseHelper dbHelper = new DatabaseHelper(context,
+                "ProgressNote.db", null, 1);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("User", null, "rowid = ?",
+                new String[]{"1"}, null, null, null,
+                null);//查询对应的数据
+        if (cursor.moveToFirst())
+            username = cursor.getString(cursor.getColumnIndex("username"));  //读取用户名
+        cursor.close();
+        return username;
+    }
+
     public void sendRequestWithOkHttpSC(Handler handler) {
         new Thread(new Runnable() {
             @Override
