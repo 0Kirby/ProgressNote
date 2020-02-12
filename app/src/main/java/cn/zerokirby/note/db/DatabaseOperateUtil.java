@@ -91,7 +91,7 @@ public class DatabaseOperateUtil {
             @Override
             public void run() {//在子线程中进行网络操作
                 try {
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
+                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用客户端到服务器的同步servlet
                     RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
                             .add("json", Objects.requireNonNull(makeJSONArray())).build();
                     Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();

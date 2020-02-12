@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -25,12 +26,19 @@ import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.util.AppUtil;
 import cn.zerokirby.note.util.NetworkUtil;
+import cn.zerokirby.note.util.ShareUtil;
 
 public class FeedbackActivity extends BaseActivity {
 
     private static final int CHOOSE_PHOTO = 1;
+    private static final String IS_FIRST_LOGOUT = "isFirstLogout";
+    private static final String IS_COOKIE_SAVED = "isCookieSaved";
+    private static final String USER_INFO = "userInfo";
+    private static final String SESSION = "session";
+    private final String url = "https://support.qq.com/products/123835?d-wx-push=1";//吐槽吧地址
     private ValueCallback<Uri[]> uploadMessageAboveL;
     private WebView webView;
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {//防止按返回键直接关闭活动
@@ -55,7 +63,7 @@ public class FeedbackActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
 
-        final String url = "https://support.qq.com/products/123835?d-wx-push=1";//吐槽吧地址
+
         final ProgressBar progressBar = findViewById(R.id.feedback_pb);
         webView = findViewById(R.id.feedback_view);
 
@@ -102,6 +110,19 @@ public class FeedbackActivity extends BaseActivity {
                 if (newProgress == 100) {
                     //加载完毕让进度条消失
                     progressBar.setVisibility(View.GONE);
+                    boolean isCookieSaved = ShareUtil.getBoolean(FeedbackActivity.this, IS_FIRST_LOGOUT, false);
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(FeedbackActivity.this);
+                    int userId = databaseOperateUtil.getUserId();
+                    if (userId == 0 && !isCookieSaved && CookieManager.getInstance().hasCookies()) {
+                        ShareUtil.putBoolean(FeedbackActivity.this, IS_COOKIE_SAVED, true);
+                        String cookie = CookieManager.getInstance().getCookie(getDomain(url));//取出cookie
+                        String[] strArr = cookie.split(";");
+                        String userInfo = strArr[0];
+                        String session = strArr[1];
+                        ShareUtil.putString(FeedbackActivity.this, USER_INFO, userInfo);//保存
+                        ShareUtil.putString(FeedbackActivity.this, SESSION, session);
+
+                    }
                 }
                 super.onProgressChanged(view, newProgress);
             }
@@ -113,6 +134,7 @@ public class FeedbackActivity extends BaseActivity {
         String netType = NetworkUtil.getNetworkType(this);//获取网络类型
         String clientVersion = AppUtil.getVersionName(this);//获取版本号
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+
 
         int userId = databaseOperateUtil.getUserId();
         if (userId != 0) {
@@ -127,6 +149,7 @@ public class FeedbackActivity extends BaseActivity {
                     + "&netType=" + netType + "&clientVersion=" + clientVersion;
             webView.postUrl(url, postData.getBytes());
         } else {//未登录
+            cookieUtil();
             String postData = "&osVersion=" + osVersion + "&netType=" + netType + "&clientVersion=" + clientVersion;
             webView.postUrl(url, postData.getBytes());
         }
@@ -165,6 +188,32 @@ public class FeedbackActivity extends BaseActivity {
             webView.goBack();
         } else {
             finish();
+        }
+    }
+
+    /**
+     * 获取URL的域名
+     */
+    private String getDomain(String url) {
+        url = url.replace("http://", "").replace("https://", "");
+        if (url.contains("/")) {
+            url = url.substring(0, url.indexOf('/'));
+        }
+        return url;
+    }
+
+    //判断是否第一次进入游客状态以对cookie进行操作，保证游客身份的唯一性
+    private void cookieUtil() {
+        boolean isFirstLogout = ShareUtil.getBoolean(this, IS_FIRST_LOGOUT, true);
+        CookieManager.getInstance().removeAllCookies(null);
+        CookieManager.getInstance().flush();
+        if (isFirstLogout) {//第一次成为游客状态，不写入cookie
+            ShareUtil.putBoolean(this, IS_FIRST_LOGOUT, false);
+        } else {//否则写入cookie数据
+            String userInfo = ShareUtil.getString(this, USER_INFO, null);
+            String session = ShareUtil.getString(this, SESSION, null);
+            CookieManager.getInstance().setCookie(getDomain(url), userInfo);
+            CookieManager.getInstance().setCookie(getDomain(url), session);
         }
     }
 

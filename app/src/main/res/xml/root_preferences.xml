@@ -14,21 +14,15 @@
         app:title="@string/sync_header">
 
         <SwitchPreferenceCompat
-            app:key="sync"
-            app:summaryOff="仅使用手动同步"
-            app:summaryOn="在满足以下项时进行同步"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="launch_sync"
-            app:title="@string/attachment_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
             app:key="modify_sync"
             app:summary="包括新增、编辑、保存、删除等"
             app:title="修改笔记时" />
+
+        <SwitchPreferenceCompat
+            app:dependency="modify_sync"
+            app:key="launch_sync"
+            app:summary="适用于多台设备的场景"
+            app:title="@string/attachment_title" />
 
     </PreferenceCategory>
 

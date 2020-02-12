@@ -189,11 +189,12 @@ public class EditingActivity extends BaseActivity {
     }
 
     private void modifySync() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean sync = sharedPreferences.getBoolean("sync", false);
-        if (sync) {
-            boolean launch = sharedPreferences.getBoolean("launch_sync", false);
-            if (launch) {
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        int userId = databaseOperateUtil.getUserId();
+        if (userId != 0) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
+            if (modifySync) {
                 Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
                     @Override
                     public boolean handleMessage(@NonNull Message msg) {
@@ -203,7 +204,6 @@ public class EditingActivity extends BaseActivity {
                         return true;
                     }
                 });
-                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
                 databaseOperateUtil.sendRequestWithOkHttpCS(handler);
             }
         }

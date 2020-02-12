@@ -45,7 +45,7 @@
     <string name="have_a_try">立即体验</string>
     <string name="dot">圆点</string>
     <string name="title_activity_settings">设置</string>
-    <string name="sync_header">同步</string>
+    <string name="sync_header">自动同步</string>
     <string name="sync_title">自动同步</string>
     <string name="attachment_title">启动应用时</string>
     <string name="remember_username">记住用户名</string>

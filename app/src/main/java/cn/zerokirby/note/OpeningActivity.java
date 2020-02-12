@@ -56,24 +56,30 @@ public class OpeningActivity extends BaseActivity {
         }, 10000);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean sync = sharedPreferences.getBoolean("sync", false);
-        if (sync) {
-            boolean launch = sharedPreferences.getBoolean("launch_sync", false);
-            if (launch) {
-                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
-                    @Override
-                    public boolean handleMessage(@NonNull Message msg) {
-                        if (msg.what == SC) {
-                            Toast.makeText(OpeningActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                            mHandler.removeMessages(0);
-                            myThread.start();
+        boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        int userId = databaseOperateUtil.getUserId();
+        if (userId != 0) {
+            if (modifySync) {
+                boolean launch = sharedPreferences.getBoolean("launch_sync", false);
+                if (launch) {
+                    Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
+                        @Override
+                        public boolean handleMessage(@NonNull Message msg) {
+                            if (msg.what == SC) {
+                                Toast.makeText(OpeningActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                                mHandler.removeMessages(0);
+                                myThread.start();
+                            }
+                            return true;
                         }
-                        return true;
-                    }
-                });
+                    });
 
-                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-                databaseOperateUtil.sendRequestWithOkHttpSC(handler);
+                    databaseOperateUtil.sendRequestWithOkHttpSC(handler);
+                } else {
+                    myThread.start();
+                    mHandler.removeMessages(0);
+                }
             } else {
                 myThread.start();
                 mHandler.removeMessages(0);

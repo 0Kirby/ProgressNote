@@ -2,7 +2,6 @@ package cn.zerokirby.note;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 import org.json.JSONArray;
 
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.util.AppUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -41,16 +42,8 @@ public class SettingsActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        DatabaseHelper dbHelper = new DatabaseHelper(this,
-                "ProgressNote.db", null, 1);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query("User", null, "rowid = ?",
-                new String[]{"1"}, null, null, null,
-                null);//查询对应的数据
-        if (cursor.moveToFirst())
-            userId = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
-        cursor.close();
-        db.close();
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        userId = databaseOperateUtil.getUserId();  //读取id
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
@@ -58,6 +51,11 @@ public class SettingsActivity extends BaseActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
             findPreference("version").setSummary(String.format("版本号：%s\n构建日期：%d\n包名：%s", AppUtil.getVersionName(getActivity()), AppUtil.getVersionCode(getActivity()), AppUtil.getPackageName(getActivity())));
+            if (userId == 0)//如果用户没有登录，不能使用同步功能
+            {
+                SwitchPreferenceCompat modifySync = findPreference("modify_sync");
+                Objects.requireNonNull(modifySync).setEnabled(false);
+            }
         }
 
         @Override
@@ -155,5 +153,7 @@ public class SettingsActivity extends BaseActivity {
             return super.onPreferenceTreeClick(preference);
         }
     }
+
+
 }
 
