@@ -3,6 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/gridding"
+        android:icon="@drawable/ic_gridding"
+        android:title="@string/gridding"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/list"
+        android:icon="@drawable/ic_list"
+        android:title="@string/list"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/theme"
         android:icon="@drawable/ic_palette_white_24dp"
         android:title="@string/theme"

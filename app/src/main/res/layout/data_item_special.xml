@@ -2,13 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/year_month"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="6dp"
+        android:text="@string/date"
+        android:textSize="28sp" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="7dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         app:cardCornerRadius="12dp"
         app:cardElevation="12dp">
@@ -19,7 +31,7 @@
             android:padding="15dp">
 
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/title_special"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"
@@ -28,22 +40,31 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/body"
+                android:id="@+id/day_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lines="2"
+                android:gravity="right"
+                android:layout_margin="6dp"
+                android:text="@string/date"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/body_special"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:paddingTop="10dp"
                 android:text="@string/body"
                 android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="@string/date"
-                android:textSize="12sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/spread_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/button_background"
+        android:src="@drawable/stretch" />
+
 </LinearLayout>

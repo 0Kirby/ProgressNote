@@ -5,6 +5,8 @@
     <string name="title">（空）</string>
     <string name="body">（空）</string>
     <string name="date">（空）</string>
+    <string name="date_special">（空）</string>
+    <string name="time">（空）</string>
     <string name="save">保存</string>
     <string name="delete">删除</string>
     <string name="about_us">关于我们</string>
@@ -17,6 +19,7 @@
     <string name="exitApp">再按一次退出程序</string>
     <string name="formatDate">yyyy年MM月dd日    HH:mm:ss</string>
     <string name="formatDate_User">yyyy年MM月dd日 HH:mm:ss</string>
+    <string name="format_year_month_day">yyyy年MM月dd日</string>
     <string name="register">注册</string>
     <string name="username">用户名</string>
     <string name="password">密码</string>
@@ -32,6 +35,8 @@
     <string name="exit_login">退出登录</string>
     <string name="sync_SC">笔记同步（云端→本地）</string>
     <string name="sync_CS">笔记同步（本地→云端）</string>
+    <string name="gridding">网格</string>
+    <string name="list">列表</string>
     <string name="theme">主题</string>
     <string name="close">关闭</string>
     <string name="back">返回</string>

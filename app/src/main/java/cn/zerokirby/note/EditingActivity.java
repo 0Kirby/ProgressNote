@@ -102,7 +102,7 @@ public class EditingActivity extends BaseActivity {
                 Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
                         Toast.LENGTH_SHORT).show();
                 db.close();
-                modifySync();
+                MainActivity.instance.modifySync(EditingActivity.this);
                 break;
             case R.id.delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
@@ -116,7 +116,7 @@ public class EditingActivity extends BaseActivity {
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
                                 Toast.LENGTH_SHORT).show();
                         db.close();
-                        modifySync();
+                        MainActivity.instance.modifySync(EditingActivity.this);
                         finish();//关闭当前活动并返回到主活动
                     }
                 });
@@ -175,38 +175,15 @@ public class EditingActivity extends BaseActivity {
                 noteId, null, null, null,
                 null);//查询对应的数据
         if (cursor.moveToFirst()) {
-
             title = cursor.getString(cursor.getColumnIndex("title"));//读取标题并保留一份
             noteTitle.setText(title);
             noteTime.setText(simpleDateFormat.format(new Date(cursor.getLong(cursor
                     .getColumnIndex("time")))));  //读取时间
             content = cursor.getString(cursor.getColumnIndex("content"));//读取文本并保留一份
             mainText.setText(content);
-
         }
         cursor.close();
         db.close();
-    }
-
-    private void modifySync() {
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        int userId = databaseOperateUtil.getUserId();
-        if (userId != 0) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
-            if (modifySync) {
-                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
-                    @Override
-                    public boolean handleMessage(@NonNull Message msg) {
-                        if (msg.what == CS) {
-                            Toast.makeText(EditingActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        }
-                        return true;
-                    }
-                });
-                databaseOperateUtil.sendRequestWithOkHttpCS(handler);
-            }
-        }
     }
 
     //重写，实现

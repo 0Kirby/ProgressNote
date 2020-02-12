@@ -1,10 +1,12 @@
 package cn.zerokirby.note;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,6 +30,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -49,7 +52,9 @@ import java.util.Objects;
 import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.db.AvatarDatabaseUtil;
 import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.DataAdapter;
+import cn.zerokirby.note.noteData.DataAdapterSpecial;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.SystemUtil;
 import okhttp3.FormBody;
@@ -60,35 +65,49 @@ import okhttp3.Response;
 
 public class MainActivity extends BaseActivity {
 
-    private List<DataItem> dataList = new ArrayList<>();
-    private DataAdapter dataAdapter;
+    public static MainActivity instance = null;
 
+    private List<DataItem> dataList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private StaggeredGridLayoutManager layoutManager;
+    private StaggeredGridLayoutManager layoutManagerSpecial;
+    private DataAdapter dataAdapter;
+    private DataAdapterSpecial dataAdapterSpecial;
+
+    private static int arrangement = 0;//排列方式，0为网格，1为列表
+    private Menu cMenu;
     private final int SC = 1;//服务器同步到客户端
     private final int CS = 2;//客户端同步到服务器
-    private NavigationView navigationView;
-    private View headView;
-    private DrawerLayout drawerLayout;
+    private long exitTime = 0;//实现再按一次退出的间隔时间
+
+    private NavigationView navigationView;//左侧布局
+    private View headView;//头部布局
+    private DrawerLayout drawerLayout;//侧滑菜单的三横
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
-    private long exitTime = 0;//实现再按一次退出的间隔时间
+
     private boolean firstLaunch = false;
     private int isLogin;
-    private Cursor cursor;
-    private ContentValues values;
+
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase db;
+    private Cursor cursor;
+    private ContentValues values;
     private SimpleDateFormat simpleDateFormat;
+
     private String responseData;
     private int noteId;
     private long time;
     private String title;
     private String content;
+
     private TextView userId;
     private TextView username;
     private TextView lastLogin;
     private TextView lastSync;
+
     private Handler handler;
-    private ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;//同步加载框
 
     /*已弃用
     public void restartActivityNoAnimation(Activity activity) {//刷新活动
@@ -107,12 +126,37 @@ public class MainActivity extends BaseActivity {
     */
 
     //刷新数据
-    private void refreshData() {
-        dataAdapter.notifyDataSetChanged();//通知adapter更新
+    public void refreshData() {
+        if(arrangement==0)
+            dataAdapter.notifyDataSetChanged();//通知adapter更新
+        else
+            dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
         //初始化Journal数据
         dataList.clear();
         initData();
         checkLoginStatus();//检查登录状态
+    }
+
+    //同步数据
+    public void modifySync(Activity activity) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean sync = sharedPreferences.getBoolean("sync", false);
+        if (sync) {
+            boolean launch = sharedPreferences.getBoolean("launch_sync", false);
+            if (launch) {
+                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
+                    @Override
+                    public boolean handleMessage(@NonNull Message msg) {
+                        if (msg.what == CS) {
+                            Toast.makeText(activity, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        }
+                        return true;
+                    }
+                });
+                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+                databaseOperateUtil.sendRequestWithOkHttpCS(handler);
+            }
+        }
     }
 
     //判断是否是平板模式
@@ -127,20 +171,31 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //设置recyclerView
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        StaggeredGridLayoutManager layoutManager;
-        //实现瀑布流布局，将recyclerView改为两列
+        instance = this;
+
+        //获取recyclerView
+        recyclerView = findViewById(R.id.recyclerView);
         layoutManager = new StaggeredGridLayoutManager
                 (2, StaggeredGridLayoutManager.VERTICAL);
-        //如果是平板模式，则改为三列
-        if (isTablet(MainActivity.this)) {
+        layoutManagerSpecial = new StaggeredGridLayoutManager
+                (1, StaggeredGridLayoutManager.VERTICAL);
+        dataAdapter = new DataAdapter(dataList);//初始化适配器
+        dataAdapterSpecial = new DataAdapterSpecial(dataList);//初始化适配器Special
+        if (!isTablet(MainActivity.this)) {//如果不是平板模式
+            if(arrangement == 0){//实现瀑布流布局，将recyclerView改为两列
+                recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+                recyclerView.setAdapter(dataAdapter);//设置适配器
+            }else{//实现线性布局，将recyclerView改为一列
+                recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
+                recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
+            }
+        }else{//如果是平板模式，则改为三列
             layoutManager = new StaggeredGridLayoutManager
                     (3, StaggeredGridLayoutManager.VERTICAL);
+            recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+            dataAdapter = new DataAdapter(dataList);//初始化适配器
+            recyclerView.setAdapter(dataAdapter);//设置适配器
         }
-        recyclerView.setLayoutManager(layoutManager);//设置笔记布局
-        dataAdapter = new DataAdapter(dataList);//初始化适配器
-        recyclerView.setAdapter(dataAdapter);//设置适配器
 
         navigationView = findViewById(R.id.nav_view);
         headView = navigationView.getHeaderView(0);//获取头部布局
@@ -374,7 +429,7 @@ public class MainActivity extends BaseActivity {
         db.close();
     }
 
-    //重写，实现再按一次退出
+    //重写，实现再按一次退出以及关闭抽屉
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -399,6 +454,19 @@ public class MainActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+        cMenu = menu;
+        if(isTablet(MainActivity.this)){
+            menu.getItem(0).setVisible(false);//不显示网格按钮
+            menu.getItem(1).setVisible(false);//不显示列表按钮
+        }else{
+            if(arrangement == 0){
+                menu.getItem(0).setVisible(true);//显示网格按钮
+                menu.getItem(1).setVisible(false);//不显示列表按钮
+            }else{
+                menu.getItem(0).setVisible(false);//不显示网格按钮
+                menu.getItem(1).setVisible(true);//显示列表按钮
+            }
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -407,6 +475,26 @@ public class MainActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
+                break;
+
+            case R.id.gridding:
+                if(arrangement == 0){
+                    recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
+                    recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
+                    item.setVisible(false);//不显示网格按钮
+                    cMenu.getItem(1).setVisible(true);//显示列表按钮
+                    arrangement = 1;
+                }
+                break;
+
+            case R.id.list:
+                if(arrangement == 1){
+                    recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+                    recyclerView.setAdapter(dataAdapter);//设置适配器
+                    item.setVisible(false);//不显示列表按钮
+                    cMenu.getItem(0).setVisible(true);//显示网格按钮
+                    arrangement = 0;
+                }
                 break;
 
             case R.id.theme:
