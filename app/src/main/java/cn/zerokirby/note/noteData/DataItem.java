@@ -93,24 +93,24 @@ public class DataItem {
             return "今天";
         else if(days == 1)
             return "昨天";
-        else if(days != 7){
+        else if(days < 7){
             Calendar calendar = Calendar.getInstance();
             int weekday =  (7 + calendar.get(Calendar.DAY_OF_WEEK) - days) % 7;
             switch(weekday){
                 case 0:
-                    return "星期六";
+                    return getDay() + " 星期六";
                 case 1:
-                    return "星期日";
+                    return getDay() + " 星期日";
                 case 2:
-                    return "星期一";
+                    return getDay() + " 星期一";
                 case 3:
-                    return "星期二";
+                    return getDay() + " 星期二";
                 case 4:
-                    return "星期三";
+                    return getDay() + " 星期三";
                 case 5:
-                    return "星期四";
+                    return getDay() + " 星期四";
                 case 6:
-                    return "星期五";
+                    return getDay() + " 星期五";
             }
         }
         return getDay();

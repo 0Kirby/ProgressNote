@@ -123,6 +123,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.spread_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //int position=holder.getAdapterPosition();
                 if(holder.body_special.getVisibility() == View.VISIBLE){//如果内容可见
                     holder.body_special.setVisibility(View.GONE);//设置内容不可见
                     holder.spread_button.setImageResource(R.drawable.stretch);//设置拉伸图标
@@ -170,8 +171,17 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         }
 
         holder.body_special.setText(dataItem.getBody());//设置内容
-        holder.body_special.setVisibility(View.GONE);//设置内容不可见
-        //holder.spread_button.setImageResourceR.drawable.stretch);//设置拉伸图标
+
+        /*
+        //保持原有的状态
+        if(holder.body_special.getVisibility()==View.GONE){
+            holder.body_special.setVisibility(View.GONE);//设置内容不可见
+            holder.spread_button.setImageResource(R.drawable.stretch);//设置收回图标
+        }else{
+            holder.body_special.setVisibility(View.VISIBLE);//设置内容不可见
+            holder.spread_button.setImageResource(R.drawable.shrink);//设置拉伸图标
+        }
+       */
     }
 
     //获取item数量

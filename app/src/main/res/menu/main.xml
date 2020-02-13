@@ -3,15 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/gridding"
+        android:id="@+id/arrangement"
         android:icon="@drawable/ic_gridding"
-        android:title="@string/gridding"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/list"
-        android:icon="@drawable/ic_list"
-        android:title="@string/list"
+        android:title="@string/arrangement"
         app:showAsAction="ifRoom" />
 
     <item

@@ -455,18 +455,10 @@ public class MainActivity extends BaseActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         cMenu = menu;
-        if(isTablet(MainActivity.this)){
-            menu.getItem(0).setVisible(false);//不显示网格按钮
-            menu.getItem(1).setVisible(false);//不显示列表按钮
-        }else{
-            if(arrangement == 0){
-                menu.getItem(0).setVisible(true);//显示网格按钮
-                menu.getItem(1).setVisible(false);//不显示列表按钮
-            }else{
-                menu.getItem(0).setVisible(false);//不显示网格按钮
-                menu.getItem(1).setVisible(true);//显示列表按钮
-            }
-        }
+        if(isTablet(MainActivity.this))//如果是平板模式
+            menu.getItem(0).setVisible(false);//不显示布局按钮
+        else
+            menu.getItem(0).setVisible(true);//显示布局按钮
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -477,22 +469,16 @@ public class MainActivity extends BaseActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
 
-            case R.id.gridding:
+            case R.id.arrangement:
                 if(arrangement == 0){
                     recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
-                    item.setVisible(false);//不显示网格按钮
-                    cMenu.getItem(1).setVisible(true);//显示列表按钮
+                    item.setIcon(R.drawable.ic_list);
                     arrangement = 1;
-                }
-                break;
-
-            case R.id.list:
-                if(arrangement == 1){
+                }else{
                     recyclerView.setLayoutManager(layoutManager);//设置笔记布局
                     recyclerView.setAdapter(dataAdapter);//设置适配器
-                    item.setVisible(false);//不显示列表按钮
-                    cMenu.getItem(0).setVisible(true);//显示网格按钮
+                    item.setIcon(R.drawable.ic_gridding);
                     arrangement = 0;
                 }
                 break;
