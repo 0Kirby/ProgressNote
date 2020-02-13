@@ -37,7 +37,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:animateLayoutChanges="true"
                     android:padding="15dp">
 
                     <TextView
@@ -76,8 +75,7 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="6dp"
             android:background="@color/white"
-            android:animateLayoutChanges="true"
-            android:src="@drawable/stretch" />
+            android:src="@drawable/ic_expand_more_black_24dp" />
 
     </LinearLayout>
 </LinearLayout>

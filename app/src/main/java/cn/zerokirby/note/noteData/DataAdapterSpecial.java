@@ -18,10 +18,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 import cn.zerokirby.note.EditingActivity;
 import cn.zerokirby.note.MainActivity;
@@ -126,10 +123,10 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 //int position=holder.getAdapterPosition();
                 if(holder.body_special.getVisibility() == View.VISIBLE){//如果内容可见
                     holder.body_special.setVisibility(View.GONE);//设置内容不可见
-                    holder.spread_button.setImageResource(R.drawable.stretch);//设置拉伸图标
+                    holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
                 }else{//如果内容不可见
                     holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
-                    holder.spread_button.setImageResource(R.drawable.shrink);//设置收回图标
+                    holder.spread_button.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
                 }
             }
         });
