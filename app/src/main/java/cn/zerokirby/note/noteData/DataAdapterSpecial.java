@@ -128,6 +128,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                     holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
                 }
+                //notifyDataSetChanged();
             }
         });
 
@@ -168,17 +169,9 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         }
 
         holder.body_special.setText(dataItem.getBody());//设置内容
+        holder.body_special.setVisibility(View.GONE);//设置内容不可见
 
-        /*
-        //保持原有的状态
-        if(holder.body_special.getVisibility()==View.GONE){
-            holder.body_special.setVisibility(View.GONE);//设置内容不可见
-            holder.spread_button.setImageResource(R.drawable.stretch);//设置收回图标
-        }else{
-            holder.body_special.setVisibility(View.VISIBLE);//设置内容不可见
-            holder.spread_button.setImageResource(R.drawable.shrink);//设置拉伸图标
-        }
-       */
+        holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
     }
 
     //获取item数量

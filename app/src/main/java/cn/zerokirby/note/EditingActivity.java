@@ -198,6 +198,7 @@ public class EditingActivity extends BaseActivity {
                         insertData();
                     else//编辑，执行数据库更新操作
                         updateData();
+                    MainActivity.instance.modifySync(EditingActivity.this);
                     finish();
                 }
             });
@@ -256,6 +257,5 @@ public class EditingActivity extends BaseActivity {
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
                 Toast.LENGTH_SHORT).show();
         db.close();
-        MainActivity.instance.modifySync(EditingActivity.this);
     }
 }
