@@ -475,8 +475,9 @@ public class MainActivity extends BaseActivity {
                 if (arrangement == 0) {
                     recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
-                    item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮                    arrangement = 1;
-                } else {
+                    item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
+                    arrangement = 1;
+                }else{
                     recyclerView.setLayoutManager(layoutManager);//设置笔记布局
                     recyclerView.setAdapter(dataAdapter);//设置适配器
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮

@@ -40,15 +40,15 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
         ViewHolder(View view){
             super(view);
-            dataView=view;
-            title=view.findViewById(R.id.title);
-            body=view.findViewById(R.id.body);
-            date=view.findViewById(R.id.date);
+            dataView = view;
+            title = view.findViewById(R.id.title);
+            body = view.findViewById(R.id.body);
+            date = view.findViewById(R.id.date);
         }
     }
 
     public DataAdapter(List<DataItem> dataItemList){
-        mDataItemList=dataItemList;
+        mDataItemList = dataItemList;
     }
 
     //为recyclerView的每一个item设置点击事件
