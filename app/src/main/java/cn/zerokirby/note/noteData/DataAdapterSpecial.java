@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Objects;
 
 import cn.zerokirby.note.EditingActivity;
 import cn.zerokirby.note.MainActivity;
@@ -35,7 +34,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     private SQLiteDatabase db;
     private Cursor cursor;
 
-    private boolean[] type;
+    private static boolean[] type;
 
    //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -61,7 +60,6 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
     public DataAdapterSpecial(List<DataItem> dataItemList){
         mDataItemList = dataItemList;
-        type = new boolean[mDataItemList.size()];
     }
 
     //为recyclerView的每一个item设置点击事件
@@ -71,6 +69,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         View view=LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_item_special, parent, false);
         final ViewHolder holder=new ViewHolder(view);
+
+        type = new boolean[mDataItemList.size()];
 
         //笔记的点击事件
         holder.cardView.setOnClickListener(new View.OnClickListener(){
@@ -128,13 +128,12 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 if(holder.body_special.getVisibility() == View.VISIBLE){//如果内容可见
                     holder.body_special.setVisibility(View.GONE);//设置内容不可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
-                    //type[position] = true;
+                    type[position] = false;
                 }else{//如果内容不可见
                     holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
-                    //type[position] = false;
+                    type[position] = true;
                 }
-                //notifyDataSetChanged();
             }
         });
 
@@ -166,7 +165,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             holder.year_month.setText(null);//置空年月
         }
 
-        holder.title_special.setText(dataItem.getTitle());//设置标题
+        holder.title_special.setText(String.valueOf(dataItem.getTitle()));//设置标题
 
         try {
             holder.day_time.setText(dataItem.getPassDay() + " " + dataItem.getTime());//设置星期 时分秒
@@ -175,10 +174,10 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         }
 
         holder.body_special.setText(dataItem.getBody());//设置内容
-        //if(type[position])
+        if(type[position])
+            holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
+        else
             holder.body_special.setVisibility(View.GONE);//设置内容不可见
-        //else
-            //holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
 
         holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
     }

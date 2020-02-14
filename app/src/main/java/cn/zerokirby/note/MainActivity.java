@@ -21,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +75,8 @@ public class MainActivity extends BaseActivity {
     private StaggeredGridLayoutManager layoutManagerSpecial;
     private DataAdapter dataAdapter;
     private DataAdapterSpecial dataAdapterSpecial;
+    //private AlphaAnimation adapterAlpha1;
+    //private AlphaAnimation adapterAlpha2;
 
     private static int arrangement = 0;//排列方式，0为网格，1为列表
     private Menu cMenu;
@@ -161,6 +165,19 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private AlphaAnimation adapterAlpha1(){//动画1，消失
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setFillAfter(true);
+        return alphaAnimation;
+    }
+    private AlphaAnimation adapterAlpha2(){//动画1，出现
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setFillAfter(true);
+        return alphaAnimation;
+    }
+
     //判断是否是平板模式
     public static boolean isTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -183,6 +200,12 @@ public class MainActivity extends BaseActivity {
                 (1, StaggeredGridLayoutManager.VERTICAL);
         dataAdapter = new DataAdapter(dataList);//初始化适配器
         dataAdapterSpecial = new DataAdapterSpecial(dataList);//初始化适配器Special
+        /*
+        adapterAlpha1 = (AlphaAnimation) AnimationUtils.//获取adapter动画1
+                loadAnimation(MainActivity.this, R.anim.adapter_alpha1);//0.3秒消失
+        adapterAlpha2 = (AlphaAnimation) AnimationUtils.//获取adapter动画2
+                loadAnimation(MainActivity.this, R.anim.adapter_alpha2);//0.3秒出现
+        */
         if (!isTablet(MainActivity.this)) {//如果不是平板模式
             if (arrangement == 0) {//实现瀑布流布局，将recyclerView改为两列
                 recyclerView.setLayoutManager(layoutManager);//设置笔记布局
@@ -474,12 +497,16 @@ public class MainActivity extends BaseActivity {
             case R.id.arrangement:
                 if (arrangement == 0) {
                     recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
+                    recyclerView.startAnimation(adapterAlpha1());
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
+                    recyclerView.startAnimation(adapterAlpha2());
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
                 }else{
                     recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+                    recyclerView.startAnimation(adapterAlpha1());
                     recyclerView.setAdapter(dataAdapter);//设置适配器
+                    recyclerView.startAnimation(adapterAlpha2());
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
                     arrangement = 0;
                 }
