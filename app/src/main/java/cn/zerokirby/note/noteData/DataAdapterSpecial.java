@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 
 import cn.zerokirby.note.EditingActivity;
 import cn.zerokirby.note.MainActivity;
@@ -34,7 +35,9 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     private SQLiteDatabase db;
     private Cursor cursor;
 
-    //设置item中的View
+    private boolean[] type;
+
+   //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder{
         View dataView;
         CardView cardView;
@@ -57,7 +60,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     }
 
     public DataAdapterSpecial(List<DataItem> dataItemList){
-        mDataItemList=dataItemList;
+        mDataItemList = dataItemList;
+        type = new boolean[mDataItemList.size()];
     }
 
     //为recyclerView的每一个item设置点击事件
@@ -120,13 +124,15 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.spread_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //int position=holder.getAdapterPosition();
+                int position=holder.getAdapterPosition();
                 if(holder.body_special.getVisibility() == View.VISIBLE){//如果内容可见
                     holder.body_special.setVisibility(View.GONE);//设置内容不可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
+                    //type[position] = true;
                 }else{//如果内容不可见
                     holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
+                    //type[position] = false;
                 }
                 //notifyDataSetChanged();
             }
@@ -169,7 +175,10 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         }
 
         holder.body_special.setText(dataItem.getBody());//设置内容
-        holder.body_special.setVisibility(View.GONE);//设置内容不可见
+        //if(type[position])
+            holder.body_special.setVisibility(View.GONE);//设置内容不可见
+        //else
+            //holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
 
         holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
     }
