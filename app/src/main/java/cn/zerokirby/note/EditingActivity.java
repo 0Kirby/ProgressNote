@@ -91,6 +91,7 @@ public class EditingActivity extends BaseActivity {
                     insertData();
                 else//编辑，执行数据库更新操作
                     updateData();
+                MainActivity.instance.modifySync(EditingActivity.this);
                 break;
             case R.id.delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
@@ -230,6 +231,9 @@ public class EditingActivity extends BaseActivity {
         noteTime.setText(simpleDateFormat.format(date));
 
         db = dbHelper.getWritableDatabase();//写数据库
+
+        title = noteTitle.getText().toString();//更新副本
+        content = mainText.getText().toString();
 
         //获取各个控件的值
         values = new ContentValues();

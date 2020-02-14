@@ -192,4 +192,13 @@ public class DatabaseOperateUtil {
         db.update("User", values, "rowid = ?", new String[]{"1"});
         db.close();
     }
+
+    public void updateSyncTime() {//更新同步时间
+        DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
+        SQLiteDatabase db = noteDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("lastSync", System.currentTimeMillis());
+        db.update("User", values, "rowid = ?", new String[]{"1"});
+        db.close();
+    }
 }

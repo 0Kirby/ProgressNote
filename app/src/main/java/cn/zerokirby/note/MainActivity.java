@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity {
 
     //刷新数据
     public void refreshData() {
-        if(arrangement==0)
+        if (arrangement == 0)
             dataAdapter.notifyDataSetChanged();//通知adapter更新
         else
             dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
@@ -139,21 +139,23 @@ public class MainActivity extends BaseActivity {
 
     //同步数据
     public void modifySync(Activity activity) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean sync = sharedPreferences.getBoolean("sync", false);
-        if (sync) {
-            boolean launch = sharedPreferences.getBoolean("launch_sync", false);
-            if (launch) {
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        int userId = databaseOperateUtil.getUserId();//检测用户是否登录
+        if (userId != 0) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
+            if (modifySync) {
                 Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
                     @Override
                     public boolean handleMessage(@NonNull Message msg) {
                         if (msg.what == CS) {
+                            databaseOperateUtil.updateSyncTime();
+                            updateTextView();
                             Toast.makeText(activity, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
                         }
                         return true;
                     }
                 });
-                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
                 databaseOperateUtil.sendRequestWithOkHttpCS(handler);
             }
         }
@@ -182,14 +184,14 @@ public class MainActivity extends BaseActivity {
         dataAdapter = new DataAdapter(dataList);//初始化适配器
         dataAdapterSpecial = new DataAdapterSpecial(dataList);//初始化适配器Special
         if (!isTablet(MainActivity.this)) {//如果不是平板模式
-            if(arrangement == 0){//实现瀑布流布局，将recyclerView改为两列
+            if (arrangement == 0) {//实现瀑布流布局，将recyclerView改为两列
                 recyclerView.setLayoutManager(layoutManager);//设置笔记布局
                 recyclerView.setAdapter(dataAdapter);//设置适配器
-            }else{//实现线性布局，将recyclerView改为一列
+            } else {//实现线性布局，将recyclerView改为一列
                 recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
                 recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
             }
-        }else{//如果是平板模式，则改为三列
+        } else {//如果是平板模式，则改为三列
             layoutManager = new StaggeredGridLayoutManager
                     (3, StaggeredGridLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(layoutManager);//设置笔记布局
@@ -224,7 +226,7 @@ public class MainActivity extends BaseActivity {
                         Toast.makeText(MainActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
                         databaseHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
                         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
+                        ContentValues values = new ContentValues();//更新时间
                         values.put("lastSync", System.currentTimeMillis());
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
@@ -455,7 +457,7 @@ public class MainActivity extends BaseActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         cMenu = menu;
-        if(isTablet(MainActivity.this))//如果是平板模式
+        if (isTablet(MainActivity.this))//如果是平板模式
             menu.getItem(0).setVisible(false);//不显示布局按钮
         else
             menu.getItem(0).setVisible(true);//显示布局按钮
@@ -470,11 +472,11 @@ public class MainActivity extends BaseActivity {
                 break;
 
             case R.id.arrangement:
-                if(arrangement == 0){
+                if (arrangement == 0) {
                     recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮                    arrangement = 1;
-                }else{
+                } else {
                     recyclerView.setLayoutManager(layoutManager);//设置笔记布局
                     recyclerView.setAdapter(dataAdapter);//设置适配器
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮

@@ -68,6 +68,8 @@ public class OpeningActivity extends BaseActivity {
                         public boolean handleMessage(@NonNull Message msg) {
                             if (msg.what == SC) {
                                 Toast.makeText(OpeningActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(OpeningActivity.this);
+                                databaseOperateUtil.updateSyncTime();
                                 mHandler.removeMessages(0);
                                 myThread.start();
                             }
