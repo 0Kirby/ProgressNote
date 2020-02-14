@@ -4,12 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -19,10 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.preference.PreferenceManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,7 +25,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
 
 public class EditingActivity extends BaseActivity {
 
@@ -96,13 +90,7 @@ public class EditingActivity extends BaseActivity {
                 if (type == 0)//新建，执行数据库插入操作
                     insertData();
                 else//编辑，执行数据库更新操作
-                    db.update("Note", values, "id = ?",
-                            new String[]{String.valueOf(type)});
-                values.clear();
-                Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
-                        Toast.LENGTH_SHORT).show();
-                db.close();
-                MainActivity.instance.modifySync(EditingActivity.this);
+                    updateData();
                 break;
             case R.id.delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
@@ -206,9 +194,10 @@ public class EditingActivity extends BaseActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行保存操作
                     getData();
-                    insertData();
-                    Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
-                            Toast.LENGTH_SHORT).show();
+                    if (type == 0)//新建，执行数据库插入操作
+                        insertData();
+                    else//编辑，执行数据库更新操作
+                        updateData();
                     finish();
                 }
             });
@@ -257,5 +246,16 @@ public class EditingActivity extends BaseActivity {
         cur.close();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);//切换标题
         cMenu.getItem(0).setVisible(true);//显示删除按钮
+    }
+
+    //更新数据
+    private void updateData() {
+        db.update("Note", values, "id = ?",
+                new String[]{String.valueOf(type)});
+        values.clear();
+        Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
+                Toast.LENGTH_SHORT).show();
+        db.close();
+        MainActivity.instance.modifySync(EditingActivity.this);
     }
 }

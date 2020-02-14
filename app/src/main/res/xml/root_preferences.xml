@@ -7,6 +7,10 @@
         <Preference
             android:icon="@mipmap/icon"
             android:key="version" />
+        <Preference
+            android:key="check_update"
+            android:summary="检查中..."
+            android:title="检查更新" />
     </PreferenceCategory>
 
     <PreferenceCategory

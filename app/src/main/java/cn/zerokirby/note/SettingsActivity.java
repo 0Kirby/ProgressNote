@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.Preference;
@@ -14,6 +17,8 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -29,7 +34,33 @@ import okhttp3.Response;
 
 public class SettingsActivity extends BaseActivity {
 
+    private static final int UPDATE = 1;
     private static int userId;
+    private static String versionName = "";
+    private static Preference checkUpdatePref;
+    private static Handler handler;
+
+    private static void checkUpdate() {//检查更新
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求下载JSON
+                Request request = new Request.Builder().url("https://zerokirby.cn/version.json").build();//检测更新地址
+                try {
+                    Response response = client.newCall(request).execute();
+                    String json = Objects.requireNonNull(response.body()).string();
+                    JSONObject jsonObject = new JSONObject(json);
+                    versionName = jsonObject.getString("versionName");//从JSON中解析到版本名称
+                    Message message = new Message();
+                    message.what = UPDATE;
+                    handler.sendMessage(message);
+                    response.close();
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +75,19 @@ public class SettingsActivity extends BaseActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
         userId = databaseOperateUtil.getUserId();  //读取id
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
+                if (msg.what == UPDATE) {
+                    if (AppUtil.getVersionName(SettingsActivity.this).equals(versionName))//如果从服务器获取的版本名称和本地相等
+                        checkUpdatePref.setSummary("当前已是最新版本");
+                    else
+                        checkUpdatePref.setSummary("有新版本发布，请至主页下载");
+                }
+                return false;
+            }
+        });
+        checkUpdate();//每次进入设置页面自动检查更新
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
@@ -51,6 +95,7 @@ public class SettingsActivity extends BaseActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
             findPreference("version").setSummary(String.format("版本号：%s\n构建日期：%d\n包名：%s", AppUtil.getVersionName(getActivity()), AppUtil.getVersionCode(getActivity()), AppUtil.getPackageName(getActivity())));
+            checkUpdatePref = findPreference("check_update");
             if (userId == 0)//如果用户没有登录，不能使用同步功能
             {
                 SwitchPreferenceCompat modifySync = findPreference("modify_sync");
@@ -65,6 +110,10 @@ public class SettingsActivity extends BaseActivity {
             DatabaseHelper databaseHelper = new DatabaseHelper(getActivity(), "ProgressNote.db", null, 1);
 
             switch (preference.getKey()) {
+                case "check_update":
+                    checkUpdatePref.setSummary("检查中...");
+                    checkUpdate();
+                    break;
                 case "delete_note":
                     builder.setTitle("警告");
                     builder.setMessage("这将清除本地所有笔记\n此操作无法恢复\n是否继续？");
@@ -153,7 +202,6 @@ public class SettingsActivity extends BaseActivity {
             return super.onPreferenceTreeClick(preference);
         }
     }
-
 
 }
 
