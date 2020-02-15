@@ -81,10 +81,10 @@ public class DataItem {
     }
 
     //获取过去的时间表示
-    public String getPassDay() throws ParseException {
+    public String getPassDay(MainActivity mainActivity) throws ParseException {
         //获取精确到日的时间截
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                MainActivity.instance.getString(R.string.format_year_month_day), Locale.getDefault());
+                mainActivity.getString(R.string.format_year_month_day), Locale.getDefault());
         long diff = System.currentTimeMillis() - Objects.requireNonNull(simpleDateFormat.parse(date)).getTime();
         int days = (int)(diff/(1000*60*60*24));
         //long hours = (diff-days*(1000*60*60*24))/(1000*60*60);
@@ -122,10 +122,10 @@ public class DataItem {
     }
 
     //获取item的精确到秒的时间截
-    public long getTimeFormat() throws ParseException {
+    public long getTimeFormat(MainActivity mainActivity) throws ParseException {
         //获取精确到秒的时间截
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                MainActivity.instance.getString(R.string.formatDate), Locale.getDefault());
+                mainActivity.getString(R.string.formatDate), Locale.getDefault());
         return Objects.requireNonNull(simpleDateFormat.parse(date)).getTime();
     }
 

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import cn.zerokirby.note.db.DatabaseHelper;
 
 public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.ViewHolder> {
 
+    private MainActivity mainActivity;
     private List<DataItem> mDataItemList;
 
     private DatabaseHelper dbHelper;
@@ -35,6 +37,21 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     private Cursor cursor;
 
     private static boolean[] type;
+
+    /*已弃用
+    private ScaleAnimation adapterAlpha3() {//动画3，收回
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1, 1, 1, 0);
+        scaleAnimation.setDuration(300);
+        scaleAnimation.setFillAfter(true);
+        return scaleAnimation;
+    }
+    private ScaleAnimation adapterAlpha4() {//动画4，拉伸
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1, 1, 0, 1);
+        scaleAnimation.setDuration(300);
+        scaleAnimation.setFillAfter(true);
+        return scaleAnimation;
+    }
+    */
 
    //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -58,7 +75,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         }
     }
 
-    public DataAdapterSpecial(List<DataItem> dataItemList){
+    public DataAdapterSpecial(MainActivity mainActivity ,List<DataItem> dataItemList){
+        this.mainActivity = mainActivity;
         mDataItemList = dataItemList;
     }
 
@@ -94,21 +112,21 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 DataItem dataItem=mDataItemList.get(position);
                 int id = dataItem.getId();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.instance);//显示删除提示
+                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
                 builder.setMessage("是否要删除该条记录？");
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        dbHelper = new DatabaseHelper(MainActivity.instance,
+                        dbHelper = new DatabaseHelper(mainActivity,
                                 "ProgressNote.db", null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(MainActivity.instance, MainActivity.instance.getString(R.string.deleteSuccess),
+                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess),
                                 Toast.LENGTH_SHORT).show();
                         db.close();
-                        MainActivity.instance.modifySync(MainActivity.instance);
-                        MainActivity.instance.refreshData();
+                        mainActivity.modifySync(mainActivity);
+                        mainActivity.refreshData();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -126,11 +144,15 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             public void onClick(View v) {
                 int position=holder.getAdapterPosition();
                 if(holder.body_special.getVisibility() == View.VISIBLE){//如果内容可见
+                    holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
+                    holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
                     holder.body_special.setVisibility(View.GONE);//设置内容不可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
                     type[position] = false;
                 }else{//如果内容不可见
                     holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
+                    holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
+                    holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
                     holder.spread_button.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
                     type[position] = true;
                 }
@@ -168,7 +190,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.title_special.setText(String.valueOf(dataItem.getTitle()));//设置标题
 
         try {
-            holder.day_time.setText(dataItem.getPassDay() + " " + dataItem.getTime());//设置星期 时分秒
+            holder.day_time.setText(dataItem.getPassDay(mainActivity) + " " + dataItem.getTime());//设置星期 时分秒
         }catch(ParseException e){
             e.printStackTrace();
         }

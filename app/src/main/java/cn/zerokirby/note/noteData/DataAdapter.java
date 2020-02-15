@@ -25,6 +25,7 @@ import cn.zerokirby.note.db.DatabaseHelper;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
+    private MainActivity mainActivity;
     private List<DataItem> mDataItemList;
 
     private DatabaseHelper dbHelper;
@@ -47,7 +48,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         }
     }
 
-    public DataAdapter(List<DataItem> dataItemList){
+    public DataAdapter(MainActivity mainActivity ,List<DataItem> dataItemList){
+        this.mainActivity = mainActivity;
         mDataItemList = dataItemList;
     }
 
@@ -81,21 +83,21 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 DataItem dataItem=mDataItemList.get(position);
                 int id = dataItem.getId();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.instance);//显示删除提示
+                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
                 builder.setMessage("是否要删除该条记录？");
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        dbHelper = new DatabaseHelper(MainActivity.instance,
+                        dbHelper = new DatabaseHelper(mainActivity,
                                 "ProgressNote.db", null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(MainActivity.instance, MainActivity.instance.getString(R.string.deleteSuccess),
+                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess),
                                 Toast.LENGTH_SHORT).show();
                         db.close();
-                        MainActivity.instance.modifySync(MainActivity.instance);
-                        MainActivity.instance.refreshData();
+                        mainActivity.modifySync(mainActivity);
+                        mainActivity.refreshData();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做

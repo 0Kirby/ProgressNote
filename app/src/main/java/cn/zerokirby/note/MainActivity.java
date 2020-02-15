@@ -26,7 +26,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,8 +83,22 @@ public class MainActivity extends BaseActivity {
     private StaggeredGridLayoutManager layoutManagerSpecial;
     private DataAdapter dataAdapter;
     private DataAdapterSpecial dataAdapterSpecial;
-    //private AlphaAnimation adapterAlpha1;
-    //private AlphaAnimation adapterAlpha2;
+    private Animation adapterAlpha1;//动画1，消失
+    private Animation adapterAlpha2;//动画2，出现
+    /*已弃用
+    private AlphaAnimation adapterAlpha1() {//动画1，消失
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setFillAfter(true);
+        return alphaAnimation;
+    }
+    private AlphaAnimation adapterAlpha2() {//动画2，出现
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setFillAfter(true);
+        return alphaAnimation;
+    }
+    */
 
     private static int arrangement = 0;//排列方式，0为网格，1为列表
     private final int SC = 1;//服务器同步到客户端
@@ -140,69 +155,18 @@ public class MainActivity extends BaseActivity {
     }
     */
 
-    //刷新数据
-    public void refreshData() {
-        if (arrangement == 0)
-            dataAdapter.notifyDataSetChanged();//通知adapter更新
-        else
-            dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
-        //初始化Journal数据
-        dataList.clear();
-        initData();
-        checkLoginStatus();//检查登录状态
-    }
-
-    //同步数据
-    public void modifySync(Activity activity) {
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        int userId = databaseOperateUtil.getUserId();//检测用户是否登录
-        if (userId != 0) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
-            if (modifySync) {
-                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
-                    @Override
-                    public boolean handleMessage(@NonNull Message msg) {
-                        if (msg.what == CS) {
-                            databaseOperateUtil.updateSyncTime();
-                            updateTextView();
-                            Toast.makeText(activity, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        }
-                        return true;
-                    }
-                });
-                databaseOperateUtil.sendRequestWithOkHttpCS(handler);
-            }
-        }
-    }
-
-    private AlphaAnimation adapterAlpha1() {//动画1，消失
-        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
-        alphaAnimation.setDuration(500);
-        alphaAnimation.setFillAfter(true);
-        return alphaAnimation;
-    }
-
-    private AlphaAnimation adapterAlpha2() {//动画1，出现
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alphaAnimation.setDuration(500);
-        alphaAnimation.setFillAfter(true);
-        return alphaAnimation;
-    }
-
-    //判断是否是平板模式
-    public static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >=
-                Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        instance = this;
+        instance = MainActivity.this;
+
+        //获取动画
+        adapterAlpha1 = AnimationUtils.loadAnimation(
+                MainActivity.this, R.anim.adapter_alpha1);
+        adapterAlpha2 = AnimationUtils.loadAnimation(
+                MainActivity.this, R.anim.adapter_alpha2);
 
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
@@ -210,14 +174,8 @@ public class MainActivity extends BaseActivity {
                 (2, StaggeredGridLayoutManager.VERTICAL);
         layoutManagerSpecial = new StaggeredGridLayoutManager
                 (1, StaggeredGridLayoutManager.VERTICAL);
-        dataAdapter = new DataAdapter(dataList);//初始化适配器
-        dataAdapterSpecial = new DataAdapterSpecial(dataList);//初始化适配器Special
-        /*
-        adapterAlpha1 = (AlphaAnimation) AnimationUtils.//获取adapter动画1
-                loadAnimation(MainActivity.this, R.anim.adapter_alpha1);//0.3秒消失
-        adapterAlpha2 = (AlphaAnimation) AnimationUtils.//获取adapter动画2
-                loadAnimation(MainActivity.this, R.anim.adapter_alpha2);//0.3秒出现
-        */
+        dataAdapter = new DataAdapter(MainActivity.this ,dataList);//初始化适配器
+        dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this ,dataList);//初始化适配器Special
         if (!isTablet(MainActivity.this)) {//如果不是平板模式
             if (arrangement == 0) {//实现瀑布流布局，将recyclerView改为两列
                 recyclerView.setLayoutManager(layoutManager);//设置笔记布局
@@ -230,9 +188,31 @@ public class MainActivity extends BaseActivity {
             layoutManager = new StaggeredGridLayoutManager
                     (3, StaggeredGridLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(layoutManager);//设置笔记布局
-            dataAdapter = new DataAdapter(dataList);//初始化适配器
+            dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
             recyclerView.setAdapter(dataAdapter);//设置适配器
         }
+
+        //为悬浮按钮设置点击事件
+        floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), EditingActivity.class);
+                intent.putExtra("noteId", 0);//传递0，表示新建
+                v.getContext().startActivity(intent);
+            }
+        });
+
+        //为下拉刷新设置事件
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshDataLayout();
+                    }
+                });
 
         navigationView = findViewById(R.id.nav_view);
         headView = navigationView.getHeaderView(0);//获取头部布局
@@ -366,29 +346,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        //为悬浮按钮设置点击事件
-        floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), EditingActivity.class);
-                intent.putExtra("noteId", 0);//传递0，表示新建
-                v.getContext().startActivity(intent);
-            }
-        });
-
-        //为下拉刷新设置事件
-        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        refreshDataLayout();
-                    }
-                });
-
-
         databaseHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         SystemUtil systemUtil = new SystemUtil();//获取手机信息
@@ -413,6 +370,30 @@ public class MainActivity extends BaseActivity {
         initData();//初始化数据
     }
 
+    //恢复到本活动时刷新数据
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshData();
+        /*已弃用
+        if (firstLaunch)
+            restartActivity(MainActivity.this);
+        firstLaunch = true;
+        */
+    }
+
+    //刷新数据
+    public void refreshData() {
+        if (arrangement == 0)
+            dataAdapter.notifyDataSetChanged();//通知adapter更新
+        else
+            dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
+        //初始化Journal数据
+        dataList.clear();
+        initData();
+        checkLoginStatus();//检查登录状态
+    }
+
     //刷新数据
     private void refreshDataLayout() {
         new Thread(new Runnable() {
@@ -421,26 +402,16 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        recyclerView.startAnimation(adapterAlpha1);
                         //restartActivity(MainActivity.this);
                         refreshData();
                         swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
+                        recyclerView.startAnimation(adapterAlpha2);
                     }
                 });
             }
         }).start();
-    }
-
-    //恢复到本活动时先重启活动
-    @Override
-    protected void onResume() {
-        super.onResume();
-        refreshData();
-        /*
-        if (firstLaunch)
-            restartActivity(MainActivity.this);
-        firstLaunch = true;
-        */
     }
 
     //初始化从数据库中读取数据并填充dataItem
@@ -471,25 +442,11 @@ public class MainActivity extends BaseActivity {
         db.close();
     }
 
-    //重写，实现再按一次退出以及关闭抽屉
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                if ((System.currentTimeMillis() - exitTime) > 2000) {
-                    Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
-                    exitTime = System.currentTimeMillis();
-                } else {
-                    finish();
-                    System.exit(0);
-                }
-                return true;
-            } else {//抽屉打开时先关闭抽屉
-                drawerLayout.closeDrawers();
-                return false;
-            }
-        }
-        return super.onKeyDown(keyCode, event);
+    //判断是否是平板模式
+    public static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >=
+                Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     @Override
@@ -511,21 +468,19 @@ public class MainActivity extends BaseActivity {
                 break;
 
             case R.id.arrangement:
+                recyclerView.startAnimation(adapterAlpha1);
                 if (arrangement == 0) {
                     recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
-                    recyclerView.startAnimation(adapterAlpha1());
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
-                    recyclerView.startAnimation(adapterAlpha2());
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
                 } else {
                     recyclerView.setLayoutManager(layoutManager);//设置笔记布局
-                    recyclerView.startAnimation(adapterAlpha1());
                     recyclerView.setAdapter(dataAdapter);//设置适配器
-                    recyclerView.startAnimation(adapterAlpha2());
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
                     arrangement = 0;
                 }
+                recyclerView.startAnimation(adapterAlpha2);
                 break;
 
             case R.id.theme:
@@ -533,6 +488,51 @@ public class MainActivity extends BaseActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //重写，实现再按一次退出以及关闭抽屉
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                if ((System.currentTimeMillis() - exitTime) > 2000) {
+                    Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
+                    exitTime = System.currentTimeMillis();
+                } else {
+                    finish();
+                    System.exit(0);
+                }
+                return true;
+            } else {//抽屉打开时先关闭抽屉
+                drawerLayout.closeDrawers();
+                return false;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    //自动同步数据
+    public void modifySync(Activity activity) {
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        int userId = databaseOperateUtil.getUserId();//检测用户是否登录
+        if (userId != 0) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
+            if (modifySync) {
+                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
+                    @Override
+                    public boolean handleMessage(@NonNull Message msg) {
+                        if (msg.what == CS) {
+                            databaseOperateUtil.updateSyncTime();
+                            updateTextView();
+                            Toast.makeText(activity, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        }
+                        return true;
+                    }
+                });
+                databaseOperateUtil.sendRequestWithOkHttpCS(handler);
+            }
+        }
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示

@@ -39,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) { //创建时调用
         db.execSQL(CREATE_USER); //创建表
         db.execSQL(CREATE_NOTE); //创建表
-        Toast.makeText(mContext, "创建数据库成功！", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(mContext, "创建数据库成功！", Toast.LENGTH_SHORT).show();
     }
 
     @Override
