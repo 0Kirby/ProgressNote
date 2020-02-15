@@ -1,5 +1,6 @@
 package cn.zerokirby.note;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -7,14 +8,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -22,14 +27,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
@@ -40,10 +47,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,7 +64,9 @@ import cn.zerokirby.note.noteData.DataAdapter;
 import cn.zerokirby.note.noteData.DataAdapterSpecial;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.SystemUtil;
-import okhttp3.FormBody;
+import cn.zerokirby.note.userData.UriUtil;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -79,9 +86,11 @@ public class MainActivity extends BaseActivity {
     //private AlphaAnimation adapterAlpha2;
 
     private static int arrangement = 0;//排列方式，0为网格，1为列表
-    private Menu cMenu;
     private final int SC = 1;//服务器同步到客户端
     private final int CS = 2;//客户端同步到服务器
+    private static final int UPLOAD = 3;
+    private static final int CHOOSE_PHOTO = 4;
+    private static final int PHOTO_REQUEST_CUT = 5;
     private long exitTime = 0;//实现再按一次退出的间隔时间
 
     private NavigationView navigationView;//左侧布局
@@ -109,7 +118,9 @@ public class MainActivity extends BaseActivity {
     private TextView username;
     private TextView lastLogin;
     private TextView lastSync;
+    private ImageView avatar;
 
+    private Uri cropImageUri;
     private Handler handler;
     private ProgressDialog progressDialog;//同步加载框
 
@@ -165,13 +176,14 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private AlphaAnimation adapterAlpha1(){//动画1，消失
+    private AlphaAnimation adapterAlpha1() {//动画1，消失
         AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
         alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
         return alphaAnimation;
     }
-    private AlphaAnimation adapterAlpha2(){//动画1，出现
+
+    private AlphaAnimation adapterAlpha2() {//动画1，出现
         AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
@@ -256,6 +268,9 @@ public class MainActivity extends BaseActivity {
                         refreshData();
                         //restartActivityNoAnimation(MainActivity.this);
                         break;
+                    case UPLOAD:
+                        Toast.makeText(MainActivity.this, "上传成功！", Toast.LENGTH_SHORT).show();//上传头像成功
+                        break;
                 }
                 return false;
             }
@@ -281,7 +296,8 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                                 progressDialog.show();
-                                sendRequestWithOkHttpSC(isLogin);//根据已登录的ID发送查询请求
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                                databaseOperateUtil.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -299,7 +315,8 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                                 progressDialog.show();
-                                sendRequestWithOkHttpCS(isLogin);//根据已登录的ID发送更新请求
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                                databaseOperateUtil.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -479,7 +496,6 @@ public class MainActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
-        cMenu = menu;
         if (isTablet(MainActivity.this))//如果是平板模式
             menu.getItem(0).setVisible(false);//不显示布局按钮
         else
@@ -502,7 +518,7 @@ public class MainActivity extends BaseActivity {
                     recyclerView.startAnimation(adapterAlpha2());
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
-                }else{
+                } else {
                     recyclerView.setLayoutManager(layoutManager);//设置笔记布局
                     recyclerView.startAnimation(adapterAlpha1());
                     recyclerView.setAdapter(dataAdapter);//设置适配器
@@ -520,18 +536,10 @@ public class MainActivity extends BaseActivity {
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this,
-                "ProgressNote.db", null, 1);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query("User", null, "rowid = ?",
-                new String[]{"1"}, null, null, null,
-                null);//查询对应的数据
-        if (cursor.moveToFirst())
-            isLogin = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
-        cursor.close();
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        isLogin = databaseOperateUtil.getUserId();
 
-
-        final ImageView imageView = headView.findViewById(R.id.user_avatar);
+        avatar = headView.findViewById(R.id.user_avatar);
 
         //实例化TextView，以便填入具体数据
         userId = headView.findViewById(R.id.login_userId);
@@ -544,8 +552,8 @@ public class MainActivity extends BaseActivity {
         if (isLogin == 0) {//用户没有登录
 
             //设置头像未待添加，并禁用修改头像按钮
-            imageView.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
-            imageView.setOnClickListener(new View.OnClickListener() {
+            avatar.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
+            avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
@@ -574,6 +582,8 @@ public class MainActivity extends BaseActivity {
         } else {//用户已经登录
 
             //显示头像，并启用修改头像按钮
+            DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this,
+                    "ProgressNote.db", null, 1);
             db = dbHelper.getReadableDatabase();
             AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, dbHelper);
             byte[] imgData = avatarDatabaseUtil.readImage();
@@ -581,15 +591,14 @@ public class MainActivity extends BaseActivity {
                 //将字节数组转化为位图
                 Bitmap imagebitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
                 //将位图显示为图片
-                imageView.setImageBitmap(imagebitmap);
+                avatar.setImageBitmap(imagebitmap);
                 imagebitmap = null;
             }
 
-            imageView.setOnClickListener(new View.OnClickListener() {
+            avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), IconActivity.class);
-                    startActivity(intent);
+                    iconClick();
                 }
             });
 
@@ -601,112 +610,6 @@ public class MainActivity extends BaseActivity {
             menu.getItem(4).setVisible(true);//显示“退出登录”
         }
         db.close();
-    }
-
-    //笔记同步用方法
-    private void sendRequestWithOkHttpSC(final int userId) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {//在子线程中进行网络操作
-                try {
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
-                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
-                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC").post(requestBody).build();
-                    Response response = client.newCall(request).execute();
-                    responseData = Objects.requireNonNull(response.body()).string();
-                    parseJSONWithJSONArray(responseData);//处理JSON
-                    Message message = new Message();
-                    message.what = SC;
-                    handler.sendMessage(message);//通过handler发送消息请求toast
-                    response.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    private void sendRequestWithOkHttpCS(final int userId) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {//在子线程中进行网络操作
-                try {
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
-                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
-                            .add("json", Objects.requireNonNull(makeJSONArray())).build();
-                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
-                    Response response = client.newCall(request).execute();
-                    Message message = new Message();
-                    message.what = CS;
-                    handler.sendMessage(message);//通过handler发送消息请求toast
-                    response.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    private void parseJSONWithJSONArray(String jsonData) {//处理JSON
-        try {
-            JSONArray jsonArray = new JSONArray(jsonData);
-            DatabaseHelper noteDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
-            SQLiteDatabase db = noteDbHelper.getWritableDatabase();
-            db.execSQL("Delete from Note");//清空笔记表
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                noteId = jsonObject.getInt("NoteId");
-                time = jsonObject.getLong("Time");
-                title = jsonObject.getString("Title");
-                content = jsonObject.getString("Content");
-
-                ContentValues values = new ContentValues();//将笔记ID、标题、修改时间和内容存储到本地
-                values.put("id", noteId);
-                values.put("title", title);
-                values.put("time", time);
-                values.put("content", content);
-
-                db.insert("Note", null, values);
-            }
-            db.close();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String makeJSONArray() {//生成JSON数组的字符串
-        try {
-            JSONArray jsonArray = new JSONArray();
-            DatabaseHelper noteDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
-            SQLiteDatabase db = noteDbHelper.getReadableDatabase();
-            Cursor cursor = db.query("Note", null, null,
-                    null, null, null, null,
-                    null);//查询对应的数据
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    JSONObject jsonObject = new JSONObject();
-
-                    jsonObject.put("NoteId", cursor.getString(cursor
-                            .getColumnIndex("id")));//读取编号
-                    jsonObject.put("Title", cursor.getString(cursor
-                            .getColumnIndex("title")));//读取标题
-                    jsonObject.put("Time", cursor.getLong(cursor
-                            .getColumnIndex("time")));//读取修改时间
-                    jsonObject.put("Content", cursor.getString(cursor
-                            .getColumnIndex("content")));//读取正文
-
-                    jsonArray.put(jsonObject);
-                } while (cursor.moveToNext());
-            }
-            if (cursor != null) {
-                cursor.close();
-                db.close();
-            }
-            return jsonArray.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void updateTextView() {//更新TextView显示用户信息
@@ -741,4 +644,138 @@ public class MainActivity extends BaseActivity {
         cursor.close();
         db.close();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case CHOOSE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    Toast.makeText(this, "打开成功", Toast.LENGTH_SHORT).show();
+                    handleImage(data);
+                } else
+                    Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
+                break;
+            case PHOTO_REQUEST_CUT:
+                if (resultCode == RESULT_OK) {
+                    displayImage(UriUtil.getPath(this, cropImageUri));
+                    uploadImage(handler);
+                } else
+                    Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
+            default:
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CHOOSE_PHOTO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openAlbum();
+            } else {
+                Toast.makeText(this, "未授权外置存储读写权限，无法使用！", Toast.LENGTH_SHORT).show();
+            }
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    public void iconClick() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission
+                    .WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, CHOOSE_PHOTO);
+        } else
+            openAlbum();
+    }
+
+    public void openAlbum() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        startActivityForResult(intent, CHOOSE_PHOTO);
+    }
+
+    public void handleImage(Intent data) {//处理接收到的图片
+        Uri uri = data.getData();
+        startPhotoZoom(uri);
+    }
+
+    public void startPhotoZoom(Uri uri) {
+        File CropPhoto = new File(getExternalCacheDir(), "crop.jpg");
+        try {
+            if (CropPhoto.exists()) {
+                CropPhoto.delete();
+            }
+            CropPhoto.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        cropImageUri = Uri.fromFile(CropPhoto);
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+        }
+        // 下面这个crop=true是设置在开启的Intent中设置显示的VIEW可裁剪
+        intent.putExtra("crop", "true");
+        intent.putExtra("scale", true);
+
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+
+        //输出的宽高
+
+        intent.putExtra("outputX", 200);
+        intent.putExtra("outputY", 200);
+
+        intent.putExtra("return-data", false);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, cropImageUri);
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+        intent.putExtra("noFaceDetection", true); // no face detection
+        startActivityForResult(intent, PHOTO_REQUEST_CUT);
+    }
+
+    public void displayImage(String imagePath) {//解码并显示图片,同时将图片写入本地数据库
+        if (imagePath != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            avatar.setImageBitmap(bitmap);
+            DatabaseHelper userDbHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
+            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
+            avatarDatabaseUtil.saveImage(bitmap);
+            bitmap = null;
+        } else
+            Toast.makeText(this, "打开失败", Toast.LENGTH_SHORT).show();
+    }
+
+    public void uploadImage(Handler handler) {//上传头像
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(Objects.requireNonNull(UriUtil.getPath(MainActivity.this, cropImageUri)));
+                final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
+                DatabaseHelper userDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
+                AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(MainActivity.this, userDbHelper);
+                final int id = avatarDatabaseUtil.getUserId();//获取用户id
+                userDbHelper.close();
+                OkHttpClient client = new OkHttpClient();
+                RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型为jpg
+                RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart("userId", String.valueOf(id))
+                        .addFormDataPart("file", id + ".jpg", fileBody).build();
+                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/UploadAvatarServlet").post(requestBody).build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    Message message = new Message();//发送消息
+                    message.what = UPLOAD;
+                    handler.sendMessage(message);
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
 }

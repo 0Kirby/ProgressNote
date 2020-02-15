@@ -7,7 +7,7 @@ defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode Integer.valueOf(getDate())
-        versionName "2.8.6"
+        versionName "2.8.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

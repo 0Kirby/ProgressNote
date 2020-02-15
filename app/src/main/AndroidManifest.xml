@@ -26,10 +26,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="cn.zerokirby.note.MainActivity" />
         </activity>
-        <activity
-            android:name=".IconActivity"
-            android:label="@string/change_icon"
-            android:parentActivityName=".MainActivity" />
         <activity android:name=".GuideActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".BaseActivity" />
