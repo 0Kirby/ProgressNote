@@ -1,10 +1,13 @@
 package cn.zerokirby.note.noteData;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +38,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
-
+    private ValueAnimator valueAnimator;
     private static boolean[] type;
 
     /*已弃用
@@ -53,29 +56,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     }
     */
 
-   //设置item中的View
-    static class ViewHolder extends RecyclerView.ViewHolder{
-        View dataView;
-        CardView cardView;
-        TextView year_month;
-        TextView title_special;
-        TextView day_time;
-        TextView body_special;
-        ImageButton spread_button;
-
-        ViewHolder(View view){
-            super(view);
-            dataView = view;
-            cardView = view.findViewById(R.id.cardView);
-            year_month = view.findViewById(R.id.year_month);
-            title_special = view.findViewById(R.id.title_special);
-            day_time = view.findViewById(R.id.day_time);
-            body_special = view.findViewById(R.id.body_special);
-            spread_button = view.findViewById(R.id.spread_button);
-        }
-    }
-
-    public DataAdapterSpecial(MainActivity mainActivity ,List<DataItem> dataItemList){
+    public DataAdapterSpecial(MainActivity mainActivity, List<DataItem> dataItemList) {
         this.mainActivity = mainActivity;
         mDataItemList = dataItemList;
     }
@@ -84,22 +65,22 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext())
+        View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_item_special, parent, false);
-        final ViewHolder holder=new ViewHolder(view);
+        final ViewHolder holder = new ViewHolder(view);
 
         type = new boolean[mDataItemList.size()];
 
         //笔记的点击事件
-        holder.cardView.setOnClickListener(new View.OnClickListener(){
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                int position=holder.getAdapterPosition();
-                DataItem dataItem=mDataItemList.get(position);
+            public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
-                Intent intent=new Intent(view.getContext(), EditingActivity.class);
+                Intent intent = new Intent(view.getContext(), EditingActivity.class);
                 //传送数据的id并启动EditingActivity
-                intent.putExtra("noteId",id);
+                intent.putExtra("noteId", id);
                 view.getContext().startActivity(intent);
             }
         });
@@ -108,8 +89,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                int position=holder.getAdapterPosition();
-                DataItem dataItem=mDataItemList.get(position);
+                int position = holder.getAdapterPosition();
+                DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
@@ -142,20 +123,45 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.spread_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position=holder.getAdapterPosition();
-                if(holder.body_special.getVisibility() == View.VISIBLE){//如果内容可见
+                int position = holder.getAdapterPosition();
+                int minHeight;
+                int maxHeight;
+                Display display = mainActivity.getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                holder.body_special.measure(size.x, size.y);//测量bodySpecial的高度
+                int specialHeight = holder.body_special.getMeasuredHeight();
+                if (holder.body_special.getVisibility() == View.VISIBLE) {//如果内容可见
+
+                    maxHeight = holder.cardView.getMeasuredHeight();
+                    minHeight = maxHeight - specialHeight;
                     holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
                     holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
                     holder.body_special.setVisibility(View.GONE);//设置内容不可见
                     holder.spread_button.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
                     type[position] = false;
-                }else{//如果内容不可见
+                    valueAnimator = ValueAnimator.ofInt(maxHeight, minHeight);
+
+                } else {//如果内容不可见
                     holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
+                    minHeight = holder.cardView.getMeasuredHeight();
+                    maxHeight = minHeight + specialHeight;
                     holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
                     holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
                     holder.spread_button.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
                     type[position] = true;
+                    valueAnimator = ValueAnimator.ofInt(minHeight, maxHeight);
                 }
+                valueAnimator.setDuration(300);
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int currentHeight = (Integer) animation.getAnimatedValue();
+                        holder.cardView.getLayoutParams().height = currentHeight;
+                        holder.cardView.requestLayout();
+                    }
+                });
+                valueAnimator.start();
             }
         });
 
@@ -165,24 +171,24 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     //获取DataItem的数据
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position){
-        DataItem dataItem=mDataItemList.get(position);//此item
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        DataItem dataItem = mDataItemList.get(position);//此item
 
         //相同的年月只显示一次
         String year_month0 = dataItem.getYear() + dataItem.getMonth();//此item的年月
         boolean flag = true;
-        for(int i = 0; i<mDataItemList.size(); i++){//列表的所有item
+        for (int i = 0; i < mDataItemList.size(); i++) {//列表的所有item
             //如果年月相同 且 不是列表中最上面的一个
-            if((mDataItemList.get(i).getYear() + mDataItemList.get(i).getMonth()).equals(year_month0)
-                    && position > i){
+            if ((mDataItemList.get(i).getYear() + mDataItemList.get(i).getMonth()).equals(year_month0)
+                    && position > i) {
                 flag = false;
                 break;
             }
         }
-        if(flag){
+        if (flag) {
             holder.year_month.setVisibility(View.VISIBLE);//设置年月可见
             holder.year_month.setText(year_month0);//设置年月
-        }else{
+        } else {
             holder.year_month.setVisibility(View.GONE);//设置年月不可见
             holder.year_month.setText(null);//置空年月
         }
@@ -191,12 +197,12 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
         try {
             holder.day_time.setText(dataItem.getPassDay(mainActivity) + " " + dataItem.getTime());//设置星期 时分秒
-        }catch(ParseException e){
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
         holder.body_special.setText(dataItem.getBody());//设置内容
-        if(type[position])
+        if (type[position])
             holder.body_special.setVisibility(View.VISIBLE);//设置内容可见
         else
             holder.body_special.setVisibility(View.GONE);//设置内容不可见
@@ -206,8 +212,30 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
     //获取item数量
     @Override
-    public int getItemCount(){
+    public int getItemCount() {
         return mDataItemList.size();
+    }
+
+    //设置item中的View
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        View dataView;
+        CardView cardView;
+        TextView year_month;
+        TextView title_special;
+        TextView day_time;
+        TextView body_special;
+        ImageButton spread_button;
+
+        ViewHolder(View view) {
+            super(view);
+            dataView = view;
+            cardView = view.findViewById(R.id.cardView);
+            year_month = view.findViewById(R.id.year_month);
+            title_special = view.findViewById(R.id.title_special);
+            day_time = view.findViewById(R.id.day_time);
+            body_special = view.findViewById(R.id.body_special);
+            spread_button = view.findViewById(R.id.spread_button);
+        }
     }
 
 }

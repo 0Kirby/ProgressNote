@@ -249,6 +249,8 @@ public class EditingActivity extends BaseActivity {
         cur.moveToFirst();
         type = cur.getInt(0);//获取新建记录的id
         cur.close();
+        db.close();
+        Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);//切换标题
         cMenu.getItem(0).setVisible(true);//显示删除按钮
     }
@@ -258,8 +260,7 @@ public class EditingActivity extends BaseActivity {
         db.update("Note", values, "id = ?",
                 new String[]{String.valueOf(type)});
         values.clear();
-        Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess),
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         db.close();
     }
 }
