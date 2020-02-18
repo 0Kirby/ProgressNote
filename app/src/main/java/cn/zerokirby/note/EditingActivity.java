@@ -96,8 +96,8 @@ public class EditingActivity extends BaseActivity {
             case R.id.delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
                 builder.setTitle("提示");
-                builder.setMessage("是否要删除该条记录？");
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                builder.setMessage("是否要删除这条笔记？");
+                builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                         db = dbHelper.getWritableDatabase();

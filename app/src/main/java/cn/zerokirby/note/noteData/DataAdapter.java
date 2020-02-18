@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -83,10 +86,25 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 DataItem dataItem=mDataItemList.get(position);
                 int id = dataItem.getId();
 
+                /*暂时不用
+                MyDialog myDialog=new MyDialog();
+
+                //向MyDialog传递对话框类型flag和笔记的id
+                Bundle bundle = new Bundle();
+                bundle.putInt("flag", 0);
+                bundle.putInt("id", id);
+                myDialog.setArguments(bundle);
+
+                //获取碎片管理器
+                FragmentManager fragmentManager = ((AppCompatActivity)view.getContext()).getSupportFragmentManager();
+                //启动对话框碎片
+                myDialog.show(fragmentManager,"MyDialog");
+                */
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
-                builder.setMessage("是否要删除该条记录？");
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                builder.setMessage("是否要删除这条笔记？");
+                builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                         dbHelper = new DatabaseHelper(mainActivity,
@@ -106,6 +124,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                     }
                 });
                 builder.show();
+
                 return true;
             }
         });
