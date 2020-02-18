@@ -110,18 +110,20 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/text_input_username"
+                        style="@style/MD_Dialog_Input_Layout"
+                        android:hint="@string/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/username"
+                            style="@style/MD_Dialog_Input_Layout.Message"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="100dp"
+
                             android:digits="@string/filter_username"
                             android:drawableStart="@drawable/ic_person_black_24dp"
-                            android:hint="@string/username"
                             android:importantForAutofill="no"
                             android:inputType="textEmailAddress"
                             android:selectAllOnFocus="true" />
@@ -137,16 +139,18 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/text_input_password"
+                            style="@style/MD_Dialog_Input_Layout"
+                            android:hint="@string/password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:passwordToggleEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/password"
+                                style="@style/MD_Dialog_Input_Layout.Message"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:drawableStart="@drawable/ic_key_black_24dp"
-                                android:hint="@string/password"
                                 android:imeOptions="actionDone"
                                 android:importantForAutofill="no"
                                 android:inputType="textPassword"

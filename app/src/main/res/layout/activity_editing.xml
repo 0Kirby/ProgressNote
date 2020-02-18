@@ -56,7 +56,6 @@
         android:lines="1"
         android:maxLength="12"
         android:singleLine="true"
-        android:textColor="#000000"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:targetApi="o" />
@@ -87,7 +86,6 @@
                 android:hint="@string/please_text"
                 android:importantForAutofill="no"
                 android:inputType="none"
-                android:textColor="#000000"
                 tools:targetApi="o" />
         </LinearLayout>
     </ScrollView>

@@ -1,6 +1,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="BaseLightTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="BaseLightTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@android:color/white</item>
         <item name="color_view_background">@android:color/white</item>
         <item name="color_windows_background">#FFF5F5F5</item>
@@ -29,7 +29,7 @@
 
     </style>
 
-    <style name="BaseDarkTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="BaseDarkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">#FF303030</item>
         <item name="color_view_background">#FF303030</item>
         <item name="color_windows_background">#FF202020</item>
@@ -164,6 +164,7 @@
     </style>
 
     <style name="DarkAppTheme" parent="BaseDarkTheme">
+        <item name="android:textColor">#FFFFFF</item>
         <item name="colorPrimary">@color/darkColorPrimary</item>
         <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
         <item name="colorAccent">@color/darkColorAccent</item>
@@ -182,6 +183,25 @@
     <style name="DialogTextButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog.Flush">
         <item name="android:textColor">?attr/dialog_button_color</item>
         <item name="rippleColor">?attr/dialog_button_color</item>
+    </style>
+
+    <style name="MD_Dialog_Input_Layout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="boxBackgroundColor">@android:color/transparent</item>
+        <item name="boxStrokeColor">?attr/colorAccent</item>
+        <item name="hintTextColor">?attr/colorAccent</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_color</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="MD_Dialog_Input_Layout.Message">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/text_high</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textColorHint">?attr/colorAccent</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

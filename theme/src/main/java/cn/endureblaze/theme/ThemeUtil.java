@@ -50,7 +50,8 @@ public class ThemeUtil {
                 R.drawable.theme_brown,
                 R.drawable.theme_bluegrey,
                 R.drawable.theme_yellow,
-                R.drawable.theme_white
+                R.drawable.theme_white,
+                R.drawable.theme_dark
         };
         List<Integer> list = Arrays.asList(res);
         ThemeListAdapter adapter = new ThemeListAdapter(activity, list);
