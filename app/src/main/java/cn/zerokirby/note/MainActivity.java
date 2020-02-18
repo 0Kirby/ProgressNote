@@ -608,6 +608,7 @@ public class MainActivity extends BaseActivity {
             menu.getItem(1).setVisible(true);//显示“同步（服务器->客户端）”
             menu.getItem(2).setVisible(true);//显示“同步（客户端->服务器）”
             menu.getItem(4).setVisible(true);//显示“退出登录”
+
             db.close();
         }
     }

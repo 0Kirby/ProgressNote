@@ -30,7 +30,9 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".EditingActivity">
+        <activity
+            android:name=".EditingActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
             </intent-filter>
