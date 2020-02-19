@@ -431,7 +431,7 @@ public class MainActivity extends BaseActivity {
                         cursor.getColumnIndex("time"))));//读取时间并存入s1
                 String s2 = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入s2
 
-                if(TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)){//如果字符串为空 或 标题、时间或文本中包含要查询的字符串
+                if (TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)) {//如果字符串为空 或 标题、时间或文本中包含要查询的字符串
                     //封装数据
                     DataItem dataItem = new DataItem();
                     dataItem.setId(Integer.parseInt(cursor.getString(cursor
@@ -449,7 +449,7 @@ public class MainActivity extends BaseActivity {
         }
         db.close();
 
-        if(!TextUtils.isEmpty(s)){
+        if (!TextUtils.isEmpty(s)) {
             Toast.makeText(MainActivity.this, "找到" + i + "条笔记", Toast.LENGTH_SHORT).show();
         }
     }
@@ -479,14 +479,16 @@ public class MainActivity extends BaseActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.search_button:
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
                 builder.setTitle("提示");
                 builder.setMessage("请输入要查找的内容\n");
-
                 EditText search_et = new EditText(MainActivity.this);//添加输入框
                 search_et.setHint("若不输入则显示全部");
+                int themeId = ThemeUtil.getThemeId(this);
+                if (themeId == 2)
+                    search_et.setHintTextColor(getResources().getColor(R.color.white));
                 search_et.setBackgroundResource(R.drawable.search_et_bg);//设置背景
-                search_et.setPadding(12,24,12,24);
+                search_et.setPadding(12, 24, 12, 24);
                 builder.setView(search_et, 18, 0, 18, 0);
 
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {

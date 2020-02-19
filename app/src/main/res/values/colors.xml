@@ -12,7 +12,7 @@
     <color name="darkred">#DF3F4F</color>
     <color name="skyblue">#9FCFFF</color>
     <color name="yellow">#FFDF4F</color>
-
+    <color name="icon_background">#00000000</color>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>

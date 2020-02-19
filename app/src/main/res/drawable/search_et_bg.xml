@@ -10,8 +10,7 @@
             <!-- stroke 设置边框显示 -->
             <stroke
                 android:dashGap="0dp"
-                android:width="2dp"
-                android:color="@color/pink" />
+                android:width="2dp" android:color="?attr/colorPrimaryDark" />
             <!-- padding：Button里面的文字与Button边界的间隔 -->
             <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
         </shape>
@@ -26,8 +25,7 @@
             <!-- stroke 设置边框显示 -->
             <stroke
                 android:dashGap="0dp"
-                android:width="2dp"
-                android:color="@color/skyblue" />
+                android:width="2dp" android:color="?attr/colorAccent" />
             <!-- padding：Button里面的文字与Button边界的间隔 -->
             <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
         </shape>
