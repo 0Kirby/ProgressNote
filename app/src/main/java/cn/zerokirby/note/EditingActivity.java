@@ -106,6 +106,7 @@ public class EditingActivity extends BaseActivity {
                                 Toast.LENGTH_SHORT).show();
                         db.close();
                         MainActivity.instance.modifySync(EditingActivity.this);
+                        MainActivity.instance.refreshData("");
                         finish();//关闭当前活动并返回到主活动
                     }
                 });

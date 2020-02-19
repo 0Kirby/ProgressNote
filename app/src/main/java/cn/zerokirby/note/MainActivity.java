@@ -87,6 +87,7 @@ public class MainActivity extends BaseActivity {
     private DataAdapterSpecial dataAdapterSpecial;
     private Animation adapterAlpha1;//动画1，消失
     private Animation adapterAlpha2;//动画2，出现
+    private String searchText;//用来保存在查找对话框输入的文字
     /*已弃用
     private AlphaAnimation adapterAlpha1() {//动画1，消失
         AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
@@ -404,7 +405,7 @@ public class MainActivity extends BaseActivity {
                     public void run() {
                         recyclerView.startAnimation(adapterAlpha1);
                         //restartActivity(MainActivity.this);
-                        refreshData("");
+                        refreshData(searchText);
                         swipeRefreshLayout.setRefreshing(false);
                         //Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
                         recyclerView.startAnimation(adapterAlpha2);
@@ -479,14 +480,14 @@ public class MainActivity extends BaseActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.search_button:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示查找提示
                 builder.setTitle("提示");
                 builder.setMessage("请输入要查找的内容\n");
                 EditText search_et = new EditText(MainActivity.this);//添加输入框
                 search_et.setHint("若不输入则显示全部");
                 int themeId = ThemeUtil.getThemeId(this);
                 if (themeId == 2)
-                    search_et.setHintTextColor(getResources().getColor(R.color.white));
+                    search_et.setHintTextColor(getResources().getColor(R.color.gray));
                 search_et.setBackgroundResource(R.drawable.search_et_bg);//设置背景
                 search_et.setPadding(12, 24, 12, 24);
                 builder.setView(search_et, 18, 0, 18, 0);
@@ -494,14 +495,16 @@ public class MainActivity extends BaseActivity {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
+                        searchText = search_et.getText().toString();
                         recyclerView.startAnimation(adapterAlpha1);
-                        refreshData(search_et.getText().toString());
+                        refreshData(searchText);
                         recyclerView.startAnimation(adapterAlpha2);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
                 builder.show();
