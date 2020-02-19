@@ -69,7 +69,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         final ViewHolder holder = new ViewHolder(view);
 
         if(flag){
-            type = new boolean[getItemCount()];
+            type = new boolean[mDataItemList.size()];
             flag = false;
         }
 
