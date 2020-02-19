@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="7dp"
-        app:cardBackgroundColor="?attr/color_view_background"
+        app:cardBackgroundColor="?attr/color_windows_background"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         app:cardCornerRadius="12dp"
         app:cardElevation="6dp">
@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:background="?attr/color_windows_background"
             android:padding="15dp">
 
             <TextView

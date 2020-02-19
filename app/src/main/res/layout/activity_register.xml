@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f2f2f2"
+    android:background="?attr/color_view_background"
     tools:context=".RegisterActivity">
 
     <ImageView
@@ -32,23 +32,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
                 android:gravity="center_horizontal"
                 android:text="@string/register"
-                android:textColor="#333232"
+                android:textColor="?attr/icon_color"
                 android:textSize="30sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="right|bottom"
+                android:gravity="end|bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_marginBottom="7.3dp"
                     android:background="@drawable/small_circle" />
 
@@ -88,15 +88,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="13dp"
-                android:layout_marginRight="35.6dp"
+                android:layout_marginStart="13dp"
+                android:layout_marginEnd="35.6dp"
                 android:background="@drawable/rectangle">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="225dp"
-                    android:layout_marginLeft="13dp"
-                    android:layout_marginRight="19dp"
+                    android:layout_marginStart="13dp"
+                    android:layout_marginEnd="19dp"
                     android:orientation="vertical">
 
 
@@ -105,8 +105,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20.3dp"
                         android:gravity="center_horizontal"
-                        android:text="欢迎"
-                        android:textColor="#333232"
+                        android:text="@string/welcome"
+                        android:textColor="?attr/icon_color"
                         android:textSize="16.7sp" />
 
 
@@ -144,7 +144,8 @@
                             android:hint="@string/password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:passwordToggleEnabled="true">
+                            app:passwordToggleEnabled="true"
+                            app:passwordToggleTint="?attr/icon_color">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/password"
@@ -180,14 +181,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="75dp"
-                android:text="@string/remember_username" />
+                android:text="@string/remember_username"
+                android:textColor="?attr/icon_color" />
 
             <CheckBox
                 android:id="@+id/password_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="75dp"
-                android:text="@string/remember_password" />
+                android:text="@string/remember_password"
+                android:textColor="?attr/icon_color" />
 
         </LinearLayout>
 
