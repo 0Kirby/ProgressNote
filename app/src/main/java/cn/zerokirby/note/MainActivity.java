@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -245,7 +247,7 @@ public class MainActivity extends BaseActivity {
                         values.put("lastSync", System.currentTimeMillis());
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
-                        refreshData();
+                        refreshData("");
                         //restartActivityNoAnimation(MainActivity.this);
                         break;
                     case UPLOAD:
@@ -364,17 +366,15 @@ public class MainActivity extends BaseActivity {
             db.insert("User", null, values);//插入
         } else
             db.update("User", values, "rowid = ?", new String[]{"1"});//更新
-
-        dataList.clear();//刷新dataList
         db.close();
-        initData();//初始化数据
+        refreshData("");
     }
 
     //恢复到本活动时刷新数据
     @Override
     protected void onResume() {
         super.onResume();
-        refreshData();
+        refreshData("");
         /*已弃用
         if (firstLaunch)
             restartActivity(MainActivity.this);
@@ -383,14 +383,14 @@ public class MainActivity extends BaseActivity {
     }
 
     //刷新数据
-    public void refreshData() {
+    public void refreshData(String s) {
         if (arrangement == 0)
             dataAdapter.notifyDataSetChanged();//通知adapter更新
         else
             dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
         //初始化Journal数据
         dataList.clear();
-        initData();
+        initData(s);
         checkLoginStatus();//检查登录状态
     }
 
@@ -402,12 +402,12 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        recyclerView.startAnimation(adapterAlpha1);
+                        recyclerView.setAnimation(adapterAlpha1);
                         //restartActivity(MainActivity.this);
-                        refreshData();
+                        refreshData("");
                         swipeRefreshLayout.setRefreshing(false);
                         //Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
-                        recyclerView.startAnimation(adapterAlpha2);
+                        recyclerView.setAnimation(adapterAlpha2);
                     }
                 });
             }
@@ -415,31 +415,43 @@ public class MainActivity extends BaseActivity {
     }
 
     //初始化从数据库中读取数据并填充dataItem
-    private void initData() {
+    private void initData(String s) {
         simpleDateFormat = new SimpleDateFormat(
                 getString(R.string.formatDate), Locale.getDefault());
         db = databaseHelper.getReadableDatabase();
         cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
                 null);//查询对应的数据
+
+        int i = 0;//找到的笔记数量
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                DataItem dataItem = new DataItem();
-                dataItem.setId(Integer.parseInt(cursor.getString(cursor
-                        .getColumnIndex("id"))));//读取编号，需从字符串型转换成整型
-                dataItem.setTitle(cursor.getString(cursor
-                        .getColumnIndex("title")));//读取标题
-                dataItem.setDate(simpleDateFormat.format(new Date(cursor.getLong(cursor
-                        .getColumnIndex("time")))));//读取时间
-                dataItem.setBody(cursor.getString(cursor
-                        .getColumnIndex("content")));//读取文本
-                dataList.add(dataItem);
+                String s0 = cursor.getString(cursor.getColumnIndex("title"));//读取标题并存入s0
+                String s1 = simpleDateFormat.format(new Date(cursor.getLong(
+                        cursor.getColumnIndex("time"))));//读取时间并存入s1
+                String s2 = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入s2
+
+                if(TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)){//如果字符串为空 或 标题、时间或文本中包含要查询的字符串
+                    //封装数据
+                    DataItem dataItem = new DataItem();
+                    dataItem.setId(Integer.parseInt(cursor.getString(cursor
+                            .getColumnIndex("id"))));//读取编号，需从字符串型转换成整型
+                    dataItem.setTitle(s0);
+                    dataItem.setDate(s1);
+                    dataItem.setBody(s2);
+                    dataList.add(dataItem);
+                    i++;
+                }
             } while (cursor.moveToNext());
         }
         if (cursor != null) {
             cursor.close();
         }
         db.close();
+
+        if(!TextUtils.isEmpty(s)){
+            Toast.makeText(MainActivity.this, "找到" + i + "条笔记", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //判断是否是平板模式
@@ -466,7 +478,32 @@ public class MainActivity extends BaseActivity {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
+            case R.id.search_button:
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                builder.setTitle("提示");
+                builder.setMessage("请输入要查找的内容\n");
 
+                EditText search_et = new EditText(MainActivity.this);//添加输入框
+                search_et.setHint("若不输入则显示全部");
+                search_et.setBackgroundResource(R.drawable.search_et_bg);//设置背景
+                search_et.setPadding(12,24,12,24);
+                builder.setView(search_et, 18, 0, 18, 0);
+
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
+                        recyclerView.setAnimation(adapterAlpha1);
+                        refreshData(search_et.getText().toString());
+                        recyclerView.setAnimation(adapterAlpha2);
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                builder.show();
+                break;
             case R.id.arrangement:
                 recyclerView.startAnimation(adapterAlpha1);
                 if (arrangement == 0) {
@@ -482,7 +519,6 @@ public class MainActivity extends BaseActivity {
                 }
                 recyclerView.startAnimation(adapterAlpha2);
                 break;
-
             case R.id.theme:
                 ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
                 break;
