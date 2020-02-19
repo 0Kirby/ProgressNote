@@ -370,11 +370,11 @@ public class MainActivity extends BaseActivity {
         refreshData("");
     }
 
-    //恢复到本活动时刷新数据
+    //恢复到本活动时刷新数据（已弃用）
     @Override
     protected void onResume() {
         super.onResume();
-        refreshData("");
+        //refreshData("");
         /*已弃用
         if (firstLaunch)
             restartActivity(MainActivity.this);
@@ -402,12 +402,12 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        recyclerView.setAnimation(adapterAlpha1);
+                        recyclerView.startAnimation(adapterAlpha1);
                         //restartActivity(MainActivity.this);
                         refreshData("");
                         swipeRefreshLayout.setRefreshing(false);
                         //Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
-                        recyclerView.setAnimation(adapterAlpha2);
+                        recyclerView.startAnimation(adapterAlpha2);
                     }
                 });
             }
@@ -492,9 +492,9 @@ public class MainActivity extends BaseActivity {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
-                        recyclerView.setAnimation(adapterAlpha1);
+                        recyclerView.startAnimation(adapterAlpha1);
                         refreshData(search_et.getText().toString());
-                        recyclerView.setAnimation(adapterAlpha2);
+                        recyclerView.startAnimation(adapterAlpha2);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做

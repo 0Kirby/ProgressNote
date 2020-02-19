@@ -115,12 +115,13 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                                 Toast.LENGTH_SHORT).show();
                         db.close();
                         mainActivity.modifySync(mainActivity);
-                        mainActivity.refreshData();
+                        mainActivity.refreshData("");
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
                 builder.show();

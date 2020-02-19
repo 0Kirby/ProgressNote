@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 当输入框被点击时 -->
+    <item android:state_pressed= "true">
+        <shape android:shape="rectangle" >
+            <!-- 设置输入框的四个角为弧形 -->
+            <!-- android:radius 弧形的半径 -->
+            <corners android:radius="5dp" />
+            <!-- stroke 设置边框显示 -->
+            <stroke
+                android:dashGap="0dp"
+                android:width="2dp"
+                android:color="@color/pink" />
+            <!-- padding：Button里面的文字与Button边界的间隔 -->
+            <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
+        </shape>
+    </item>
+
+    <!-- 设置输入框的边框 -->
+    <item>
+        <shape android:shape="rectangle" >
+            <!-- 设置输入框的四个角为弧形 -->
+            <!-- android:radius 弧形的半径 -->
+            <corners android:radius="5dp" />
+            <!-- stroke 设置边框显示 -->
+            <stroke
+                android:dashGap="0dp"
+                android:width="2dp"
+                android:color="@color/skyblue" />
+            <!-- padding：Button里面的文字与Button边界的间隔 -->
+            <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
+        </shape>
+    </item>
+
+</selector>

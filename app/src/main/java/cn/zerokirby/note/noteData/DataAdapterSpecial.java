@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -67,8 +68,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 .inflate(R.layout.data_item_special, parent, false);
         final ViewHolder holder = new ViewHolder(view);
 
-        if (flag) {
-            type = new boolean[mDataItemList.size()];
+        if(flag){
+            type = new boolean[getItemCount()];
             flag = false;
         }
 
@@ -123,12 +124,13 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                                 Toast.LENGTH_SHORT).show();
                         db.close();
                         mainActivity.modifySync(mainActivity);
-                        mainActivity.refreshData();
+                        mainActivity.refreshData("");
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
                 builder.show();
@@ -142,15 +144,15 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 if (type[position]) {//如果内容可见
-                    //holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
-                    //holder.layout_drawer.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
+                    holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
+                    //holder.layoutDrawer.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
                     holder.bodySpecial.setVisibility(View.GONE);//设置内容不可见
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
                     type[position] = false;
                 } else {//如果内容不可见
                     holder.bodySpecial.setVisibility(View.VISIBLE);//设置内容可见
-                    //holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
-                    //holder.layout_drawer.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
+                    holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
+                    //layoutDrawer.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
                     type[position] = true;
                 }
@@ -203,10 +205,11 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
         }
 
-        holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
-
-        if (position == mDataItemList.size() - 1) {//最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
+        //最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
+        if (position == mDataItemList.size() - 1) {
             holder.extendView.setVisibility(View.VISIBLE);
+        } else {
+            holder.extendView.setVisibility(View.GONE);
         }
     }
 

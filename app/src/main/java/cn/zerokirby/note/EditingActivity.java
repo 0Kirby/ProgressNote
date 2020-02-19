@@ -99,7 +99,7 @@ public class EditingActivity extends BaseActivity {
                 builder.setMessage("是否要删除这条笔记？");
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                    public void onClick(DialogInterface dialogInterface, int i) {//点击删除则执行删除操作
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
@@ -112,6 +112,7 @@ public class EditingActivity extends BaseActivity {
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
                 builder.show();
@@ -253,6 +254,7 @@ public class EditingActivity extends BaseActivity {
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);//切换标题
         cMenu.getItem(0).setVisible(true);//显示删除按钮
+        MainActivity.instance.refreshData("");
     }
 
     //更新数据
@@ -262,5 +264,6 @@ public class EditingActivity extends BaseActivity {
         values.clear();
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         db.close();
+        MainActivity.instance.refreshData("");
     }
 }
