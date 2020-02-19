@@ -209,7 +209,7 @@
                 android:enabled="false"
                 android:gravity="center"
                 android:text="@string/action_sign_in"
-                android:textColor="#ffffff"
+                android:textColor="?attr/toolbar_icon_color"
                 android:textSize="15sp" />
 
         </LinearLayout>

@@ -4,7 +4,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/color_view_background">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -47,6 +48,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:theme="@style/AppTheme"
+        android:background="?attr/color_view_background"
+        app:itemIconTint="?attr/icon_color"
+        app:itemTextColor="?attr/icon_color"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/navigation" />
 

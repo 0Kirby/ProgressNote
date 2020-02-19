@@ -174,8 +174,8 @@ public class MainActivity extends BaseActivity {
                 (2, StaggeredGridLayoutManager.VERTICAL);
         layoutManagerSpecial = new StaggeredGridLayoutManager
                 (1, StaggeredGridLayoutManager.VERTICAL);
-        dataAdapter = new DataAdapter(MainActivity.this ,dataList);//初始化适配器
-        dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this ,dataList);//初始化适配器Special
+        dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
+        dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
         if (!isTablet(MainActivity.this)) {//如果不是平板模式
             if (arrangement == 0) {//实现瀑布流布局，将recyclerView改为两列
                 recyclerView.setLayoutManager(layoutManager);//设置笔记布局

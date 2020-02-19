@@ -5,12 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,9 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
@@ -59,33 +54,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     }
     */
 
-   //设置item中的View
-    static class ViewHolder extends RecyclerView.ViewHolder{
-        View dataView;
-        CardView cardView;
-        TextView yearMonth;
-        TextView titleSpecial;
-        TextView dayTime;
-        LinearLayout layoutDrawer;
-        TextView bodySpecial;
-        ImageButton spreadButton;
-        View extendView;
-
-        ViewHolder(View view){
-            super(view);
-            dataView = view;
-            cardView = view.findViewById(R.id.cardView);
-            yearMonth = view.findViewById(R.id.year_month);
-            titleSpecial = view.findViewById(R.id.title_special);
-            dayTime = view.findViewById(R.id.day_time);
-            layoutDrawer = view.findViewById(R.id.layout_drawer);
-            bodySpecial = view.findViewById(R.id.body_special);
-            spreadButton = view.findViewById(R.id.spread_button);
-            extendView = view.findViewById(R.id.extend_view);
-        }
-    }
-
-    public DataAdapterSpecial(MainActivity mainActivity ,List<DataItem> dataItemList){
+    public DataAdapterSpecial(MainActivity mainActivity, List<DataItem> dataItemList) {
         this.mainActivity = mainActivity;
         mDataItemList = dataItemList;
     }
@@ -94,25 +63,25 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext())
+        View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_item_special, parent, false);
-        final ViewHolder holder=new ViewHolder(view);
+        final ViewHolder holder = new ViewHolder(view);
 
-        if(flag){
+        if (flag) {
             type = new boolean[mDataItemList.size()];
             flag = false;
         }
 
         //笔记的点击事件
-        holder.cardView.setOnClickListener(new View.OnClickListener(){
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
-                Intent intent=new Intent(view.getContext(), EditingActivity.class);
+                Intent intent = new Intent(view.getContext(), EditingActivity.class);
                 //传送数据的id并启动EditingActivity
-                intent.putExtra("noteId",id);
+                intent.putExtra("noteId", id);
                 view.getContext().startActivity(intent);
             }
         });
@@ -172,13 +141,13 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             @Override
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
-                if(type[position]){//如果内容可见
+                if (type[position]) {//如果内容可见
                     //holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
                     //holder.layout_drawer.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
                     holder.bodySpecial.setVisibility(View.GONE);//设置内容不可见
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
                     type[position] = false;
-                }else{//如果内容不可见
+                } else {//如果内容不可见
                     holder.bodySpecial.setVisibility(View.VISIBLE);//设置内容可见
                     //holder.body_special.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
                     //holder.layout_drawer.setAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
@@ -194,24 +163,24 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     //获取DataItem的数据
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position){
-        DataItem dataItem=mDataItemList.get(position);//此item
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        DataItem dataItem = mDataItemList.get(position);//此item
 
         //相同的年月只显示一次
         String year_month0 = dataItem.getYear() + dataItem.getMonth();//此item的年月
         boolean flag = true;
-        for(int i = 0; i<mDataItemList.size(); i++){//列表的所有item
+        for (int i = 0; i < mDataItemList.size(); i++) {//列表的所有item
             //如果年月相同 且 不是列表中最上面的一个
-            if((mDataItemList.get(i).getYear() + mDataItemList.get(i).getMonth()).equals(year_month0)
-                    && position > i){
+            if ((mDataItemList.get(i).getYear() + mDataItemList.get(i).getMonth()).equals(year_month0)
+                    && position > i) {
                 flag = false;
                 break;
             }
         }
-        if(flag){
+        if (flag) {
             holder.yearMonth.setVisibility(View.VISIBLE);//设置年月可见
             holder.yearMonth.setText(year_month0);//设置年月
-        }else{
+        } else {
             holder.yearMonth.setVisibility(View.GONE);//设置年月不可见
             holder.yearMonth.setText(null);//置空年月
         }
@@ -220,13 +189,13 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
         try {
             holder.dayTime.setText(dataItem.getPassDay(mainActivity) + " " + dataItem.getTime());//设置星期 时分秒
-        }catch(ParseException e){
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
         holder.bodySpecial.setText(dataItem.getBody());//设置内容
         //holder.body_special.setVisibility(View.GONE);//设置内容不可见
-        if(type[position]){
+        if (type[position]) {
             holder.bodySpecial.setVisibility(View.VISIBLE);//设置内容可见
             holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
         } else {
@@ -236,15 +205,41 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
         holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
 
-        if(position == mDataItemList.size() - 1){//最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
+        if (position == mDataItemList.size() - 1) {//最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
             holder.extendView.setVisibility(View.VISIBLE);
         }
     }
 
     //获取item数量
     @Override
-    public int getItemCount(){
+    public int getItemCount() {
         return mDataItemList.size();
+    }
+
+    //设置item中的View
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        View dataView;
+        CardView cardView;
+        TextView yearMonth;
+        TextView titleSpecial;
+        TextView dayTime;
+        LinearLayout layoutDrawer;
+        TextView bodySpecial;
+        ImageButton spreadButton;
+        View extendView;
+
+        ViewHolder(View view) {
+            super(view);
+            dataView = view;
+            cardView = view.findViewById(R.id.cardView);
+            yearMonth = view.findViewById(R.id.year_month);
+            titleSpecial = view.findViewById(R.id.title_special);
+            dayTime = view.findViewById(R.id.day_time);
+            layoutDrawer = view.findViewById(R.id.layout_drawer);
+            bodySpecial = view.findViewById(R.id.body_special);
+            spreadButton = view.findViewById(R.id.spread_button);
+            extendView = view.findViewById(R.id.extend_view);
+        }
     }
 
 }

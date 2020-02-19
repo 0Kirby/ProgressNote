@@ -20,17 +20,19 @@ import java.util.Locale;
 
 public class ThemeUtil {
     public final static int BLUE_THEME = 0;
-    public final static int RED_THEME = 1;
-    public final static int PURPLE_THEME = 2;
-    public final static int Indigo_THEME = 3;
-    public final static int TEAL_THEME = 4;
-    public final static int GREEN_THEME = 5;
-    public final static int ORANGE_THEME = 6;
-    public final static int BROWN_THEME = 7;
-    public final static int BLUEGREY_THEME = 8;
-    public final static int YELLOW_THEME = 9;
-    public final static int WHITE_THEME = 10;
-    public final static int DARK_THEME = 11;
+    public final static int WHITE_THEME = 1;
+    public final static int DARK_THEME = 2;
+    public final static int YELLOW_THEME = 3;
+    public final static int ORANGE_THEME = 4;
+    public final static int RED_THEME = 5;
+    public final static int PURPLE_THEME = 6;
+    public final static int INDIGO_THEME = 7;
+    public final static int TEAL_THEME = 8;
+    public final static int GREEN_THEME = 9;
+    public final static int BROWN_THEME = 10;
+    public final static int BLUEGREY_THEME = 11;
+
+
 
     public final static String FILE_NAME = "theme";
 
@@ -41,17 +43,18 @@ public class ThemeUtil {
         theme.setTitle("主题");
         Integer[] res = new Integer[]{
                 R.drawable.theme_blue,
+                R.drawable.theme_white,
+                R.drawable.theme_dark,
+                R.drawable.theme_yellow,
+                R.drawable.theme_orange,
                 R.drawable.theme_red,
                 R.drawable.theme_purple,
                 R.drawable.theme_indigo,
                 R.drawable.theme_teal,
                 R.drawable.theme_green,
-                R.drawable.theme_orange,
                 R.drawable.theme_brown,
-                R.drawable.theme_bluegrey,
-                R.drawable.theme_yellow,
-                R.drawable.theme_white,
-                R.drawable.theme_dark
+                R.drawable.theme_bluegrey
+
         };
         List<Integer> list = Arrays.asList(res);
         ThemeListAdapter adapter = new ThemeListAdapter(activity, list);
@@ -103,7 +106,7 @@ public class ThemeUtil {
             case PURPLE_THEME:
                 context.setTheme(R.style.PurpleAppTheme);
                 break;
-            case Indigo_THEME:
+            case INDIGO_THEME:
                 context.setTheme(R.style.IndigoAppTheme);
                 break;
             case TEAL_THEME:
