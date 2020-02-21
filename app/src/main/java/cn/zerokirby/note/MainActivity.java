@@ -31,6 +31,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -227,11 +228,17 @@ public class MainActivity extends BaseActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
 
-        //初始化ProgressDialog
-        progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setCancelable(true);
-        progressDialog.setTitle("请稍后");
-        progressDialog.setMessage("同步中...");
+        //初始化ProgressDialog，这里为
+
+        AlertDialog.Builder progressBuilder = new AlertDialog.Builder(this);//显示查找提示
+        progressBuilder.setTitle("请稍后");
+        progressBuilder.setMessage("同步中...");
+        ProgressBar progressBar = new ProgressBar(this);
+        progressBuilder.setView(progressBar);
+        AlertDialog progressDialog = progressBuilder.create();
+
+
+
         handler = new Handler(new Handler.Callback() {//用于异步消息处理
 
             @Override

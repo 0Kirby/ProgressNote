@@ -85,6 +85,7 @@ public class RegisterActivity extends BaseActivity {
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
                         LoginActivity.loginActivity.finish();
+                        MainActivity.instance.checkLoginStatus();
                         finish();
                     }
                 }

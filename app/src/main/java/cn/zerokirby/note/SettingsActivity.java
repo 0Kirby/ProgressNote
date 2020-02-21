@@ -123,6 +123,7 @@ public class SettingsActivity extends BaseActivity {
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
                             db.execSQL("Delete from Note");//清空笔记表
                             db.close();
+                            MainActivity.instance.refreshData("");
                             Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
@@ -160,6 +161,7 @@ public class SettingsActivity extends BaseActivity {
                                     }
                                 }
                             }).start();
+                            MainActivity.instance.refreshData("");
                             Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });

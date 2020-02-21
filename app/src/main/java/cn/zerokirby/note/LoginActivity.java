@@ -101,6 +101,7 @@ public class LoginActivity extends BaseActivity {
                         values.put("lastSync", syncTime);
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
+                        MainActivity.instance.checkLoginStatus();
                         finish();
                     }
                 }
