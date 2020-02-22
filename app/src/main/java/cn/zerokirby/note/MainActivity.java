@@ -238,7 +238,6 @@ public class MainActivity extends BaseActivity {
         AlertDialog progressDialog = progressBuilder.create();
 
 
-
         handler = new Handler(new Handler.Callback() {//用于异步消息处理
 
             @Override
@@ -478,10 +477,10 @@ public class MainActivity extends BaseActivity {
     }
 
     //删除dataList的笔记
-    public void deletItemById(int id){
+    public void deletItemById(int id) {
         int index = 0;
-        for(DataItem item: dataList) {
-            if(item.getId() == id)
+        for (DataItem item : dataList) {
+            if (item.getId() == id)
                 break;
             index++;
         }
@@ -499,8 +498,8 @@ public class MainActivity extends BaseActivity {
     public void modifyItem(DataItem dataItem) {
         //dataItem.setFlag(true);//设置修改后状态为展开
         int index = 0;
-        for(DataItem item: dataList) {
-            if(item.getId() == dataItem.getId())
+        for (DataItem item : dataList) {
+            if (item.getId() == dataItem.getId())
                 break;
             index++;
         }
@@ -522,7 +521,7 @@ public class MainActivity extends BaseActivity {
     private void goneYearMonth(DataItem dataItem) {
         String year_month0 = dataItem.getYear() + dataItem.getMonth();//此item的年月
         String year_month1 = dataList.get(1).getYear() + dataList.get(1).getMonth();//1号item的年月
-        if(year_month0.equals(year_month1)) {//如果相同，则隐藏1号item的年月
+        if (year_month0.equals(year_month1)) {//如果相同，则隐藏1号item的年月
             View view1 = recyclerView.getChildAt(0);//在加进来之前，1号item还是0号
             final RecyclerView.ViewHolder holder1 = recyclerView.getChildViewHolder(view1);
             holder1.itemView.findViewById(R.id.year_month).setVisibility(View.GONE);
@@ -534,7 +533,7 @@ public class MainActivity extends BaseActivity {
         View view0 = recyclerView.getChildAt(index);
         final RecyclerView.ViewHolder holder0 = recyclerView.getChildViewHolder(view0);
         //如果删除的item包含年月，则显示下一个item的年月
-        if(holder0.itemView.findViewById(R.id.year_month).getVisibility() == View.VISIBLE) {
+        if (holder0.itemView.findViewById(R.id.year_month).getVisibility() == View.VISIBLE) {
             View view1 = recyclerView.getChildAt(index + 1);
             final RecyclerView.ViewHolder holder1 = recyclerView.getChildViewHolder(view1);
             holder1.itemView.findViewById(R.id.year_month).setVisibility(View.VISIBLE);
