@@ -29,7 +29,6 @@ public class DataItem {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -37,7 +36,6 @@ public class DataItem {
     String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
@@ -45,7 +43,6 @@ public class DataItem {
     String getBody() {
         return body;
     }
-
     public void setBody(String body) {
         this.body = body;
     }
@@ -53,7 +50,6 @@ public class DataItem {
     String getDate() {
         return date;
     }
-
     public void setDate(String date) {
         this.date = date;
     }
@@ -127,6 +123,14 @@ public class DataItem {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
                 mainActivity.getString(R.string.formatDate), Locale.getDefault());
         return Objects.requireNonNull(simpleDateFormat.parse(date)).getTime();
+    }
+
+    private boolean flag = false;//这个成员用来记录dataItem的展开状态
+    public boolean getFlag() {
+        return flag;
+    }
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 
 }

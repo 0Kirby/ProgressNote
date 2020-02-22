@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.noteData.DataItem;
 
 public class EditingActivity extends BaseActivity {
 
@@ -40,7 +41,9 @@ public class EditingActivity extends BaseActivity {
     private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
-    ContentValues values;
+    private ContentValues values;
+    private DataItem dataItem;
+
     private static int type;
     private Menu cMenu;
     private String title = "";
@@ -105,8 +108,12 @@ public class EditingActivity extends BaseActivity {
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
                                 Toast.LENGTH_SHORT).show();
                         db.close();
+
                         MainActivity.instance.modifySync(EditingActivity.this);
-                        MainActivity.instance.refreshData("");
+
+                        //MainActivity.instance.refreshData("");
+                        MainActivity.instance.deletItemById(type);
+
                         finish();//关闭当前活动并返回到主活动
                     }
                 });
@@ -239,9 +246,14 @@ public class EditingActivity extends BaseActivity {
 
         //获取各个控件的值
         values = new ContentValues();
-        values.put("title", noteTitle.getText().toString());
+        values.put("title", title);
         values.put("time", currentTime);
-        values.put("content", mainText.getText().toString());
+        values.put("content", content);
+
+        dataItem = new DataItem();
+        dataItem.setTitle(title);
+        dataItem.setDate(simpleDateFormat.format(date));
+        dataItem.setBody(content);
     }
 
     //添加数据
@@ -255,7 +267,11 @@ public class EditingActivity extends BaseActivity {
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);//切换标题
         cMenu.getItem(0).setVisible(true);//显示删除按钮
-        MainActivity.instance.refreshData("");
+        //MainActivity.instance.refreshData("");
+
+        //添加数据到dataList
+        dataItem.setId(type);
+        MainActivity.instance.addItem(dataItem);
     }
 
     //更新数据
@@ -265,6 +281,10 @@ public class EditingActivity extends BaseActivity {
         values.clear();
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         db.close();
-        MainActivity.instance.refreshData("");
+        //MainActivity.instance.refreshData("");
+
+        //修改dataList数据
+        dataItem.setId(type);
+        MainActivity.instance.modifyItem(dataItem);
     }
 }

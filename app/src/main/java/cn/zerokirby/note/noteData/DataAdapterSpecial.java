@@ -37,9 +37,6 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     private SQLiteDatabase db;
     private Cursor cursor;
 
-    private boolean flag = true;
-    private boolean[] type;
-
     /*
     private ScaleAnimation adapterAlpha3() {//动画3，收回
         ScaleAnimation scaleAnimation = new ScaleAnimation(1, 1, 1, 0);
@@ -67,11 +64,6 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_item_special, parent, false);
         final ViewHolder holder = new ViewHolder(view);
-
-        if(flag){
-            type = new boolean[mDataItemList.size()];
-            flag = false;
-        }
 
         //笔记的点击事件
         holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -124,7 +116,9 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                                 Toast.LENGTH_SHORT).show();
                         db.close();
                         mainActivity.modifySync(mainActivity);
-                        mainActivity.refreshData("");
+
+                        //mainActivity.refreshData("");
+                        mainActivity.deletItemById(id);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -143,18 +137,19 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             @Override
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
-                if (type[position]) {//如果内容可见
+                DataItem dataItem = mDataItemList.get(position);
+                if (dataItem.getFlag()) {//如果状态为展开
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
                     //holder.layoutDrawer.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
                     holder.bodySpecial.setVisibility(View.GONE);//设置内容不可见
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
-                    type[position] = false;
-                } else {//如果内容不可见
+                    dataItem.setFlag(false);//设置状态为收起
+                } else {//如果状态为收起
                     holder.bodySpecial.setVisibility(View.VISIBLE);//设置内容可见
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
                     //layoutDrawer.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
-                    type[position] = true;
+                    dataItem.setFlag(true);//设置状态为展开
                 }
             }
         });
@@ -170,6 +165,16 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
         //相同的年月只显示一次
         String year_month0 = dataItem.getYear() + dataItem.getMonth();//此item的年月
+
+        holder.yearMonth.setText(year_month0);//设置年月
+        holder.titleSpecial.setText(String.valueOf(dataItem.getTitle()));//设置标题
+        try {//设置星期 时分秒
+            holder.dayTime.setText(dataItem.getPassDay(mainActivity) + " " + dataItem.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        holder.bodySpecial.setText(dataItem.getBody());//设置内容
+
         boolean flag = true;
         for (int i = 0; i < mDataItemList.size(); i++) {//列表的所有item
             //如果年月相同 且 不是列表中最上面的一个
@@ -179,25 +184,13 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 break;
             }
         }
-        if (flag) {
+        if (flag)
             holder.yearMonth.setVisibility(View.VISIBLE);//设置年月可见
-            holder.yearMonth.setText(year_month0);//设置年月
-        } else {
+        else
             holder.yearMonth.setVisibility(View.GONE);//设置年月不可见
-            holder.yearMonth.setText(null);//置空年月
-        }
 
-        holder.titleSpecial.setText(String.valueOf(dataItem.getTitle()));//设置标题
-
-        try {
-            holder.dayTime.setText(dataItem.getPassDay(mainActivity) + " " + dataItem.getTime());//设置星期 时分秒
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        holder.bodySpecial.setText(dataItem.getBody());//设置内容
         //holder.body_special.setVisibility(View.GONE);//设置内容不可见
-        if (type[position]) {
+        if (dataItem.getFlag()) {
             holder.bodySpecial.setVisibility(View.VISIBLE);//设置内容可见
             holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
         } else {
