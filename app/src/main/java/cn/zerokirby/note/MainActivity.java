@@ -465,12 +465,14 @@ public class MainActivity extends BaseActivity {
 
     //为dataList添加笔记
     public void addItem(DataItem dataItem) {
+        dataItem.setFlag(true);//设置修改后状态为展开
         dataList.add(0, dataItem);//将数据插入到dataList头部
         if (arrangement == 0)
             dataAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
         else {
             dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial插入数据到头部
-            goneYearMonth(dataItem);
+            if(dataList.size() > 1)
+                goneYearMonth(dataItem);
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
@@ -489,14 +491,14 @@ public class MainActivity extends BaseActivity {
             dataAdapter.notifyItemRemoved(index);//通知adapter删除指定位置数据
         else {
             dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial删除指定位置数据
-
-            visibleYearMonth(index);
+            if(dataList.size() > 0)
+                visibleYearMonth(index);
         }
     }
 
     //修改dataList的笔记
     public void modifyItem(DataItem dataItem) {
-        //dataItem.setFlag(true);//设置修改后状态为展开
+        dataItem.setFlag(true);//设置修改后状态为展开
         int index = 0;
         for (DataItem item : dataList) {
             if (item.getId() == dataItem.getId())
@@ -511,7 +513,8 @@ public class MainActivity extends BaseActivity {
         } else {
             dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial删除指定位置数据
             dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial插入数据到头部
-            goneYearMonth(dataItem);
+            if(dataList.size() > 1)
+                goneYearMonth(dataItem);
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
