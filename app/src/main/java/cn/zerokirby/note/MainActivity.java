@@ -228,7 +228,7 @@ public class MainActivity extends BaseActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
 
-        //初始化ProgressDialog，这里为
+        //初始化ProgressDialog，这里为AlertDialog+ProgressBar
 
         AlertDialog.Builder progressBuilder = new AlertDialog.Builder(this);//显示查找提示
         progressBuilder.setTitle("请稍后");

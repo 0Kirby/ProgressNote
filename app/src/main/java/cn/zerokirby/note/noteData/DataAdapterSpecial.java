@@ -1,10 +1,13 @@
 package cn.zerokirby.note.noteData;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +67,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_item_special, parent, false);
         final ViewHolder holder = new ViewHolder(view);
+
 
         //笔记的点击事件
         holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -136,21 +140,47 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.spreadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                ValueAnimator valueAnimator;
+//                int minHeight;
+//                int maxHeight;
+//                Display display = mainActivity.getWindowManager().getDefaultDisplay();
+//                Point size = new Point();
+//                display.getSize(size);
+//                holder.bodySpecial.measure(size.x, size.y);//测量bodySpecial的高度
+//                int specialHeight = holder.bodySpecial.getMeasuredHeight();
                 int position = holder.getAdapterPosition();
                 DataItem dataItem = mDataItemList.get(position);
+
                 if (dataItem.getFlag()) {//如果状态为展开
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失);
                     //holder.layoutDrawer.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha3));//动画3，收回);
                     holder.bodySpecial.setVisibility(View.GONE);//设置内容不可见
+//                    maxHeight = holder.cardView.getMeasuredHeight();
+//                    minHeight = maxHeight - specialHeight;
+//                    valueAnimator = ValueAnimator.ofInt(maxHeight, minHeight);
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
                     dataItem.setFlag(false);//设置状态为收起
                 } else {//如果状态为收起
                     holder.bodySpecial.setVisibility(View.VISIBLE);//设置内容可见
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现);
+//                    minHeight = holder.cardView.getMeasuredHeight();
+//                    maxHeight = minHeight + specialHeight;
+//                    valueAnimator = ValueAnimator.ofInt(minHeight, maxHeight);
                     //layoutDrawer.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha4));//动画4，拉伸);
                     holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
                     dataItem.setFlag(true);//设置状态为展开
                 }
+//                valueAnimator.setDuration(300);
+//                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                    @Override
+//                    public void onAnimationUpdate(ValueAnimator animation) {
+//                        int currentHeight = (Integer) animation.getAnimatedValue();
+//                        holder.cardView.getLayoutParams().height = currentHeight;
+//                        holder.cardView.requestLayout();
+//
+//                    }
+//                });
+//                valueAnimator.start();
             }
         });
 
@@ -197,6 +227,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             holder.bodySpecial.setVisibility(View.GONE);//设置内容不可见
             holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
         }
+
 
         //最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
         if (position == mDataItemList.size() - 1) {
