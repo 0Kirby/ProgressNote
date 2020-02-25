@@ -1,22 +1,18 @@
 package cn.endureblaze.theme;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.widget.GridView;
 
 import androidx.appcompat.app.AlertDialog;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 public class ThemeUtil {
     public final static int BLUE_THEME = 0;
@@ -31,7 +27,6 @@ public class ThemeUtil {
     public final static int GREEN_THEME = 9;
     public final static int BROWN_THEME = 10;
     public final static int BLUEGREY_THEME = 11;
-
 
 
     public final static String FILE_NAME = "theme";
@@ -59,7 +54,7 @@ public class ThemeUtil {
         List<Integer> list = Arrays.asList(res);
         ThemeListAdapter adapter = new ThemeListAdapter(activity, list);
         adapter.setCheckItem(itemSelected);
-        @SuppressLint("InflateParams") GridView gridView = (GridView) LayoutInflater.from(activity).inflate(R.layout.dialog_sw_theme, null);
+        GridView gridView = (GridView) LayoutInflater.from(activity).inflate(R.layout.dialog_sw_theme, null);
         gridView.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
         gridView.setCacheColorHint(0);
         gridView.setAdapter(adapter);
@@ -200,16 +195,4 @@ public class ThemeUtil {
         return mode == Configuration.UI_MODE_NIGHT_YES;
     }
 
-    //获取是否设置根据时间切换
-    private static boolean isAutoDarkModeByTime(Context context) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH", Locale.getDefault());
-        String hour = sdf.format(new java.util.Date());
-        int k = Integer.parseInt(hour);
-        boolean by_time = (k >= 0 && k < 6) || (k >= 22 && k < 24);
-
-        SharedPreferences edit = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean by_setting = edit.getBoolean("autoDarkMode", true);
-
-        return by_time && by_setting;
-    }
 }
