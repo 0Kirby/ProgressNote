@@ -168,10 +168,8 @@ public class MainActivity extends BaseActivity {
         instance = MainActivity.this;
 
         //获取动画
-        adapterAlpha1 = AnimationUtils.loadAnimation(
-                MainActivity.this, R.anim.adapter_alpha1);
-        adapterAlpha2 = AnimationUtils.loadAnimation(
-                MainActivity.this, R.anim.adapter_alpha2);
+        adapterAlpha1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.adapter_alpha1);
+        adapterAlpha2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.adapter_alpha2);
 
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
@@ -190,8 +188,7 @@ public class MainActivity extends BaseActivity {
                 recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
             }
         } else {//如果是平板模式，则改为三列
-            layoutManager = new StaggeredGridLayoutManager
-                    (3, StaggeredGridLayoutManager.VERTICAL);
+            layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(layoutManager);//设置笔记布局
             dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
             recyclerView.setAdapter(dataAdapter);//设置适配器
@@ -395,13 +392,13 @@ public class MainActivity extends BaseActivity {
     //刷新数据
     public void refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
+        //初始化Journal数据
+        dataList.clear();
+        initData(s);
         if (arrangement == 0)
             dataAdapter.notifyDataSetChanged();//通知adapter更新
         else
             dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
-        //初始化Journal数据
-        dataList.clear();
-        initData(s);
         checkLoginStatus();//检查登录状态
         recyclerView.startAnimation(adapterAlpha2);
     }
@@ -466,7 +463,7 @@ public class MainActivity extends BaseActivity {
 
     //为dataList添加笔记
     public void addItem(DataItem dataItem) {
-        //dataItem.setFlag(true);//设置添加后状态为展开
+        dataItem.setFlag(true);//设置添加后状态为展开
         dataList.add(0, dataItem);//将数据插入到dataList头部
         if (arrangement == 0)
             dataAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
@@ -497,7 +494,7 @@ public class MainActivity extends BaseActivity {
 
     //修改dataList的笔记
     public void modifyItem(DataItem dataItem) {
-        //dataItem.setFlag(true);//设置修改后状态为展开
+        dataItem.setFlag(true);//设置修改后状态为展开
         int index = 0;
         for (DataItem item : dataList) {
             if (item.getId() == dataItem.getId())
@@ -686,8 +683,7 @@ public class MainActivity extends BaseActivity {
         } else {//用户已经登录
 
             //显示头像，并启用修改头像按钮
-            DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this,
-                    "ProgressNote.db", null, 1);
+            DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
             db = dbHelper.getReadableDatabase();
             AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, dbHelper);
             byte[] imgData = avatarDatabaseUtil.readImage();
@@ -731,12 +727,12 @@ public class MainActivity extends BaseActivity {
             userId.setVisibility(View.VISIBLE);//显示“用户ID”
             username.setVisibility(View.VISIBLE);//显示“用户名”
             lastSync.setVisibility(View.VISIBLE);//显示“上次同步”
-            userId.setText(String.format(getResources().getString(R.string.login_userId), cursor.getInt(cursor
-                    .getColumnIndex("userId"))));  //读取ID
-            username.setText(String.format(getResources().getString(R.string.login_username), cursor.getString(cursor
-                    .getColumnIndex("username"))));  //读取用户名
-            lastLogin.setText(String.format(getResources().getString(R.string.last_login), simpleDateFormat.format(new Date(cursor.getLong(cursor
-                    .getColumnIndex("lastUse"))))));  //读取上次登录时间
+            userId.setText(String.format(getResources().getString(R.string.login_userId),
+                    cursor.getInt(cursor.getColumnIndex("userId"))));  //读取ID
+            username.setText(String.format(getResources().getString(R.string.login_username),
+                    cursor.getString(cursor.getColumnIndex("username"))));  //读取用户名
+            lastLogin.setText(String.format(getResources().getString(R.string.last_login),
+                    simpleDateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex("lastUse"))))));  //读取上次登录时间
             lastLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);//设置文字大小
             long time = cursor.getLong(cursor.getColumnIndex("lastSync"));//读取上次同步时间
             if (time != 0)
