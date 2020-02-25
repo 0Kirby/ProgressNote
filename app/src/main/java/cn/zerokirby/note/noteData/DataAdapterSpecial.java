@@ -78,7 +78,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     //获取改变控件尺寸动画
     //参数：需要改变高度的linearLayout，动画前的高度，动画后的高度，需要滑动的recyclerView，需要滑动回的item的位置
     private ValueAnimator getValueAnimator(
-            LinearLayout linearLayout , int startHeight, int endHeight, RecyclerView recyclerView, int position) {
+            LinearLayout linearLayout, int startHeight, int endHeight, RecyclerView recyclerView, int position) {
         ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
         valueAnimator.setDuration(300);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

@@ -89,20 +89,6 @@ public class MainActivity extends BaseActivity {
     private Animation adapterAlpha1;//动画1，消失
     private Animation adapterAlpha2;//动画2，出现
     private String searchText;//用来保存在查找对话框输入的文字
-    /*已弃用
-    private AlphaAnimation adapterAlpha1() {//动画1，消失
-        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
-        alphaAnimation.setDuration(500);
-        alphaAnimation.setFillAfter(true);
-        return alphaAnimation;
-    }
-    private AlphaAnimation adapterAlpha2() {//动画2，出现
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alphaAnimation.setDuration(500);
-        alphaAnimation.setFillAfter(true);
-        return alphaAnimation;
-    }
-    */
 
     private static int arrangement = 0;//排列方式，0为网格，1为列表
     private final int SC = 1;//服务器同步到客户端
@@ -118,7 +104,6 @@ public class MainActivity extends BaseActivity {
     private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
 
-    private boolean firstLaunch = false;
     private int isLogin;
 
     private DatabaseHelper databaseHelper;
@@ -126,12 +111,6 @@ public class MainActivity extends BaseActivity {
     private Cursor cursor;
     private ContentValues values;
     private SimpleDateFormat simpleDateFormat;
-
-    private String responseData;
-    private int noteId;
-    private long time;
-    private String title;
-    private String content;
 
     private TextView userId;
     private TextView username;
@@ -141,22 +120,6 @@ public class MainActivity extends BaseActivity {
 
     private Uri cropImageUri;
     private Handler handler;
-
-    /*已弃用
-    public void restartActivityNoAnimation(Activity activity) {//刷新活动
-        Intent intent = new Intent();
-        intent.setClass(activity, activity.getClass());
-        activity.startActivity(intent);
-        activity.finish();
-        overridePendingTransition(0, 0);
-    }
-    public void restartActivity(Activity activity) {//刷新活动
-        Intent intent = new Intent();
-        intent.setClass(activity, activity.getClass());
-        activity.startActivity(intent);
-        activity.finish();
-    }
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -373,18 +336,6 @@ public class MainActivity extends BaseActivity {
         db.close();
 
         refreshData("");
-    }
-
-    //恢复到本活动时刷新数据（已弃用）
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //refreshData("");
-        /*已弃用
-        if (firstLaunch)
-            restartActivity(MainActivity.this);
-        firstLaunch = true;
-        */
     }
 
     //刷新数据
@@ -875,7 +826,6 @@ public class MainActivity extends BaseActivity {
                 }
             }
         }).start();
-
     }
 
 }

@@ -33,38 +33,22 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private Cursor cursor;
 
     //构造器
-    public DataAdapter(MainActivity mainActivity ,List<DataItem> dataItemList){
+    public DataAdapter(MainActivity mainActivity, List<DataItem> dataItemList) {
         this.mainActivity = mainActivity;
         mDataItemList = dataItemList;
     }
 
     //获取item数量
     @Override
-    public int getItemCount(){
+    public int getItemCount() {
         return mDataItemList.size();
-    }
-
-    //设置item中的View
-    static class ViewHolder extends RecyclerView.ViewHolder{
-        View dataView;
-        TextView title;
-        TextView body;
-        TextView date;
-
-        ViewHolder(View view){
-            super(view);
-            dataView = view;
-            title = view.findViewById(R.id.title);
-            body = view.findViewById(R.id.body);
-            date = view.findViewById(R.id.date);
-        }
     }
 
     //获取DataItem的数据
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position){
-        DataItem dataItem=mDataItemList.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        DataItem dataItem = mDataItemList.get(position);
         holder.title.setText(dataItem.getTitle());//设置标题
         holder.body.setText(dataItem.getBody());//设置内容
         holder.date.setText(dataItem.getYear() + dataItem.getMonth() + dataItem.getDay() +
@@ -75,20 +59,20 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext())
+        View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_item, parent, false);
-        final ViewHolder holder=new ViewHolder(view);
+        final ViewHolder holder = new ViewHolder(view);
 
-        holder.dataView.setOnClickListener(new View.OnClickListener(){
+        holder.dataView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                int position=holder.getAdapterPosition();
-                DataItem dataItem=mDataItemList.get(position);
+            public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
 
-                Intent intent=new Intent(view.getContext(), EditingActivity.class);
+                Intent intent = new Intent(view.getContext(), EditingActivity.class);
                 //传送数据的id并启动EditingActivity
-                intent.putExtra("noteId",id);
+                intent.putExtra("noteId", id);
                 view.getContext().startActivity(intent);
             }
         });
@@ -97,8 +81,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         holder.dataView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                int position=holder.getAdapterPosition();
-                DataItem dataItem=mDataItemList.get(position);
+                int position = holder.getAdapterPosition();
+                DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
 
                 /*暂时不用
@@ -148,6 +132,22 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         });
 
         return holder;
+    }
+
+    //设置item中的View
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        View dataView;
+        TextView title;
+        TextView body;
+        TextView date;
+
+        ViewHolder(View view) {
+            super(view);
+            dataView = view;
+            title = view.findViewById(R.id.title);
+            body = view.findViewById(R.id.body);
+            date = view.findViewById(R.id.date);
+        }
     }
 
 }

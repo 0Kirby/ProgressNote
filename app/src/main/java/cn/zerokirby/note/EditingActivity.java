@@ -34,8 +34,6 @@ public class EditingActivity extends BaseActivity {
     private TextView wordNum;
     private EditText mainText;
 
-    private final int CS = 2;//客户端同步到服务器
-
     private Date date;
     private SimpleDateFormat simpleDateFormat;
     private DatabaseHelper dbHelper;

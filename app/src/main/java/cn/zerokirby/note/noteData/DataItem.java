@@ -1,12 +1,8 @@
 package cn.zerokirby.note.noteData;
 
-import android.animation.ValueAnimator;
-
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -31,6 +27,7 @@ public class DataItem {
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -38,6 +35,7 @@ public class DataItem {
     String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -45,6 +43,7 @@ public class DataItem {
     String getBody() {
         return body;
     }
+
     public void setBody(String body) {
         this.body = body;
     }
@@ -52,27 +51,28 @@ public class DataItem {
     String getDate() {
         return date;
     }
+
     public void setDate(String date) {
         this.date = date;
     }
 
     //获取yy年，若为第一位为0，则去掉0
-    public String getYear(){
-        return date.substring(0,5);
+    public String getYear() {
+        return date.substring(0, 5);
     }
 
     //获取MM月，若为第一位为0，则去掉0
-    public String getMonth(){
-        String month = date.substring(5,8);
-        if(month.substring(0, 1).equals("0"))
+    public String getMonth() {
+        String month = date.substring(5, 8);
+        if (month.substring(0, 1).equals("0"))
             month = month.substring(1);
         return month;
     }
 
     //获取dd日，若为第一位为0，则去掉0
-    public String getDay(){
-        String day = date.substring(8,11);
-        if(day.substring(0, 1).equals("0")){
+    public String getDay() {
+        String day = date.substring(8, 11);
+        if (day.substring(0, 1).equals("0")) {
             day = day.substring(1);
         }
         return day;
@@ -84,17 +84,17 @@ public class DataItem {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
                 mainActivity.getString(R.string.format_year_month_day), Locale.getDefault());
         long diff = System.currentTimeMillis() - Objects.requireNonNull(simpleDateFormat.parse(date)).getTime();
-        int days = (int)(diff/(1000*60*60*24));
+        int days = (int) (diff / (1000 * 60 * 60 * 24));
         //long hours = (diff-days*(1000*60*60*24))/(1000*60*60);
         //long minutes = (diff-days*(1000*60*60*24)-hours*(1000*60*60))/(1000*60);
-        if(days == 0)
+        if (days == 0)
             return "今天";
-        else if(days == 1)
+        else if (days == 1)
             return "昨天";
-        else if(days < 7){
+        else if (days < 7) {
             Calendar calendar = Calendar.getInstance();
-            int weekday =  (7 + calendar.get(Calendar.DAY_OF_WEEK) - days) % 7;
-            switch(weekday){
+            int weekday = (7 + calendar.get(Calendar.DAY_OF_WEEK) - days) % 7;
+            switch (weekday) {
                 case 0:
                     return getDay() + " 星期六";
                 case 1:
@@ -115,7 +115,7 @@ public class DataItem {
     }
 
     //获取HH:mm:ss时 分 秒
-    public String getTime(){
+    public String getTime() {
         return date.substring(12);
     }
 
@@ -128,9 +128,11 @@ public class DataItem {
     }
 
     private boolean flag = false;//这个成员用来记录dataItem的展开状态
+
     public boolean getFlag() {
         return flag;
     }
+
     public void setFlag(boolean flag) {
         this.flag = flag;
     }
