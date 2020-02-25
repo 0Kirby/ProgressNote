@@ -128,14 +128,16 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         else
             holder.yearMonth.setVisibility(View.GONE);//设置年月不可见
 
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.bodySpecial.getLayoutParams();
         if (dataItem.getFlag()) {//如果状态为展开
-            holder.layoutDrawer.getLayoutParams().height = //设置高度为bodySpecial的高度
+            layoutParams.height = //设置高度为bodySpecial的高度
                     holder.bodySpecial.getLineHeight() * holder.bodySpecial.getLineCount();
             holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
         } else {//如果状态为收起
-            holder.layoutDrawer.getLayoutParams().height = 0;//设置高度为0
+            layoutParams.height = 0;//设置高度为0
             holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
         }
+        holder.layoutDrawer.setLayoutParams(layoutParams);
 
         //最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
         if (position == mDataItemList.size() - 1) {
