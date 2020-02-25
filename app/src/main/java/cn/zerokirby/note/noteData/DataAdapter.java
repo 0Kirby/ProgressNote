@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -35,6 +32,18 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private SQLiteDatabase db;
     private Cursor cursor;
 
+    //构造器
+    public DataAdapter(MainActivity mainActivity ,List<DataItem> dataItemList){
+        this.mainActivity = mainActivity;
+        mDataItemList = dataItemList;
+    }
+
+    //获取item数量
+    @Override
+    public int getItemCount(){
+        return mDataItemList.size();
+    }
+
     //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder{
         View dataView;
@@ -51,9 +60,15 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         }
     }
 
-    public DataAdapter(MainActivity mainActivity ,List<DataItem> dataItemList){
-        this.mainActivity = mainActivity;
-        mDataItemList = dataItemList;
+    //获取DataItem的数据
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position){
+        DataItem dataItem=mDataItemList.get(position);
+        holder.title.setText(dataItem.getTitle());//设置标题
+        holder.body.setText(dataItem.getBody());//设置内容
+        holder.date.setText(dataItem.getYear() + dataItem.getMonth() + dataItem.getDay() +
+                "\n" + dataItem.getTime());//设置标准化日期时间
     }
 
     //为recyclerView的每一个item设置点击事件
@@ -133,23 +148,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         });
 
         return holder;
-    }
-
-    //获取DataItem的数据
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position){
-        DataItem dataItem=mDataItemList.get(position);
-        holder.title.setText(dataItem.getTitle());//设置标题
-        holder.body.setText(dataItem.getBody());//设置内容
-        holder.date.setText(dataItem.getYear() + dataItem.getMonth() + dataItem.getDay() +
-                "\n" + dataItem.getTime());//设置标准化日期时间
-    }
-
-    //获取item数量
-    @Override
-    public int getItemCount(){
-        return mDataItemList.size();
     }
 
 }

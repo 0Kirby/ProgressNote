@@ -1,5 +1,7 @@
 package cn.zerokirby.note.noteData;
 
+import android.animation.ValueAnimator;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -132,5 +134,4 @@ public class DataItem {
     public void setFlag(boolean flag) {
         this.flag = flag;
     }
-
 }

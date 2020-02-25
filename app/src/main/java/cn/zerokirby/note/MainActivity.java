@@ -44,6 +44,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -465,14 +466,13 @@ public class MainActivity extends BaseActivity {
 
     //为dataList添加笔记
     public void addItem(DataItem dataItem) {
-        dataItem.setFlag(true);//设置修改后状态为展开
+        //dataItem.setFlag(true);//设置添加后状态为展开
         dataList.add(0, dataItem);//将数据插入到dataList头部
         if (arrangement == 0)
             dataAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
         else {
             dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial插入数据到头部
-            if(dataList.size() > 1)
-                goneYearMonth(dataItem);
+            dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
@@ -491,14 +491,13 @@ public class MainActivity extends BaseActivity {
             dataAdapter.notifyItemRemoved(index);//通知adapter删除指定位置数据
         else {
             dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial删除指定位置数据
-            if(dataList.size() > 0)
-                visibleYearMonth(index);
+            dataAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新index号item，显示被删除的年月
         }
     }
 
     //修改dataList的笔记
     public void modifyItem(DataItem dataItem) {
-        dataItem.setFlag(true);//设置修改后状态为展开
+        //dataItem.setFlag(true);//设置修改后状态为展开
         int index = 0;
         for (DataItem item : dataList) {
             if (item.getId() == dataItem.getId())
@@ -513,34 +512,10 @@ public class MainActivity extends BaseActivity {
         } else {
             dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial删除指定位置数据
             dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial插入数据到头部
-            if(dataList.size() > 1)
-                goneYearMonth(dataItem);
+            dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
-    }
-
-    //添加或修改item时，隐藏DataAdapterSpecial相同的年月
-    private void goneYearMonth(DataItem dataItem) {
-        String year_month0 = dataItem.getYear() + dataItem.getMonth();//此item的年月
-        String year_month1 = dataList.get(1).getYear() + dataList.get(1).getMonth();//1号item的年月
-        if (year_month0.equals(year_month1)) {//如果相同，则隐藏1号item的年月
-            View view1 = recyclerView.getChildAt(0);//在加进来之前，1号item还是0号
-            final RecyclerView.ViewHolder holder1 = recyclerView.getChildViewHolder(view1);
-            holder1.itemView.findViewById(R.id.year_month).setVisibility(View.GONE);
-        }
-    }
-
-    //删除item时，显示DataAdapterSpecial被删除的年月
-    private void visibleYearMonth(int index) {
-        View view0 = recyclerView.getChildAt(index);
-        final RecyclerView.ViewHolder holder0 = recyclerView.getChildViewHolder(view0);
-        //如果删除的item包含年月，则显示下一个item的年月
-        if (holder0.itemView.findViewById(R.id.year_month).getVisibility() == View.VISIBLE) {
-            View view1 = recyclerView.getChildAt(index + 1);
-            final RecyclerView.ViewHolder holder1 = recyclerView.getChildViewHolder(view1);
-            holder1.itemView.findViewById(R.id.year_month).setVisibility(View.VISIBLE);
-        }
     }
 
     //判断是否是平板模式
