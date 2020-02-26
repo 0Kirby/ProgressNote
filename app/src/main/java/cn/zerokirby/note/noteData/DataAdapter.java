@@ -63,15 +63,15 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                 .inflate(R.layout.data_item, parent, false);
         final ViewHolder holder = new ViewHolder(view);
 
+        //笔记的点击事件
         holder.dataView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //传送数据的id并启动EditingActivity
                 int position = holder.getAdapterPosition();
                 DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
-
                 Intent intent = new Intent(view.getContext(), EditingActivity.class);
-                //传送数据的id并启动EditingActivity
                 intent.putExtra("noteId", id);
                 view.getContext().startActivity(intent);
             }
@@ -102,7 +102,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
-                builder.setMessage("是否要删除这条笔记？");
+                builder.setMessage("是否要删除\"" + dataItem.getTitle() + "\"？");
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作

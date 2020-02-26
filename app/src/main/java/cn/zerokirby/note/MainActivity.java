@@ -23,6 +23,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -339,17 +340,18 @@ public class MainActivity extends BaseActivity {
     }
 
     //刷新数据
-    public void refreshData(String s) {
+    public int refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
         //初始化Journal数据
         dataList.clear();
-        initData(s);
+        int dataCount = initData(s);
         if (arrangement == 0)
             dataAdapter.notifyDataSetChanged();//通知adapter更新
         else
             dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
         checkLoginStatus();//检查登录状态
         recyclerView.startAnimation(adapterAlpha2);
+        return dataCount;
     }
 
     //刷新数据
@@ -360,10 +362,9 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //restartActivity(MainActivity.this);
-                        refreshData(searchText);
+                        Toast.makeText(MainActivity.this,
+                                "找到" + refreshData(searchText) + "条笔记", Toast.LENGTH_SHORT).show();
                         swipeRefreshLayout.setRefreshing(false);
-                        //Toast.makeText(MainActivity.this, "刷新数据", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -371,7 +372,7 @@ public class MainActivity extends BaseActivity {
     }
 
     //初始化从数据库中读取数据并填充dataItem
-    private void initData(String s) {
+    private int initData(String s) {
         simpleDateFormat = new SimpleDateFormat(
                 getString(R.string.formatDate), Locale.getDefault());
         db = databaseHelper.getReadableDatabase();
@@ -379,7 +380,7 @@ public class MainActivity extends BaseActivity {
                 null, null, null, "time desc",
                 null);//查询对应的数据
 
-        int i = 0;//找到的笔记数量
+        int dataCount = 0;//找到的笔记数量
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 String s0 = cursor.getString(cursor.getColumnIndex("title"));//读取标题并存入s0
@@ -387,7 +388,8 @@ public class MainActivity extends BaseActivity {
                         cursor.getColumnIndex("time"))));//读取时间并存入s1
                 String s2 = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入s2
 
-                if (TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)) {//如果字符串为空 或 标题、时间或文本中包含要查询的字符串
+                //如果字符串为空 或 标题、时间或文本中包含要查询的字符串
+                if (TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)) {
                     //封装数据
                     DataItem dataItem = new DataItem();
                     dataItem.setId(Integer.parseInt(cursor.getString(cursor
@@ -396,7 +398,7 @@ public class MainActivity extends BaseActivity {
                     dataItem.setDate(s1);
                     dataItem.setBody(s2);
                     dataList.add(dataItem);
-                    i++;
+                    dataCount++;
                 }
             } while (cursor.moveToNext());
         }
@@ -405,9 +407,7 @@ public class MainActivity extends BaseActivity {
         }
         db.close();
 
-        if (!TextUtils.isEmpty(s)) {
-            Toast.makeText(MainActivity.this, "找到" + i + "条笔记", Toast.LENGTH_SHORT).show();
-        }
+        return dataCount;//返回找到的笔记数量
     }
 
     //为dataList添加笔记
@@ -493,22 +493,18 @@ public class MainActivity extends BaseActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示查找提示
                 builder.setTitle("提示");
                 builder.setMessage("请输入要查找的内容\n");
-                EditText search_et = new EditText(MainActivity.this);//添加输入框
-                search_et.setHint("若不输入则显示全部");
-                int themeId = ThemeUtil.getThemeId(this);
-                if (themeId == 2)
-                    search_et.setHintTextColor(getResources().getColor(R.color.gray));
-                search_et.setBackgroundResource(R.drawable.search_et_bg);//设置背景
-                search_et.setPadding(12, 24, 12, 24);
-                builder.setView(search_et, 18, 0, 18, 0);
 
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+                View searchView = layoutInflater.inflate(R.layout.search_view, null);
+                EditText searchEt = findViewById(R.id.search_et);
+                builder.setView(searchView);
+
+                builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
-                        searchText = search_et.getText().toString();
-                        recyclerView.startAnimation(adapterAlpha1);
-                        refreshData(searchText);
-                        recyclerView.startAnimation(adapterAlpha2);
+                        searchText = searchEt.getText().toString();
+                        Toast.makeText(MainActivity.this,
+                                "找到" + refreshData(searchText) + "条笔记", Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -520,7 +516,6 @@ public class MainActivity extends BaseActivity {
                 builder.show();
                 break;
             case R.id.arrangement:
-                recyclerView.startAnimation(adapterAlpha1);
                 if (arrangement == 0) {
                     recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
@@ -532,7 +527,7 @@ public class MainActivity extends BaseActivity {
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
                     arrangement = 0;
                 }
-                recyclerView.startAnimation(adapterAlpha2);
+                refreshData(searchText);
                 break;
             case R.id.theme:
                 ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
