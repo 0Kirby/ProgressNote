@@ -496,7 +496,7 @@ public class MainActivity extends BaseActivity {
 
                 LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
                 View searchView = layoutInflater.inflate(R.layout.search_view, null);
-                EditText searchEt = findViewById(R.id.search_et);
+                EditText searchEt = searchView.findViewById(R.id.search_et);
                 builder.setView(searchView);
 
                 builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {

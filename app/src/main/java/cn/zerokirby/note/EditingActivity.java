@@ -103,8 +103,7 @@ public class EditingActivity extends BaseActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {//点击删除则执行删除操作
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
-                        Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess),
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
                         MainActivity.instance.modifySync(EditingActivity.this);
@@ -167,9 +166,8 @@ public class EditingActivity extends BaseActivity {
         dbHelper = new DatabaseHelper(this,
                 "ProgressNote.db", null, 1);
         db = dbHelper.getReadableDatabase();
-        cursor = db.query("Note", null, "id = ?",
-                noteId, null, null, null,
-                null);//查询对应的数据
+        cursor = db.query("Note", null, "id = ?", noteId,
+                null, null, null, null);//查询对应的数据
         if (cursor.moveToFirst()) {
             title = cursor.getString(cursor.getColumnIndex("title"));//读取标题并保留一份
             noteTitle.setText(title);

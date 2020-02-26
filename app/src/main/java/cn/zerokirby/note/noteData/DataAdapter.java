@@ -102,7 +102,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
-                builder.setMessage("是否要删除\"" + dataItem.getTitle() + "\"？");
+                builder.setMessage("是否要删除“" + dataItem.getTitle() + "”？");
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
@@ -110,8 +110,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                                 "ProgressNote.db", null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess),
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
                         mainActivity.modifySync(mainActivity);
 

@@ -84,9 +84,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                int currentHeight = (Integer) animation.getAnimatedValue();
                 //逐渐变化linearLayout的高度
-                linearLayout.getLayoutParams().height = currentHeight;
+                linearLayout.getLayoutParams().height = (int) animation.getAnimatedValue();
                 linearLayout.requestLayout();
 
                 //不断地移动回这个item的位置
@@ -194,7 +193,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
-                builder.setMessage("是否要删除\"" + dataItem.getTitle() + "\"？");
+                builder.setMessage("是否要删除“" + dataItem.getTitle() + "”？");
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
@@ -202,8 +201,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                                 "ProgressNote.db", null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess),
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
                         mainActivity.modifySync(mainActivity);
 
