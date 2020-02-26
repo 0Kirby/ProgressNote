@@ -239,12 +239,12 @@ public class MainActivity extends BaseActivity {
                         startActivity(intent);
                         break;
                     case R.id.sync_SC:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
                         builder.setTitle("警告");
                         builder.setMessage("这将导致本地数据被云端数据替换\n是否继续？");
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
                                 DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
                                 databaseOperateUtil.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
@@ -258,12 +258,12 @@ public class MainActivity extends BaseActivity {
                         builder.show();
                         break;
                     case R.id.sync_CS:
-                        builder = new AlertDialog.Builder(MainActivity.this);//显示删除提示
+                        builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
                         builder.setTitle("警告");
                         builder.setMessage("这将导致云端数据被本地数据替换\n是否继续？");
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
                                 DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
                                 databaseOperateUtil.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
@@ -284,7 +284,7 @@ public class MainActivity extends BaseActivity {
                         builder = new AlertDialog.Builder(MainActivity.this);//显示提示
                         builder.setTitle("提示");
                         builder.setMessage("是否退出登录？");
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 DatabaseHelper userDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
@@ -605,7 +605,7 @@ public class MainActivity extends BaseActivity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
                     builder.setTitle("提示");
                     builder.setMessage("请先登陆后再使用！");
-                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 

@@ -117,7 +117,7 @@ public class SettingsActivity extends BaseActivity {
                 case "delete_note":
                     builder.setTitle("警告");
                     builder.setMessage("这将清除本地所有笔记\n此操作无法恢复\n是否继续？");
-                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
@@ -138,7 +138,7 @@ public class SettingsActivity extends BaseActivity {
                 case "delete_all":
                     builder.setTitle("警告");
                     builder.setMessage("这将清除本地和云端所有数据并退出登录\n此操作无法恢复\n是否继续？");
-                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
