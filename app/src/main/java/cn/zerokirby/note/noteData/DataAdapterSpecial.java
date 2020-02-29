@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -76,23 +77,39 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     }
 
     //获取改变控件尺寸动画
-    //参数：需要改变高度的linearLayout，动画前的高度，动画后的高度，需要滑动的recyclerView，需要滑动回的item的位置
-    private ValueAnimator getValueAnimator(
-            LinearLayout linearLayout, int startHeight, int endHeight, RecyclerView recyclerView, int position) {
+    //参数：需要改变高度的layoutDrawer（当然也可以是其它view），动画前的高度，动画后的高度，需要滑动回的item的位置
+    private ValueAnimator getValueAnimator(View view, int startHeight, int endHeight, int position) {
+        RecyclerView recyclerView = mainActivity.findViewById(R.id.recyclerView);//需要回滚的recyclerView
         ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
-        valueAnimator.setDuration(300);
+        //valueAnimator.setDuration(300);//动画时间（默认就是300）
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                //逐渐变化linearLayout的高度
-                linearLayout.getLayoutParams().height = (int) animation.getAnimatedValue();
-                linearLayout.requestLayout();
+                //逐渐改变view的高度
+                view.getLayoutParams().height = (int) animation.getAnimatedValue();
+                view.requestLayout();
 
                 //不断地移动回这个item的位置
                 recyclerView.scrollToPosition(position);
             }
         });
         return valueAnimator;
+    }
+
+    //伸展按钮的旋转动画
+    //参数：需要旋转的spreadButton（当然也可以是其它view），动画前的旋转角度，动画后的旋转角度
+    public void rotateExpandIcon(View view, float from, float to) {
+        final ValueAnimator valueAnimator = ValueAnimator.ofFloat(from, to);
+        valueAnimator.setInterpolator(new DecelerateInterpolator());//先加速后减速的动画
+        //valueAnimator.setDuration(300);//动画时间（默认就是300）
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                //逐渐改变view的旋转角度
+                view.setRotation((float) valueAnimator.getAnimatedValue());
+            }
+        });
+        valueAnimator.start();
     }
 
     //获取DataItem的数据
@@ -112,6 +129,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             e.printStackTrace();
         }
         holder.bodySpecial.setText(dataItem.getBody());//设置内容
+        holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置伸展图标
 
         boolean flag = true;
         for (int i = 0; i < mDataItemList.size(); i++) {//列表的所有item
@@ -129,14 +147,14 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.bodySpecial.getLayoutParams();
         if (dataItem.getFlag()) {//如果状态为展开
-            layoutParams.height = //设置高度为bodySpecial的高度
+            layoutParams.height = //高度为bodySpecial的高度
                     holder.bodySpecial.getLineHeight() * holder.bodySpecial.getLineCount();
-            holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
+            holder.spreadButton.setRotation(180);//设置旋转角度为180
         } else {//如果状态为收起
-            layoutParams.height = 0;//设置高度为0
-            holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
+            layoutParams.height = 0;//高度为0
+            holder.spreadButton.setRotation(0);//设置旋转角度为0
         }
-        holder.layoutDrawer.setLayoutParams(layoutParams);
+        holder.layoutDrawer.setLayoutParams(layoutParams);//设置高度
 
         //最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
         if (position == mDataItemList.size() - 1) {
@@ -229,22 +247,23 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 final DataItem dataItem = mDataItemList.get(position);
                 final ValueAnimator valueAnimator;//伸展动画
                 final int bodyHeight = holder.bodySpecial.getLineHeight() * holder.bodySpecial.getLineCount();//计算bodySpecial的高度
-                final RecyclerView recyclerView = mainActivity.findViewById(R.id.recyclerView);//从mainActivity寻找recyclerView
 
                 if (dataItem.getFlag()) {//如果状态为展开
-                    holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//动画1，消失;
-                    valueAnimator = getValueAnimator(holder.layoutDrawer, bodyHeight, 0, recyclerView, position);//设置动画为收起
-                    holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置拉伸图标
+                    holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//文字动画1，消失;
+                    valueAnimator = getValueAnimator(holder.layoutDrawer, bodyHeight, 0, position);//设置抽屉动画为收起
+                    rotateExpandIcon(holder.spreadButton, 180, 360);//伸展按钮的旋转动画
+                    //rotateExpandIcon(holder.cardView, 0, 360);//卡片的旋转动画（跟你说这个东西贼好玩）
                     dataItem.setFlag(false);//设置状态为收起
 
                 } else {//如果状态为收起
-                    holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//动画2，出现;
-                    valueAnimator = getValueAnimator(holder.layoutDrawer, 0, bodyHeight, recyclerView, position);//设置动画为展开
-                    holder.spreadButton.setImageResource(R.drawable.ic_expand_less_black_24dp);//设置收回图标
+                    holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//文字动画2，出现;
+                    valueAnimator = getValueAnimator(holder.layoutDrawer, 0, bodyHeight, position);//设置抽屉动画为展开
+                    rotateExpandIcon(holder.spreadButton, 0, 180);//伸展按钮的旋转动画
+                    //rotateExpandIcon(holder.cardView, 0, 360);//卡片的旋转动画（跟你说这个东西贼好玩）
                     dataItem.setFlag(true);//设置状态为展开
                 }
 
-                valueAnimator.start();//开始动画
+                valueAnimator.start();//开始抽屉的伸缩动画
             }
         });
         return holder;

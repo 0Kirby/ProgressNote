@@ -84,7 +84,6 @@ public class MainActivity extends BaseActivity {
     private List<DataItem> dataList = new ArrayList<>();
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
-    private StaggeredGridLayoutManager layoutManagerSpecial;
     private DataAdapter dataAdapter;
     private DataAdapterSpecial dataAdapterSpecial;
     private Animation adapterAlpha1;//动画1，消失
@@ -122,6 +121,13 @@ public class MainActivity extends BaseActivity {
     private Uri cropImageUri;
     private Handler handler;
 
+    //判断是否是平板模式
+    public static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >=
+                Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,26 +141,20 @@ public class MainActivity extends BaseActivity {
 
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
-        layoutManager = new StaggeredGridLayoutManager
-                (2, StaggeredGridLayoutManager.VERTICAL);
-        layoutManagerSpecial = new StaggeredGridLayoutManager
-                (1, StaggeredGridLayoutManager.VERTICAL);
         dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
         dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
-        if (!isTablet(MainActivity.this)) {//如果不是平板模式
-            if (arrangement == 0) {//实现瀑布流布局，将recyclerView改为两列
-                recyclerView.setLayoutManager(layoutManager);//设置笔记布局
-                recyclerView.setAdapter(dataAdapter);//设置适配器
-            } else {//实现线性布局，将recyclerView改为一列
-                recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
-                recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
-            }
-        } else {//如果是平板模式，则改为三列
-            layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
-            recyclerView.setLayoutManager(layoutManager);//设置笔记布局
-            dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
+        layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        if(arrangement == 0) {//网格模式
+            if(!isTablet(MainActivity.this))//手机模式
+                layoutManager.setSpanCount(2);//设置列数为2
+            else//平板模式
+                layoutManager.setSpanCount(3);//设置列数为3
             recyclerView.setAdapter(dataAdapter);//设置适配器
+        } else {//单列模式
+            layoutManager.setSpanCount(1);//设置列数为1
+            recyclerView.setAdapter(dataAdapterSpecial);//设置适配器
         }
+        recyclerView.setLayoutManager(layoutManager);//设置笔记布局
 
         //为悬浮按钮设置点击事件
         floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
@@ -464,21 +464,10 @@ public class MainActivity extends BaseActivity {
         recyclerView.scrollToPosition(0);//移动到头部
     }
 
-    //判断是否是平板模式
-    public static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >=
-                Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
-        if (isTablet(MainActivity.this))//如果是平板模式
-            menu.getItem(0).setVisible(false);//不显示布局按钮
-        else
-            menu.getItem(0).setVisible(true);//显示布局按钮
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -517,16 +506,21 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.arrangement:
                 if (arrangement == 0) {
-                    recyclerView.setLayoutManager(layoutManagerSpecial);//设置笔记布局Special
+                    layoutManager.setSpanCount(1);//设置列数为1
                     recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
                 } else {
-                    recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+                    if(!isTablet(MainActivity.this))//手机模式
+                        layoutManager.setSpanCount(2);//设置列数为2
+                    else//平板模式
+                        layoutManager.setSpanCount(3);//设置列数为3
                     recyclerView.setAdapter(dataAdapter);//设置适配器
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
                     arrangement = 0;
                 }
+                recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+
                 refreshData(searchText);
                 break;
             case R.id.theme:
