@@ -106,7 +106,7 @@ public class SettingsActivity extends BaseActivity {
         @Override
         public boolean onPreferenceTreeClick(Preference preference) {
             Intent browser = new Intent("android.intent.action.VIEW");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());//显示删除提示
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());//显示清除提示
             DatabaseHelper databaseHelper = new DatabaseHelper(getActivity(), "ProgressNote.db", null, 1);
 
             switch (preference.getKey()) {
@@ -119,7 +119,7 @@ public class SettingsActivity extends BaseActivity {
                     builder.setMessage("这将清除本地所有笔记\n此操作无法恢复\n是否继续？");
                     builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
                             db.execSQL("Delete from Note");//清空笔记表
                             db.close();
@@ -140,7 +140,7 @@ public class SettingsActivity extends BaseActivity {
                     builder.setMessage("这将清除本地和云端所有数据并退出登录\n此操作无法恢复\n是否继续？");
                     builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
+                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
                             db.execSQL("Delete from Note");//清空笔记表
                             db.execSQL("Delete from User");//清空用户表

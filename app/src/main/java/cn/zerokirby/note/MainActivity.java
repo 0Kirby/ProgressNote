@@ -121,11 +121,10 @@ public class MainActivity extends BaseActivity {
     private Uri cropImageUri;
     private Handler handler;
 
-    //判断是否是平板模式
-    public static boolean isTablet(Context context) {
+    //判断是否是手机模式
+    public static boolean isMobile(Context context) {
         return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >=
-                Configuration.SCREENLAYOUT_SIZE_LARGE;
+                & Configuration.SCREENLAYOUT_SIZE_MASK) < Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     @Override
@@ -144,8 +143,8 @@ public class MainActivity extends BaseActivity {
         dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
         dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        if(arrangement == 0) {//网格模式
-            if(!isTablet(MainActivity.this))//手机模式
+        if (arrangement == 0) {//网格模式
+            if (isMobile(MainActivity.this))//手机模式
                 layoutManager.setSpanCount(2);//设置列数为2
             else//平板模式
                 layoutManager.setSpanCount(3);//设置列数为3
@@ -214,9 +213,7 @@ public class MainActivity extends BaseActivity {
                         values.put("lastSync", System.currentTimeMillis());
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
-
                         refreshData("");
-                        //restartActivityNoAnimation(MainActivity.this);
                         break;
                     case UPLOAD:
                         Toast.makeText(MainActivity.this, "上传成功！", Toast.LENGTH_SHORT).show();//上传头像成功
@@ -425,7 +422,7 @@ public class MainActivity extends BaseActivity {
     }
 
     //删除dataList的笔记
-    public void deletItemById(int id) {
+    public void deleteItemById(int id) {
         int index = 0;
         for (DataItem item : dataList) {
             if (item.getId() == id)
@@ -511,7 +508,7 @@ public class MainActivity extends BaseActivity {
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
                 } else {
-                    if(!isTablet(MainActivity.this))//手机模式
+                    if (isMobile(MainActivity.this))//手机模式
                         layoutManager.setSpanCount(2);//设置列数为2
                     else//平板模式
                         layoutManager.setSpanCount(3);//设置列数为3

@@ -108,8 +108,7 @@ public class EditingActivity extends BaseActivity {
 
                         MainActivity.instance.modifySync(EditingActivity.this);
 
-                        //MainActivity.instance.refreshData("");
-                        MainActivity.instance.deletItemById(type);
+                        MainActivity.instance.deleteItemById(type);
 
                         finish();//关闭当前活动并返回到主活动
                     }
@@ -193,7 +192,7 @@ public class EditingActivity extends BaseActivity {
     //笔记有未保存的修改点击后退键弹出警告
     private void backWarning() {
         if (!title.equals(noteTitle.getText().toString()) || !content.equals(mainText.getText().toString())) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示修改保存提示
             builder.setTitle("提示");
             builder.setMessage("有尚未保存的修改\n是否保存？");
             builder.setNeutralButton("保存", new DialogInterface.OnClickListener() {
@@ -263,7 +262,6 @@ public class EditingActivity extends BaseActivity {
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);//切换标题
         cMenu.getItem(0).setVisible(true);//显示删除按钮
-        //MainActivity.instance.refreshData("");
 
         //添加数据到dataList
         dataItem.setId(type);

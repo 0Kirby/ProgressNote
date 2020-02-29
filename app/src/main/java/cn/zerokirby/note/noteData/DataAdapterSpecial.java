@@ -223,8 +223,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                         db.close();
                         mainActivity.modifySync(mainActivity);
 
-                        //mainActivity.refreshData("");
-                        mainActivity.deletItemById(id);
+                        mainActivity.deleteItemById(id);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -251,7 +250,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                 if (dataItem.getFlag()) {//如果状态为展开
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//文字动画1，消失;
                     valueAnimator = getValueAnimator(holder.layoutDrawer, bodyHeight, 0, position);//设置抽屉动画为收起
-                    rotateExpandIcon(holder.spreadButton, 180, 360);//伸展按钮的旋转动画
+                    rotateExpandIcon(holder.spreadButton, 180, 0);//伸展按钮的旋转动画
                     //rotateExpandIcon(holder.cardView, 0, 360);//卡片的旋转动画（跟你说这个东西贼好玩）
                     dataItem.setFlag(false);//设置状态为收起
 

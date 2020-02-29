@@ -114,8 +114,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
                         db.close();
                         mainActivity.modifySync(mainActivity);
 
-                        //mainActivity.refreshData("");
-                        mainActivity.deletItemById(id);
+                        mainActivity.deleteItemById(id);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
