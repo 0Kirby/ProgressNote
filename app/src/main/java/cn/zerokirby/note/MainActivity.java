@@ -407,14 +407,27 @@ public class MainActivity extends BaseActivity {
         return dataCount;//返回找到的笔记数量
     }
 
+    //通过id寻找item的下标
+    private int findItemIndexById(int id) {
+        int index = 0;
+        for (DataItem dataItem : dataList) {
+            if (dataItem.getId() == id)
+                break;
+            index++;
+        }
+        return index;
+    }
+
     //为dataList添加笔记
     public void addItem(DataItem dataItem) {
         dataItem.setFlag(true);//设置添加后状态为展开
+
         dataList.add(0, dataItem);//将数据插入到dataList头部
+
         if (arrangement == 0)
             dataAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
         else {
-            dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial插入数据到头部
+            dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
             dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
         }
 
@@ -423,39 +436,39 @@ public class MainActivity extends BaseActivity {
 
     //删除dataList的笔记
     public void deleteItemById(int id) {
-        int index = 0;
-        for (DataItem item : dataList) {
-            if (item.getId() == id)
-                break;
-            index++;
-        }
-        dataList.remove(index);
+        int index = findItemIndexById(id);
+
+        dataList.remove(index);//移除原位置的item
+
         if (arrangement == 0)
-            dataAdapter.notifyItemRemoved(index);//通知adapter删除指定位置数据
+            dataAdapter.notifyItemRemoved(index);//通知adapter移除原位置的item
         else {
-            dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial删除指定位置数据
-            dataAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新index号item，显示被删除的年月
+            dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置item
+            dataAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
         }
     }
 
     //修改dataList的笔记
     public void modifyItem(DataItem dataItem) {
         dataItem.setFlag(true);//设置修改后状态为展开
-        int index = 0;
-        for (DataItem item : dataList) {
-            if (item.getId() == dataItem.getId())
-                break;
-            index++;
-        }
-        dataList.remove(index);//删除dataList原位置数据
+
+        int index = findItemIndexById(dataItem.getId());
+
+        dataList.remove(index);//移除dataList原位置数据
         dataList.add(0, dataItem);//将数据插入到dataList头部
+
         if (arrangement == 0) {
-            dataAdapter.notifyItemRemoved(index);//通知adapter删除指定位置数据
-            dataAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
+            dataAdapter.notifyItemRemoved(index);//通知adapter移除原位置数据
+            dataAdapter.notifyItemInserted(0);//通知adapter有数据插入到头部
         } else {
-            dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial删除指定位置数据
-            dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial插入数据到头部
-            dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
+            if (index == 0)
+                dataAdapterSpecial.notifyItemChanged(0);//通知adapterSpecial更新0号item
+            else {
+                dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置数据
+                dataAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
+                dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
+                dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
+            }
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
