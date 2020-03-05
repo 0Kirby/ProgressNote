@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +35,6 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
     private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
-    private Cursor cursor;
 
     //构造器
     public DataAdapterSpecial(MainActivity mainActivity, List<DataItem> dataItemList) {
@@ -98,7 +96,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
 
     //伸展按钮的旋转动画
     //参数：需要旋转的spreadButton（当然也可以是其它view），动画前的旋转角度，动画后的旋转角度
-    public void rotateExpandIcon(View view, float from, float to) {
+    private void rotateExpandIcon(View view, float from, float to) {
         final ValueAnimator valueAnimator = ValueAnimator.ofFloat(from, to);
         valueAnimator.setInterpolator(new DecelerateInterpolator());//先加速后减速的动画
         //valueAnimator.setDuration(300);//动画时间（默认就是300）

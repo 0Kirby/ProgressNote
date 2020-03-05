@@ -49,9 +49,19 @@
         app:title="关于">
 
         <Preference
-            android:key="homepage"
+            android:key="my_homepage"
             android:summary="zerokirby.cn"
-            android:title="主页" />
+            android:title="我的主页" />
+
+        <Preference
+            android:key="homepage"
+            android:summary="note.zerokirby.cn"
+            android:title="天天笔记主页" />
+
+        <Preference
+            android:key="blog"
+            android:summary="blog.zerokirby.cn"
+            android:title="博客" />
 
         <Preference
             android:key="github"

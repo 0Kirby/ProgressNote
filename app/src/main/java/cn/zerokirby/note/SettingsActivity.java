@@ -45,7 +45,7 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求下载JSON
-                Request request = new Request.Builder().url("https://zerokirby.cn/version.json").build();//检测更新地址
+                Request request = new Request.Builder().url("https://note.zerokirby.cn/version.json").build();//检测更新地址
                 try {
                     Response response = client.newCall(request).execute();
                     String json = Objects.requireNonNull(response.body()).string();
@@ -82,7 +82,7 @@ public class SettingsActivity extends BaseActivity {
                     if (AppUtil.getVersionName(SettingsActivity.this).equals(versionName))//如果从服务器获取的版本名称和本地相等
                         checkUpdatePref.setSummary("当前已是最新版本");
                     else
-                        checkUpdatePref.setSummary("有新版本发布，请至主页下载");
+                        checkUpdatePref.setSummary("有新版本发布，请至天天笔记主页下载");
                 }
                 return false;
             }
@@ -173,8 +173,16 @@ public class SettingsActivity extends BaseActivity {
                     });
                     builder.show();
                     break;
-                case "homepage":
+                case "my_homepage":
                     browser.setData(Uri.parse("https://zerokirby.cn"));
+                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    break;
+                case "homepage":
+                    browser.setData(Uri.parse("https://note.zerokirby.cn"));
+                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    break;
+                case "blog":
+                    browser.setData(Uri.parse("https://blog.zerokirby.cn"));
                     Objects.requireNonNull(getActivity()).startActivity(browser);
                     break;
                 case "github":
