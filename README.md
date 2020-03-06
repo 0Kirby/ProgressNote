@@ -1,6 +1,6 @@
 # ProgressNote
 # 简介
-**《天天笔记》** 是我的毕业设计选题《基于Android的云笔记设计与实现》。<br>本课题要求以Android Studio为集成开发环境，Java为主要编程语言，采用云服务器实现云同步功能，进行基于Android平台的移动APP云笔记本的开发。
+**《天天笔记》** 是我的毕业设计选题《基于Android的云笔记本设计与实现》。<br>本课题要求以Android Studio为集成开发环境，Java为主要编程语言，采用云服务器实现云同步功能，进行基于Android平台的移动APP云笔记本的开发。
 # 主要内容
 ## 客户端
 开屏动画：展示软件的logo和介绍语<br>
@@ -13,6 +13,8 @@
 数据库管理：对每个用户数据进行管理，包括登录认证与笔记数据等<br>
 笔记同步：通过建立连接，对客户端和服务端的笔记数据进行同步<br>
 # 联系我
-QQ：623768813<br>
+QQ：[623768813](http://wpa.qq.com/msgrd?v=3&uin=623768813&site=qq&menu=yes)<br>
 email：jty.1234567890@163.com<br>
-主页：https://zerokirby.cn
+个人主页：https://zerokirby.cn<br>
+天天笔记主页：https://note.zerokirby.cn<br>
+博客：https://blog.zerokirby.cn
