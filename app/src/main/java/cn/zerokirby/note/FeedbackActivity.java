@@ -35,7 +35,7 @@ public class FeedbackActivity extends BaseActivity {
     private static final String IS_COOKIE_SAVED = "isCookieSaved";
     private static final String USER_INFO = "userInfo";
     private static final String SESSION = "session";
-    private final String url = "https://support.qq.com/products/123835?d-wx-push=1";//吐槽吧地址
+    private final String url = "https://support.qq.com/product/123835?d-wx-push=1";//兔小巢地址
     private ValueCallback<Uri[]> uploadMessageAboveL;
     private WebView webView;
 
