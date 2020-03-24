@@ -139,22 +139,32 @@ public class EditingActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        //获取点击的数据id并将id转换为字符串数组
-        Intent intent = getIntent();
-        int flag = intent.getIntExtra("noteId", -1);
-        String[] noteId = {String.valueOf(flag)};
-
-        type = flag;
-        if (type == 0)
-            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.newNote);
-        else
-            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);
+        //获取控件的引用
         noteTime = findViewById(R.id.noteTime);
         noteTitle = findViewById(R.id.noteTitle);
         wordNum = findViewById(R.id.wordNum);
         wordNum.setText(String.format(getResources().getString(R.string.num_count), 0));//初始化为0字
         mainText = findViewById(R.id.mainText);
         mainText.addTextChangedListener(textWatcher);
+
+        //获取点击的数据id并将id转换为字符串数组
+        Intent intent = getIntent();
+        int flag = intent.getIntExtra("noteId", -1);
+        type = flag;
+        String[] noteId = {String.valueOf(flag)};
+
+        //判断是否从外部分享到天天笔记
+        String action = intent.getAction();
+        String intentType = intent.getType();
+        if (Intent.ACTION_SEND.equals(action) && intentType != null)//如果是纯文本类型
+            if (intentType.equals("text/plain")) {
+                type = 0;//设置类型为新建笔记
+                mainText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));//取出文本并设置到正文的TextView
+            }
+        if (type == 0)
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.newNote);
+        else
+            Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);
 
         //获取时间
         simpleDateFormat = new SimpleDateFormat(
