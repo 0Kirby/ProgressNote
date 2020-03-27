@@ -56,7 +56,7 @@
         android:importantForAutofill="no"
         android:inputType="text"
         android:lines="1"
-        android:maxLength="12"
+        android:maxLength="30"
         android:singleLine="true"
         android:textSize="20sp"
         android:textStyle="bold"

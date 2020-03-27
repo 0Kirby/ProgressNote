@@ -1,6 +1,5 @@
 package cn.zerokirby.note;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
@@ -14,12 +13,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -40,8 +36,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
@@ -52,8 +46,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,14 +60,9 @@ import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.DataAdapter;
 import cn.zerokirby.note.noteData.DataAdapterSpecial;
 import cn.zerokirby.note.noteData.DataItem;
+import cn.zerokirby.note.userData.IconUtil;
 import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.userData.UriUtil;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MainActivity extends BaseActivity {
 
@@ -93,9 +80,9 @@ public class MainActivity extends BaseActivity {
     private static int arrangement = 0;//排列方式，0为网格，1为列表
     private final int SC = 1;//服务器同步到客户端
     private final int CS = 2;//客户端同步到服务器
-    private static final int UPLOAD = 3;
-    private static final int CHOOSE_PHOTO = 4;
-    private static final int PHOTO_REQUEST_CUT = 5;
+    private final int UPLOAD = 3;//上传图片
+    private final int CHOOSE_PHOTO = 4;//选择图片
+    private final int PHOTO_REQUEST_CUT = 5;//请求裁剪图片
     private long exitTime = 0;//实现再按一次退出的间隔时间
 
     private NavigationView navigationView;//左侧布局
@@ -118,8 +105,8 @@ public class MainActivity extends BaseActivity {
     private TextView lastSync;
     private ImageView avatar;
 
-    private Uri cropImageUri;
     private Handler handler;
+    private IconUtil iconUtil;
 
     //判断是否是手机模式
     public static boolean isMobile(Context context) {
@@ -225,7 +212,7 @@ public class MainActivity extends BaseActivity {
 
         //检查登录状态，确定隐藏哪些文字和按钮
         checkLoginStatus();
-
+        iconUtil = new IconUtil(this, avatar);
         //设置navigationView
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -647,7 +634,7 @@ public class MainActivity extends BaseActivity {
             avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    iconClick();
+                    iconUtil.iconClick();
                 }
             });
 
@@ -696,19 +683,19 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {//开启Activity并返回结果
         switch (requestCode) {
             case CHOOSE_PHOTO:
                 if (resultCode == RESULT_OK) {
                     Toast.makeText(this, "打开成功", Toast.LENGTH_SHORT).show();
-                    handleImage(data);
+                    iconUtil.handleImage(data);
                 } else
                     Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
                 break;
             case PHOTO_REQUEST_CUT:
                 if (resultCode == RESULT_OK) {
-                    displayImage(UriUtil.getPath(this, cropImageUri));
-                    uploadImage(handler);
+                    iconUtil.displayImage(UriUtil.getPath(this, iconUtil.getCropImageUri()));
+                    iconUtil.uploadImage(handler);
                 } else
                     Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
             default:
@@ -718,113 +705,15 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {//授权
         if (requestCode == CHOOSE_PHOTO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openAlbum();
+                iconUtil.openAlbum();
             } else {
                 Toast.makeText(this, "未授权外置存储读写权限，无法使用！", Toast.LENGTH_SHORT).show();
             }
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    public void iconClick() {
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission
-                    .WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, CHOOSE_PHOTO);
-        } else
-            openAlbum();
-    }
-
-    public void openAlbum() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intent, CHOOSE_PHOTO);
-    }
-
-    public void handleImage(Intent data) {//处理接收到的图片
-        Uri uri = data.getData();
-        startPhotoZoom(uri);
-    }
-
-    public void startPhotoZoom(Uri uri) {
-        File CropPhoto = new File(getExternalCacheDir(), "crop.jpg");
-        try {
-            if (CropPhoto.exists()) {
-                CropPhoto.delete();
-            }
-            CropPhoto.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        cropImageUri = Uri.fromFile(CropPhoto);
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(uri, "image/*");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
-        }
-        // 下面这个crop=true是设置在开启的Intent中设置显示的VIEW可裁剪
-        intent.putExtra("crop", "true");
-        intent.putExtra("scale", true);
-
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-
-        //输出的宽高
-
-        intent.putExtra("outputX", 200);
-        intent.putExtra("outputY", 200);
-
-        intent.putExtra("return-data", false);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, cropImageUri);
-        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-        intent.putExtra("noFaceDetection", true); // no face detection
-        startActivityForResult(intent, PHOTO_REQUEST_CUT);
-    }
-
-    public void displayImage(String imagePath) {//解码并显示图片,同时将图片写入本地数据库
-        if (imagePath != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            avatar.setImageBitmap(bitmap);
-            DatabaseHelper userDbHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
-            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, userDbHelper);
-            avatarDatabaseUtil.saveImage(bitmap);
-            bitmap = null;
-        } else
-            Toast.makeText(this, "打开失败", Toast.LENGTH_SHORT).show();
-    }
-
-    public void uploadImage(Handler handler) {//上传头像
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                File file = new File(Objects.requireNonNull(UriUtil.getPath(MainActivity.this, cropImageUri)));
-                final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
-                DatabaseHelper userDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
-                AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(MainActivity.this, userDbHelper);
-                final int id = avatarDatabaseUtil.getUserId();//获取用户id
-                userDbHelper.close();
-                OkHttpClient client = new OkHttpClient();
-                RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型为jpg
-                RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                        .addFormDataPart("userId", String.valueOf(id))
-                        .addFormDataPart("file", id + ".jpg", fileBody).build();
-                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/UploadAvatarServlet").post(requestBody).build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    Message message = new Message();//发送消息
-                    message.what = UPLOAD;
-                    handler.sendMessage(message);
-                    response.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
 }
