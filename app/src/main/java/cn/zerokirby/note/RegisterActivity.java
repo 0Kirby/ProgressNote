@@ -2,6 +2,7 @@ package cn.zerokirby.note;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +27,7 @@ import java.util.Objects;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.userData.SystemUtil;
+import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -43,6 +45,8 @@ public class RegisterActivity extends BaseActivity {
     private String responseData;
     private String username;
     private String password;
+    private Bitmap bitmap;
+    private String code;
     private Handler handler;//用于进程间异步消息传递
     private CheckBox usernameCheckBox;
     private CheckBox passwordCheckBox;
@@ -57,12 +61,27 @@ public class RegisterActivity extends BaseActivity {
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
+        final EditText codeEditText = findViewById(R.id.code);
         final Button registerButton = findViewById(R.id.register_btn);
         final ImageView imageView = findViewById(R.id.back);
+        final ImageView codeView = findViewById(R.id.code_image);
         final ProgressBar progressBar = findViewById(R.id.loading);
         usernameCheckBox = findViewById(R.id.username_checkbox);
         passwordCheckBox = findViewById(R.id.password_checkbox);
 
+        bitmap = CodeUtil.getInstance().createBitmap();//获取工具类生成的图片验证码对象
+        code = CodeUtil.getInstance().getCode();//获取当前图片验证码的对应内容用于校验
+        codeView.setImageBitmap(bitmap);
+        codeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bitmap = CodeUtil.getInstance().createBitmap();
+                code = CodeUtil.getInstance().getCode();
+                codeView.setImageBitmap(bitmap);
+                codeEditText.setText("");
+                registerButton.setEnabled(false);
+            }
+        });
         setRemember();//初始化复选框
 
         handler = new Handler(new Handler.Callback() {
@@ -135,8 +154,9 @@ public class RegisterActivity extends BaseActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {//当两个输入框同时不为空时，按钮生效
-                if (!(usernameEditText.getText().toString().equals("") || passwordEditText.getText().toString().equals(""))) {
+            public void afterTextChanged(Editable s) {//当三个输入框同时不为空且验证码正确时，按钮生效
+                if (usernameEditText.length() > 0 && passwordEditText.length() > 0
+                        && codeEditText.getText().toString().equalsIgnoreCase(code)) {
                     registerButton.setEnabled(true);
                 } else//否则按钮失效
                 {
@@ -152,8 +172,9 @@ public class RegisterActivity extends BaseActivity {
             }
         });
 
-        usernameEditText.addTextChangedListener(textWatcher);//给两个输入框增加监控
+        usernameEditText.addTextChangedListener(textWatcher);//给三个输入框增加监控
         passwordEditText.addTextChangedListener(textWatcher);
+        codeEditText.addTextChangedListener(textWatcher);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override

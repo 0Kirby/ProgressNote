@@ -63,7 +63,6 @@
                     android:id="@+id/half_circle"
                     android:layout_width="50dp"
                     android:layout_height="100dp"
-                    android:layout_alignParentRight="true"
                     android:background="@drawable/half_circle" />
 
             </LinearLayout>
@@ -81,7 +80,7 @@
 
             <View
                 android:layout_width="5.6dp"
-                android:layout_height="225dp"
+                android:layout_height="275dp"
                 android:background="?attr/colorAccent" />
 
 
@@ -94,7 +93,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="225dp"
+                    android:layout_height="275dp"
                     android:layout_marginStart="13dp"
                     android:layout_marginEnd="19dp"
                     android:orientation="vertical">
@@ -115,56 +114,82 @@
                         style="@style/MD_Dialog_Input_Layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/username"
-                        android:layout_marginTop="20dp">
+                        android:layout_marginTop="20dp"
+                        android:hint="@string/username">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/username"
+                            style="@style/MD_Dialog_Input_Layout.Message"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:maxLength="20"
                             android:digits="@string/filter_username"
                             android:drawableStart="@drawable/ic_person_black_24dp"
-                            style="@style/MD_Dialog_Input_Layout.Message"
                             android:importantForAutofill="no"
                             android:inputType="textEmailAddress"
+                            android:maxLength="20"
                             android:selectAllOnFocus="true" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-
-                    <RelativeLayout
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/text_input_password"
+                        style="@style/MD_Dialog_Input_Layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="5dp">
+                        android:hint="@string/password"
+                        app:passwordToggleEnabled="true"
+                        app:passwordToggleTint="?attr/icon_color">
 
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/text_input_password"
-                            style="@style/MD_Dialog_Input_Layout"
-                            android:hint="@string/password"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/password"
+                            style="@style/MD_Dialog_Input_Layout.Message"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:passwordToggleEnabled="true"
+                            android:drawableStart="@drawable/ic_key_black_24dp"
+                            android:imeOptions="actionDone"
+                            android:importantForAutofill="no"
+                            android:inputType="textPassword"
+                            android:maxLength="20"
+                            android:selectAllOnFocus="true" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/text_input_code"
+                            style="@style/MD_Dialog_Input_Layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/code"
                             app:passwordToggleTint="?attr/icon_color">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/password"
+                                android:id="@+id/code"
+                                style="@style/MD_Dialog_Input_Layout.Message"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:maxLength="20"
-                                android:drawableStart="@drawable/ic_key_black_24dp"
-                                style="@style/MD_Dialog_Input_Layout.Message"
+                                android:digits="@string/filter_username"
+                                android:drawableStart="@drawable/ic_send_black_24dp"
                                 android:imeOptions="actionDone"
                                 android:importantForAutofill="no"
-                                android:inputType="textPassword"
+                                android:maxLength="4"
                                 android:selectAllOnFocus="true" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                    </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/code_image"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="2"
+                            android:contentDescription="@string/code" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
-
 
             </LinearLayout>
 
@@ -219,6 +244,7 @@
                 android:textSize="15sp" />
 
         </LinearLayout>
+
         <ProgressBar
             android:id="@+id/loading"
             android:layout_width="36dp"
@@ -226,6 +252,5 @@
             android:layout_gravity="center"
             android:visibility="gone" />
     </LinearLayout>
-
 
 </RelativeLayout>

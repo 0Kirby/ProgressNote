@@ -79,7 +79,7 @@
 
             <View
                 android:layout_width="5.6dp"
-                android:layout_height="225dp"
+                android:layout_height="275dp"
                 android:background="?attr/colorAccent" />
 
 
@@ -92,7 +92,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="225dp"
+                    android:layout_height="275dp"
                     android:layout_marginStart="13dp"
                     android:layout_marginEnd="19dp"
                     android:orientation="vertical">
@@ -129,14 +129,6 @@
                             android:selectAllOnFocus="true" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="5dp">
-
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/text_input_password"
                             style="@style/MD_Dialog_Input_Layout"
@@ -159,10 +151,44 @@
                                 android:selectAllOnFocus="true" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                    </RelativeLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/text_input_code"
+                            style="@style/MD_Dialog_Input_Layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/code"
+                            app:passwordToggleTint="?attr/icon_color">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/code"
+                                style="@style/MD_Dialog_Input_Layout.Message"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:digits="@string/filter_username"
+                                android:drawableStart="@drawable/ic_send_black_24dp"
+                                android:imeOptions="actionDone"
+                                android:importantForAutofill="no"
+                                android:maxLength="4"
+                                android:selectAllOnFocus="true" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/code_image"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="2"
+                            android:contentDescription="@string/code" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
-
 
             </LinearLayout>
 
