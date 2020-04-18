@@ -2,35 +2,30 @@ package cn.zerokirby.note;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
-
+import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.util.AppUtil;
+import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Objects;
-
-import cn.zerokirby.note.db.DatabaseHelper;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.util.AppUtil;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -39,6 +34,7 @@ public class SettingsActivity extends BaseActivity {
     private static String versionName = "";
     private static Preference checkUpdatePref;
     private static Handler handler;
+    private static final String MODIFY_SYNC = "modify_sync";
 
     private static void checkUpdate() {//检查更新
         new Thread(new Runnable() {
@@ -115,8 +111,13 @@ public class SettingsActivity extends BaseActivity {
                     checkUpdate();
                     break;
                 case "delete_note":
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    boolean modifySync = sharedPreferences.getBoolean(MODIFY_SYNC, false);
                     builder.setTitle("警告");
-                    builder.setMessage("这将清除本地所有笔记\n此操作无法恢复\n是否继续？");
+                    if (modifySync)
+                        builder.setMessage("您已开启自动同步\n在清除本地笔记的同时，\n云端笔记也将被清除\n此操作无法恢复\n是否继续？");
+                    else
+                        builder.setMessage("这将清除本地所有笔记\n此操作无法恢复\n是否继续？");
                     builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
