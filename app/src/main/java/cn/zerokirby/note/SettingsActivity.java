@@ -176,38 +176,38 @@ public class SettingsActivity extends BaseActivity {
                     break;
                 case "my_homepage":
                     browser.setData(Uri.parse("https://zerokirby.cn"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "homepage":
                     browser.setData(Uri.parse("https://note.zerokirby.cn"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "blog":
                     browser.setData(Uri.parse("https://blog.zerokirby.cn"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "github":
                     browser.setData(Uri.parse("https://github.com/0Kirby/ProgressNote"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "feedback":
                     startActivity(new Intent(getActivity(), FeedbackActivity.class));
                     break;
                 case "code":
                     browser.setData(Uri.parse("https://github.com/0Kirby"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "ui":
                     browser.setData(Uri.parse("https://github.com/BlueEra"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "theme":
                     browser.setData(Uri.parse("https://github.com/EndureBlaze"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
                 case "icon":
                     browser.setData(Uri.parse("https://space.bilibili.com/8333040"));
-                    Objects.requireNonNull(getActivity()).startActivity(browser);
+                    requireActivity().startActivity(browser);
                     break;
             }
             return super.onPreferenceTreeClick(preference);
