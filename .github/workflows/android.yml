@@ -18,4 +18,6 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Gradle
-      run: ./gradlew build --warning-mode all
+      run: chmod +x gradlew &&./gradlew assembleRelease
+    - name: Signing APK
+      run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} `find app/build/outputs/apk/release/ -name *.apk` zerokirby
