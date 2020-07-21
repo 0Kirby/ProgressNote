@@ -1,4 +1,5 @@
 # ProgressNote
+使用**Github Actions**自动检查提交、构建APK并发布到Releases  
 ![Android CI](https://github.com/0Kirby/ProgressNote/workflows/Android%20CI/badge.svg)
 ![Create APK Release](https://github.com/0Kirby/ProgressNote/workflows/Create%20APK%20Release/badge.svg)
 # 简介
