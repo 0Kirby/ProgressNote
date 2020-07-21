@@ -17,8 +17,10 @@ jobs:
           java-version: 1.8
       - name: Assemble release with Gradle
         run: chmod +x gradlew &&./gradlew assembleRelease
+      - name: Find filename and set env
+        run: echo ::set-env name=FILENAME::`basename app/build/outputs/apk/release/*.apk`
       - name: Sign APK
-        run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} `find app/build/outputs/apk/release/ -name *.apk` zerokirby
+        run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} app/build/outputs/apk/release/${{ FILENAME }} zerokirby
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -36,6 +38,6 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
          upload_url: ${{ steps.create_release.outputs.upload_url }}
-         asset_path: app/build/outputs/apk/release/ProgressNote-${{ github.ref.tag_name }}.apk
-         asset_name: ProgressNote-${{ github.ref.tag_name }}.apk
+         asset_path: app/build/outputs/apk/release/${{ FILENAME }}
+         asset_name: ${{ FILENAME }}
          asset_content_type: application/vnd.android.package-archive
