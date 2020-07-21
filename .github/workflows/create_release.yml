@@ -39,5 +39,5 @@ jobs:
         with:
          upload_url: ${{ steps.create_release.outputs.upload_url }}
          asset_path: app/build/outputs/apk/release/${{ env.FILENAME }}
-         asset_name: ${{ FILENAME }}
+         asset_name: ${{ env.FILENAME }}
          asset_content_type: application/vnd.android.package-archive
