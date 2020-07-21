@@ -1,4 +1,6 @@
 # ProgressNote
+![Android CI](https://github.com/0Kirby/ProgressNote/workflows/Android%20CI/badge.svg)
+![Create APK Release](https://github.com/0Kirby/ProgressNote/workflows/Create%20APK%20Release/badge.svg)
 # 简介
 **《天天笔记》** 是我的毕业设计选题《基于Android的云笔记本设计与实现》。  
 本课题要求以Intellij IDEA为集成开发环境，Java为主要编程语言，采用云服务器实现云同步功能，进行基于Android平台的移动APP云笔记本的开发。
