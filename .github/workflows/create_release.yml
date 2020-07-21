@@ -36,6 +36,6 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
          upload_url: ${{ steps.create_release.outputs.upload_url }}
-         asset_path: app/build/outputs/apk/release/ProgressNote-${{ github.ref }}.apk
-         asset_name: ProgressNote-${{ github.ref }}.apk
+         asset_path: app/build/outputs/apk/release/ProgressNote-${{ steps.create_release.inputs.tag_name }}.apk
+         asset_name: ProgressNote-${{ steps.create_release.inputs.tag_name }}.apk
          asset_content_type: application/vnd.android.package-archive
