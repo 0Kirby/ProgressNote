@@ -1,7 +1,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="BaseLightTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="BaseLightTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:textColor">#FF000000</item>
         <item name="color_view_background">@android:color/white</item>
         <item name="color_windows_background">#FFF5F5F5</item>
         <item name="text_high">#CC000000</item>
@@ -25,7 +26,6 @@
         <item name="m_calendar_selected_background_color">#fff</item>
         <item name="m_calendar_note_background_color">?attr/colorPrimaryDark</item>
         <item name="android:popupMenuStyle">@style/Widget.AppCompat.Light.PopupMenu</item>
-
     </style>
 
     <style name="BaseDarkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
@@ -55,7 +55,6 @@
         <item name="m_calendar_week_bar_text_color">#ABFFFFFF</item>
         <item name="m_calendar_selected_background_color">#fff</item>
         <item name="m_calendar_note_background_color">?attr/colorAccent</item>
-
         <item name="android:popupMenuStyle">@style/Widget.AppCompat.PopupWindow</item>
     </style>
 
@@ -71,7 +70,6 @@
         <item name="android:textColorSecondary">#FF606060</item>
         <item name="android:textColorPrimary">#FF606060</item>
         <item name="btn_text_color">#CC000000</item>
-
         <item name="m_calendar_background_color">?attr/colorPrimary</item>
         <item name="m_calendar_text_color">#000000</item>
         <item name="m_calendar_selected_text_color">?attr/colorPrimary</item>

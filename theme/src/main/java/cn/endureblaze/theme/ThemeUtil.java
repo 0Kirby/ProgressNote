@@ -155,23 +155,12 @@ public class ThemeUtil {
         activity.finish();
     }
 
-    /**
-     * 获取主题颜色
-     *
-     * @return
-     */
     public static int getColorPrimary(Context activity) {
         TypedValue typedValue = new TypedValue();
         activity.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
         return typedValue.data;
     }
 
-
-    /**
-     * 获取主题颜色
-     *
-     * @return
-     */
     public static int getDarkColorPrimary(Context activity) {
 
         TypedValue typedValue = new TypedValue();
