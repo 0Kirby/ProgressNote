@@ -2,10 +2,12 @@ package cn.zerokirby.note;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -38,6 +40,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -76,6 +79,10 @@ public class MainActivity extends BaseActivity {
     private Animation adapterAlpha1;//动画1，消失
     private Animation adapterAlpha2;//动画2，出现
     private String searchText;//用来保存在查找对话框输入的文字
+
+    private IntentFilter intentFilter;
+    private LocalReceiver localReceiver;
+    private LocalBroadcastManager localBroadcastManager;
 
     private static int arrangement = 0;//排列方式，0为网格，1为列表
     private final int SC = 1;//服务器同步到客户端
@@ -141,6 +148,13 @@ public class MainActivity extends BaseActivity {
             recyclerView.setAdapter(dataAdapterSpecial);//设置适配器
         }
         recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+
+        //注册本地广播监听器
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("cn.zerokirby.note.LOCAL_BROADCAST");
+        localReceiver = new LocalReceiver();
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(localReceiver, intentFilter);
 
         //为悬浮按钮设置点击事件
         floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
@@ -459,6 +473,38 @@ public class MainActivity extends BaseActivity {
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
+    }
+
+    //使用广播接收器处理笔记更新结果
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int operation_type = intent.getIntExtra("operation_type", 0);
+            DataItem dataItem = intent.getParcelableExtra("note_data");
+            int note_id = intent.getIntExtra("note_id", 0);
+
+            if(operation_type != 0) modifySync(MainActivity.this);
+
+            switch (operation_type) {
+                case 1:
+                    addItem(dataItem);
+                    break;
+                case 2:
+                    deleteItemById(note_id);
+                    break;
+                case 3:
+                    modifyItem(dataItem);
+                    break;
+                case 0:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        localBroadcastManager.unregisterReceiver(localReceiver);
     }
 
     @Override

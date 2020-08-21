@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -92,7 +93,7 @@ public class EditingActivity extends BaseActivity {
                     insertData();
                 else//编辑，执行数据库更新操作
                     updateData();
-                MainActivity.instance.modifySync(EditingActivity.this);
+                //MainActivity.instance.modifySync(EditingActivity.this);
                 break;
             case R.id.delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
@@ -106,9 +107,13 @@ public class EditingActivity extends BaseActivity {
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
-                        MainActivity.instance.modifySync(EditingActivity.this);
+                        //MainActivity.instance.modifySync(EditingActivity.this);
+                        //MainActivity.instance.deleteItemById(type);
 
-                        MainActivity.instance.deleteItemById(type);
+                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                        intent.putExtra("operation_type", 3);
+                        intent.putExtra("note_id", type);
+                        LocalBroadcastManager.getInstance(EditingActivity.this).sendBroadcast(intent);
 
                         finish();//关闭当前活动并返回到主活动
                     }
@@ -213,7 +218,7 @@ public class EditingActivity extends BaseActivity {
                         insertData();
                     else//编辑，执行数据库更新操作
                         updateData();
-                    MainActivity.instance.modifySync(EditingActivity.this);
+                    //MainActivity.instance.modifySync(EditingActivity.this);
                     finish();
                 }
             });
@@ -275,7 +280,12 @@ public class EditingActivity extends BaseActivity {
 
         //添加数据到dataList
         dataItem.setId(type);
-        MainActivity.instance.addItem(dataItem);
+        //MainActivity.instance.addItem(dataItem);
+
+        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+        intent.putExtra("operation_type", 1);
+        intent.putExtra("note_data", dataItem);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     //更新数据
@@ -289,6 +299,11 @@ public class EditingActivity extends BaseActivity {
 
         //修改dataList数据
         dataItem.setId(type);
-        MainActivity.instance.modifyItem(dataItem);
+        //MainActivity.instance.modifyItem(dataItem);
+
+        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+        intent.putExtra("operation_type", 3);
+        intent.putExtra("note_data", dataItem);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

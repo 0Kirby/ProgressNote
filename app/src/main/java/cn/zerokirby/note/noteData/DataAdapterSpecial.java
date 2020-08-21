@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
@@ -218,9 +219,14 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
                         Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
-                        mainActivity.modifySync(mainActivity);
 
-                        mainActivity.deleteItemById(id);
+                        //mainActivity.modifySync(mainActivity);
+                        //mainActivity.deleteItemById(id);
+
+                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                        intent.putExtra("operation_type", 2);
+                        intent.putExtra("note_id", id);
+                        LocalBroadcastManager.getInstance(mainActivity).sendBroadcast(intent);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做

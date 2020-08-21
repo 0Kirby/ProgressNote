@@ -1,5 +1,8 @@
 package cn.zerokirby.note.noteData;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -9,13 +12,14 @@ import java.util.Objects;
 import cn.zerokirby.note.MainActivity;
 import cn.zerokirby.note.R;
 
-public class DataItem {
+public class DataItem implements Parcelable {
     private int id;
     private String title;
     private String body;
     private String date;
 
-    public DataItem(String title, String body, String date) {
+    public DataItem(int id, String title, String body, String date) {
+        this.id = id;
         this.title = title;
         this.body = body;
         this.date = date;
@@ -136,4 +140,31 @@ public class DataItem {
     public void setFlag(boolean flag) {
         this.flag = flag;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(body);
+        dest.writeString(date);
+    }
+
+    public static final Parcelable.Creator<DataItem> CREATOR
+            = new Parcelable.Creator<DataItem>() {
+        @Override
+        public DataItem createFromParcel(Parcel source) {
+            return new DataItem(source.readInt(), source.readString(),
+                    source.readString(), source.readString());
+        }
+
+        @Override
+        public DataItem[] newArray(int size) {
+            return new DataItem[size];
+        }
+    };
 }
