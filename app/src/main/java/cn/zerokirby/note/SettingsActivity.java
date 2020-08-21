@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -124,7 +125,12 @@ public class SettingsActivity extends BaseActivity {
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
                             db.execSQL("Delete from Note");//清空笔记表
                             db.close();
-                            MainActivity.instance.refreshData("");
+
+                            //MainActivity.instance.refreshData("");
+                            Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                            intent.putExtra("operation_type", 5);
+                            LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
+
                             Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
@@ -162,7 +168,12 @@ public class SettingsActivity extends BaseActivity {
                                     }
                                 }
                             }).start();
-                            MainActivity.instance.refreshData("");
+
+                            //MainActivity.instance.refreshData("");
+                            Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                            intent.putExtra("operation_type", 5);
+                            LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
+
                             Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });

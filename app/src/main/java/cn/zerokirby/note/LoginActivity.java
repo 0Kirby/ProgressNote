@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -120,7 +121,12 @@ public class LoginActivity extends BaseActivity {
                         values.put("lastSync", syncTime);
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
-                        MainActivity.instance.checkLoginStatus();
+
+                        //MainActivity.instance.checkLoginStatus();
+                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                        intent.putExtra("operation_type", 4);
+                        LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(intent);
+
                         finish();
                     }
                 }

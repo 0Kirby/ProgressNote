@@ -69,7 +69,7 @@ import cn.zerokirby.note.userData.UriUtil;
 
 public class MainActivity extends BaseActivity {
 
-    public static MainActivity instance = null;
+    //public static MainActivity instance = null;
 
     private List<DataItem> dataList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        instance = MainActivity.this;
+        //instance = MainActivity.this;
 
         //获取动画
         adapterAlpha1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.adapter_alpha1);
@@ -494,6 +494,12 @@ public class MainActivity extends BaseActivity {
                     break;
                 case 3:
                     modifyItem(dataItem);
+                    break;
+                case 4:
+                    checkLoginStatus();
+                    break;
+                case 5:
+                    refreshData("");
                     break;
                 case 0:
                     break;
