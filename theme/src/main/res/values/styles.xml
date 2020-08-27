@@ -26,7 +26,7 @@
         <item name="android:popupMenuStyle">@style/Widget.AppCompat.Light.PopupMenu</item>
     </style>
 
-    <style name="BaseDarkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="BaseDarkTheme" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">#FF303030</item>
         <item name="android:textColor">#FFFFFFFF</item>
         <item name="color_view_background">#FF303030</item>
