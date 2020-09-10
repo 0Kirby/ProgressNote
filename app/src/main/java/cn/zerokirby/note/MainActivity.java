@@ -581,23 +581,19 @@ public class MainActivity extends BaseActivity {
 
     //重写，实现再按一次退出以及关闭抽屉
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                if ((System.currentTimeMillis() - exitTime) > 2000) {
-                    Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
-                    exitTime = System.currentTimeMillis();
-                } else {
-                    finish();
-                    System.exit(0);
-                }
-                return true;
-            } else {//抽屉打开时先关闭抽屉
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {//抽屉打开时先关闭抽屉
                 drawerLayout.closeDrawers();
-                return false;
+                return true;
+            }
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+                return true;
             }
         }
-        return super.onKeyDown(keyCode, event);
+        return super.onKeyUp(keyCode, event);
     }
 
     //自动同步数据
