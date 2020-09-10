@@ -1,0 +1,28 @@
+<resources>
+    <attr name="icon_color" format="color" />
+
+    <attr name="fab_color" format="color" />
+    <!--日历部分的颜色-->
+    <attr name="m_calendar_background_color" format="color" />
+    <attr name="m_calendar_text_color" format="color" />
+    <attr name="m_calendar_selected_text_color" format="color" />
+    <attr name="m_calendar_week_bar_text_color" format="color" />
+    <attr name="m_calendar_selected_background_color" format="color" />
+    <attr name="m_calendar_note_background_color" format="color" />
+
+    <attr name="toolbar_theme" format="string" />
+    <attr name="toolbar_icon_color" format="color" />
+    <!--底栏选中颜色-->
+    <attr name="color_nav" format="color" />
+    <!--字体色-->
+    <attr name="text_high" format="color" />
+    <attr name="text_medium" format="color" />
+    <attr name="text_hint" format="color" />
+    <attr name="text_error" format="color" />
+    <attr name="btn_text_color" format="color" />
+    <!--窗口背景色-->
+    <attr name="color_windows_background" format="color" />
+    <attr name="color_view_background" format="color" />
+
+    <attr name="dialog_button_color" format="color" />
+</resources>

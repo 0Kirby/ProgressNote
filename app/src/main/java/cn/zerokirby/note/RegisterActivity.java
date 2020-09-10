@@ -1,6 +1,7 @@
 package cn.zerokirby.note;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,7 +106,12 @@ public class RegisterActivity extends BaseActivity {
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
                         LoginActivity.loginActivity.finish();
-                        MainActivity.instance.checkLoginStatus();
+
+                        //MainActivity.instance.checkLoginStatus();
+                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                        intent.putExtra("operation_type", 4);
+                        LocalBroadcastManager.getInstance(RegisterActivity.this).sendBroadcast(intent);
+
                         finish();
                     }
                 }
