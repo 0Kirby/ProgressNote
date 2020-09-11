@@ -71,6 +71,10 @@ public class MainActivity extends BaseActivity {
 
     //public static MainActivity instance = null;
 
+    //To be removed
+    private DatabaseHelper databaseHelper;
+    private SQLiteDatabase db;
+
     private List<DataItem> dataList = new ArrayList<>();
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
@@ -100,8 +104,6 @@ public class MainActivity extends BaseActivity {
 
     private int isLogin;
 
-    private DatabaseHelper databaseHelper;
-    private SQLiteDatabase db;
     private Cursor cursor;
     private ContentValues values;
     private SimpleDateFormat simpleDateFormat;
@@ -208,12 +210,8 @@ public class MainActivity extends BaseActivity {
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
                         Toast.makeText(MainActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        databaseHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
-                        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();//更新时间
-                        values.put("lastSync", System.currentTimeMillis());
-                        db.update("User", values, "rowid = ?", new String[]{"1"});
-                        db.close();
+                        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                        databaseOperateUtil.updateSyncTime();
                         refreshData("");
                         break;
                     case UPLOAD:
@@ -285,14 +283,9 @@ public class MainActivity extends BaseActivity {
                         builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                DatabaseHelper userDbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
-                                SQLiteDatabase db = userDbHelper.getWritableDatabase();
-                                ContentValues values = new ContentValues();
-                                values.put("userId", 0);
-                                values.put("lastSync", 0);
-                                db.update("user", values, "rowid = ?", new String[]{"1"});
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                                databaseOperateUtil.exitLogin();
                                 Toast.makeText(MainActivity.this, "已退出登录！", Toast.LENGTH_SHORT).show();
-                                db.close();
                                 drawerLayout.closeDrawers();
                                 checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
                             }

@@ -30,37 +30,37 @@ public class DatabaseOperateUtil {
     private String title;
     private String content;
     private Context context;
+    private DatabaseHelper noteDbHelper;
 
     public DatabaseOperateUtil(Context context) {
         this.context = context;
+        this.noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
         this.userId = getUserId();
     }
 
     public int getUserId() {
         int id = 0;
-        DatabaseHelper dbHelper = new DatabaseHelper(context,
-                "ProgressNote.db", null, 1);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = noteDbHelper.getReadableDatabase();
         Cursor cursor = db.query("User", null, "rowid = ?",
                 new String[]{"1"}, null, null, null,
                 null);//查询对应的数据
         if (cursor.moveToFirst())
             id = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
         cursor.close();
+        db.close();
         return id;
     }
 
     public String getUsername() {
         String username = "";
-        DatabaseHelper dbHelper = new DatabaseHelper(context,
-                "ProgressNote.db", null, 1);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = noteDbHelper.getReadableDatabase();
         Cursor cursor = db.query("User", null, "rowid = ?",
                 new String[]{"1"}, null, null, null,
                 null);//查询对应的数据
         if (cursor.moveToFirst())
             username = cursor.getString(cursor.getColumnIndex("username"));  //读取用户名
         cursor.close();
+        db.close();
         return username;
     }
 
@@ -110,7 +110,6 @@ public class DatabaseOperateUtil {
     private void parseJSONWithJSONArray(String jsonData) {//处理JSON
         try {
             JSONArray jsonArray = new JSONArray(jsonData);
-            DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
             SQLiteDatabase db = noteDbHelper.getWritableDatabase();
             db.execSQL("Delete from Note");//清空笔记表
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -137,7 +136,6 @@ public class DatabaseOperateUtil {
     private String makeJSONArray() {//生成JSON数组的字符串
         try {
             JSONArray jsonArray = new JSONArray();
-            DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
             SQLiteDatabase db = noteDbHelper.getReadableDatabase();
             Cursor cursor = db.query("Note", null, null,
                     null, null, null, null,
@@ -171,7 +169,6 @@ public class DatabaseOperateUtil {
 
     public String[] getLogin() {//获取记住的用户名和密码
         String[] str = new String[2];
-        DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
         SQLiteDatabase db = noteDbHelper.getReadableDatabase();
         Cursor cursor = db.query("User", new String[]{"username", "password"}, null,
                 null, null, null, null,
@@ -181,11 +178,11 @@ public class DatabaseOperateUtil {
             str[1] = cursor.getString(cursor.getColumnIndex("password"));  //读取密码
         }
         cursor.close();
+        db.close();
         return str;
     }
 
     public void setUserColumnNull(String column) {//将User数据库的某个字段置为空
-        DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
         SQLiteDatabase db = noteDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.putNull(column);//将该字段置为空
@@ -194,11 +191,24 @@ public class DatabaseOperateUtil {
     }
 
     public void updateSyncTime() {//更新同步时间
-        DatabaseHelper noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
         SQLiteDatabase db = noteDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("lastSync", System.currentTimeMillis());
         db.update("User", values, "rowid = ?", new String[]{"1"});
         db.close();
     }
+
+    public void exitLogin() { //退出登录，设置用户ID和上次同步时间为0
+        SQLiteDatabase db = noteDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("userId", 0);
+        values.put("lastSync", 0);
+        db.update("user", values, "rowid = ?", new String[]{"1"});
+        db.close();
+    }
+
+    public void initData() { //初始化数据
+        //待补充
+    }
+
 }
