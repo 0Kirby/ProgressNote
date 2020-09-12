@@ -3,7 +3,6 @@ package cn.zerokirby.note.noteData;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +30,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
-    private Cursor cursor;
 
     //构造器
     public DataAdapter(MainActivity mainActivity, List<DataItem> dataItemList) {

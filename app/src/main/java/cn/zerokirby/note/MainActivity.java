@@ -13,8 +13,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -57,24 +55,21 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
-import cn.zerokirby.note.db.AvatarDatabaseUtil;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.DataAdapter;
 import cn.zerokirby.note.noteData.DataAdapterSpecial;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.IconUtil;
-import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.userData.UriUtil;
 
 public class MainActivity extends BaseActivity {
-
-    //public static MainActivity instance = null;
 
     //To be removed
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase db;
 
+    private DatabaseOperateUtil databaseOperateUtil;
     private List<DataItem> dataList = new ArrayList<>();
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
@@ -128,7 +123,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //instance = MainActivity.this;
+        //初始化数据库操作工具类
+        databaseOperateUtil = new DatabaseOperateUtil(this);
 
         //获取动画
         adapterAlpha1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.adapter_alpha1);
@@ -307,33 +303,14 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        databaseHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        SystemUtil systemUtil = new SystemUtil();//获取手机信息
-        values = new ContentValues();
-        values.put("language", systemUtil.getSystemLanguage());
-        values.put("version", systemUtil.getSystemVersion());
-        values.put("display", systemUtil.getSystemDisplay());
-        values.put("model", systemUtil.getSystemModel());
-        values.put("brand", systemUtil.getDeviceBrand());
-        cursor = db.rawQuery("SELECT COUNT(*) FROM User", null);
-        cursor.moveToFirst();
-        long num = cursor.getLong(0);
-
-        if (num == 0) {//如果不存在记录
-            values.put("userId", 0);
-            db.insert("User", null, values);//插入
-        } else
-            db.update("User", values, "rowid = ?", new String[]{"1"});//更新
-        db.close();
-
+        databaseOperateUtil.getInfo();
         refreshData("");
     }
 
     //刷新数据
     public int refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
-        //初始化Journal数据
+        //初始化笔记数据
         dataList.clear();
         int dataCount = initData(s);
         if (arrangement == 0)
@@ -366,6 +343,7 @@ public class MainActivity extends BaseActivity {
     private int initData(String s) {
         simpleDateFormat = new SimpleDateFormat(
                 getString(R.string.formatDate), Locale.getDefault());
+        databaseHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
         db = databaseHelper.getReadableDatabase();
         cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
@@ -468,35 +446,69 @@ public class MainActivity extends BaseActivity {
         recyclerView.scrollToPosition(0);//移动到头部
     }
 
-    //使用广播接收器处理笔记更新结果
-    class LocalReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int operation_type = intent.getIntExtra("operation_type", 0);
-            DataItem dataItem = intent.getParcelableExtra("note_data");
-            int note_id = intent.getIntExtra("note_id", 0);
+    public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        isLogin = databaseOperateUtil.getUserId();
 
-            if(operation_type != 0) modifySync(MainActivity.this);
+        avatar = headView.findViewById(R.id.user_avatar);
 
-            switch (operation_type) {
-                case 1:
-                    addItem(dataItem);
-                    break;
-                case 2:
-                    deleteItemById(note_id);
-                    break;
-                case 3:
-                    modifyItem(dataItem);
-                    break;
-                case 4:
-                    checkLoginStatus();
-                    break;
-                case 5:
-                    refreshData("");
-                    break;
-                case 0:
-                    break;
-            }
+        //实例化TextView，以便填入具体数据
+        userId = headView.findViewById(R.id.login_userId);
+        username = headView.findViewById(R.id.login_username);
+        lastLogin = headView.findViewById(R.id.last_login);
+        lastSync = headView.findViewById(R.id.last_sync);
+
+        //获取菜单
+        Menu menu = navigationView.getMenu();
+        if (isLogin == 0) {//用户没有登录
+
+            //设置头像未待添加，并禁用修改头像按钮
+            avatar.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
+            avatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
+                    builder.setTitle("提示");
+                    builder.setMessage("请先登陆后再使用！");
+                    builder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    builder.show();
+                }
+            });
+
+            username.setVisibility(View.GONE);//隐藏“用户名”
+            userId.setVisibility(View.GONE);//隐藏“用户ID”
+            lastLogin.setText("尚未登陆！");//显示“尚未登陆！”
+            lastLogin.setTextSize(32);//设置文字大小
+            lastSync.setVisibility(View.GONE);//隐藏“上次同步”
+
+            menu.getItem(0).setVisible(true);//显示“登录”
+            menu.getItem(1).setVisible(false);//隐藏“同步（服务器->客户端）”
+            menu.getItem(2).setVisible(false);//隐藏“同步（客户端->服务器）”
+            menu.getItem(4).setVisible(false);//隐藏“退出登录”
+        } else {//用户已经登录
+
+            //显示头像，并启用修改头像按钮
+            avatar.setImageBitmap(databaseOperateUtil.readIcon());
+
+            avatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    iconUtil.iconClick();
+                }
+            });
+
+            updateTextView();//更新TextView
+
+            menu.getItem(0).setVisible(false);//隐藏“登录”
+            menu.getItem(1).setVisible(true);//显示“同步（服务器->客户端）”
+            menu.getItem(2).setVisible(true);//显示“同步（客户端->服务器）”
+            menu.getItem(4).setVisible(true);//显示“退出登录”
+
         }
     }
 
@@ -613,80 +625,35 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        isLogin = databaseOperateUtil.getUserId();
+    //使用广播接收器处理笔记更新结果
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int operation_type = intent.getIntExtra("operation_type", 0);
+            DataItem dataItem = intent.getParcelableExtra("note_data");
+            int note_id = intent.getIntExtra("note_id", 0);
 
-        avatar = headView.findViewById(R.id.user_avatar);
+            if (operation_type != 0) modifySync(MainActivity.this);
 
-        //实例化TextView，以便填入具体数据
-        userId = headView.findViewById(R.id.login_userId);
-        username = headView.findViewById(R.id.login_username);
-        lastLogin = headView.findViewById(R.id.last_login);
-        lastSync = headView.findViewById(R.id.last_sync);
-
-        //获取菜单
-        Menu menu = navigationView.getMenu();
-        if (isLogin == 0) {//用户没有登录
-
-            //设置头像未待添加，并禁用修改头像按钮
-            avatar.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
-            avatar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                    builder.setTitle("提示");
-                    builder.setMessage("请先登陆后再使用！");
-                    builder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                        }
-                    });
-                    builder.show();
-                }
-            });
-
-            username.setVisibility(View.GONE);//隐藏“用户名”
-            userId.setVisibility(View.GONE);//隐藏“用户ID”
-            lastLogin.setText("尚未登陆！");//显示“尚未登陆！”
-            lastLogin.setTextSize(32);//设置文字大小
-            lastSync.setVisibility(View.GONE);//隐藏“上次同步”
-
-            menu.getItem(0).setVisible(true);//显示“登录”
-            menu.getItem(1).setVisible(false);//隐藏“同步（服务器->客户端）”
-            menu.getItem(2).setVisible(false);//隐藏“同步（客户端->服务器）”
-            menu.getItem(4).setVisible(false);//隐藏“退出登录”
-        } else {//用户已经登录
-
-            //显示头像，并启用修改头像按钮
-            DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this, "ProgressNote.db", null, 1);
-            db = dbHelper.getReadableDatabase();
-            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(this, dbHelper);
-            byte[] imgData = avatarDatabaseUtil.readImage();
-            if (imgData != null) {
-                //将字节数组转化为位图
-                Bitmap imagebitmap = BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
-                //将位图显示为图片
-                avatar.setImageBitmap(imagebitmap);
-                imagebitmap = null;
+            switch (operation_type) {
+                case 1:
+                    addItem(dataItem);
+                    break;
+                case 2:
+                    deleteItemById(note_id);
+                    break;
+                case 3:
+                    modifyItem(dataItem);
+                    break;
+                case 4:
+                    checkLoginStatus();
+                    break;
+                case 5:
+                    refreshData("");
+                    break;
+                case 0:
+                    break;
             }
-
-            avatar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    iconUtil.iconClick();
-                }
-            });
-
-            updateTextView();//更新TextView
-
-            menu.getItem(0).setVisible(false);//隐藏“登录”
-            menu.getItem(1).setVisible(true);//显示“同步（服务器->客户端）”
-            menu.getItem(2).setVisible(true);//显示“同步（客户端->服务器）”
-            menu.getItem(4).setVisible(true);//显示“退出登录”
-
-            db.close();
         }
     }
 
