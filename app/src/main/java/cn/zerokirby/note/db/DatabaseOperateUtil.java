@@ -23,6 +23,7 @@ import java.util.Objects;
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.SystemUtil;
+import cn.zerokirby.note.userData.User;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -248,6 +249,23 @@ public class DatabaseOperateUtil {
             return BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
         } else
             return null;
+    }
+
+    public User getUserInfo() { //获取用户信息并返回一个User对象
+        SQLiteDatabase db = noteDbHelper.getReadableDatabase();
+        User user = new User();
+        Cursor cursor = db.query("User", null, "rowid = ?",
+                new String[]{"1"}, null, null, null,
+                null);//查询对应的数据
+        if (cursor.moveToFirst()) {
+            user.setUserId(cursor.getInt(cursor.getColumnIndex("userId")));  //读取ID
+            user.setUsername(cursor.getString(cursor.getColumnIndex("username")));  //读取用户名
+            user.setLastUse(cursor.getLong(cursor.getColumnIndex("lastUse")));  //读取上次登录时间
+            user.setLastSync(cursor.getLong(cursor.getColumnIndex("lastSync")));//读取上次同步时间
+        }
+        cursor.close();
+        db.close();
+        return user;
     }
 
     //初始化从数据库中读取数据并填充dataItem

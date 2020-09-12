@@ -67,7 +67,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 //传送数据的id并启动EditingActivity
-                int position = holder.getAdapterPosition();
+                int position = holder.getBindingAdapterPosition();
                 DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
                 Intent intent = new Intent(view.getContext(), EditingActivity.class);
@@ -80,7 +80,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         holder.dataView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                int position = holder.getAdapterPosition();
+                int position = holder.getBindingAdapterPosition();
                 DataItem dataItem = mDataItemList.get(position);
                 int id = dataItem.getId();
 

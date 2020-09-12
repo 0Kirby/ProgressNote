@@ -62,6 +62,7 @@ import cn.zerokirby.note.noteData.DataAdapterSpecial;
 import cn.zerokirby.note.noteData.DataItem;
 import cn.zerokirby.note.userData.IconUtil;
 import cn.zerokirby.note.userData.UriUtil;
+import cn.zerokirby.note.userData.User;
 
 public class MainActivity extends BaseActivity {
 
@@ -105,7 +106,7 @@ public class MainActivity extends BaseActivity {
 
     private TextView userId;
     private TextView username;
-    private TextView lastLogin;
+    private TextView lastUse;
     private TextView lastSync;
     private ImageView avatar;
 
@@ -455,7 +456,7 @@ public class MainActivity extends BaseActivity {
         //实例化TextView，以便填入具体数据
         userId = headView.findViewById(R.id.login_userId);
         username = headView.findViewById(R.id.login_username);
-        lastLogin = headView.findViewById(R.id.last_login);
+        lastUse = headView.findViewById(R.id.last_login);
         lastSync = headView.findViewById(R.id.last_sync);
 
         //获取菜单
@@ -482,8 +483,8 @@ public class MainActivity extends BaseActivity {
 
             username.setVisibility(View.GONE);//隐藏“用户名”
             userId.setVisibility(View.GONE);//隐藏“用户ID”
-            lastLogin.setText("尚未登陆！");//显示“尚未登陆！”
-            lastLogin.setTextSize(32);//设置文字大小
+            lastUse.setText("尚未登陆！");//显示“尚未登陆！”
+            lastUse.setTextSize(32);//设置文字大小
             lastSync.setVisibility(View.GONE);//隐藏“上次同步”
 
             menu.getItem(0).setVisible(true);//显示“登录”
@@ -658,36 +659,20 @@ public class MainActivity extends BaseActivity {
     }
 
     private void updateTextView() {//更新TextView显示用户信息
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                getString(R.string.formatDate_User), Locale.getDefault());
-
-        DatabaseHelper dbHelper = new DatabaseHelper(this,
-                "ProgressNote.db", null, 1);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query("User", null, "rowid = ?",
-                new String[]{"1"}, null, null, null,
-                null);//查询对应的数据
-        if (cursor.moveToFirst()) {
-            userId.setVisibility(View.VISIBLE);//显示“用户ID”
-            username.setVisibility(View.VISIBLE);//显示“用户名”
-            lastSync.setVisibility(View.VISIBLE);//显示“上次同步”
-            userId.setText(String.format(getResources().getString(R.string.login_userId),
-                    cursor.getInt(cursor.getColumnIndex("userId"))));  //读取ID
-            username.setText(String.format(getResources().getString(R.string.login_username),
-                    cursor.getString(cursor.getColumnIndex("username"))));  //读取用户名
-            lastLogin.setText(String.format(getResources().getString(R.string.last_login),
-                    simpleDateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex("lastUse"))))));  //读取上次登录时间
-            lastLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);//设置文字大小
-            long time = cursor.getLong(cursor.getColumnIndex("lastSync"));//读取上次同步时间
-            if (time != 0)
-                lastSync.setText(String.format(getResources().getString(R.string.last_sync), simpleDateFormat.format(new Date(cursor.getLong(cursor
-                        .getColumnIndex("lastSync"))))));
-            else
-                lastSync.setText(String.format(getResources().getString(R.string.last_sync), "无"));
-        }
-        isLogin = cursor.getInt(cursor.getColumnIndex("userId"));
-        cursor.close();
-        db.close();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(getString(R.string.formatDate_User), Locale.getDefault());
+        User user = databaseOperateUtil.getUserInfo();
+        userId.setVisibility(View.VISIBLE);//显示“用户ID”
+        username.setVisibility(View.VISIBLE);//显示“用户名”
+        lastSync.setVisibility(View.VISIBLE);//显示“上次同步”
+        isLogin = user.getUserId();
+        userId.setText(String.format(getResources().getString(R.string.login_userId), user.getUserId()));  //读取ID
+        username.setText(String.format(getResources().getString(R.string.login_username), user.getUsername()));  //读取用户名
+        lastUse.setText(String.format(getResources().getString(R.string.last_login), simpleDateFormat.format(new Date(user.getLastUse()))));  //读取上次登录时间
+        lastUse.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);//设置文字大小
+        if (user.getLastSync() != 0)//读取上次同步时间
+            lastSync.setText(String.format(getResources().getString(R.string.last_sync), simpleDateFormat.format(new Date(user.getLastSync()))));
+        else
+            lastSync.setText(String.format(getResources().getString(R.string.last_sync), "无"));
     }
 
     @Override
