@@ -3,7 +3,6 @@ package cn.zerokirby.note;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,12 +10,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -55,7 +51,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
-import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.DataAdapter;
 import cn.zerokirby.note.noteData.DataAdapterSpecial;
@@ -66,12 +61,8 @@ import cn.zerokirby.note.userData.User;
 
 public class MainActivity extends BaseActivity {
 
-    //To be removed
-    private DatabaseHelper databaseHelper;
-    private SQLiteDatabase db;
-
     private DatabaseOperateUtil databaseOperateUtil;
-    private List<DataItem> dataList = new ArrayList<>();
+    private List<DataItem> dataList;
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
     private DataAdapter dataAdapter;
@@ -100,10 +91,6 @@ public class MainActivity extends BaseActivity {
 
     private int isLogin;
 
-    private Cursor cursor;
-    private ContentValues values;
-    private SimpleDateFormat simpleDateFormat;
-
     private TextView userId;
     private TextView username;
     private TextView lastUse;
@@ -123,7 +110,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //初始化数据库操作工具类
         databaseOperateUtil = new DatabaseOperateUtil(this);
 
@@ -133,6 +119,7 @@ public class MainActivity extends BaseActivity {
 
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
+        dataList = new ArrayList<>();
         dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
         dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
@@ -309,18 +296,17 @@ public class MainActivity extends BaseActivity {
     }
 
     //刷新数据
-    public int refreshData(String s) {
+    public void refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
         //初始化笔记数据
         dataList.clear();
-        int dataCount = initData(s);
+        dataList.addAll(databaseOperateUtil.initData(s));
         if (arrangement == 0)
             dataAdapter.notifyDataSetChanged();//通知adapter更新
         else
             dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
         checkLoginStatus();//检查登录状态
         recyclerView.startAnimation(adapterAlpha2);
-        return dataCount;
     }
 
     //刷新数据
@@ -331,53 +317,14 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        refreshData(searchText);
                         Toast.makeText(MainActivity.this,
-                                "找到" + refreshData(searchText) + "条笔记", Toast.LENGTH_SHORT).show();
+                                "找到" + dataList.size() + "条笔记", Toast.LENGTH_SHORT).show();
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
             }
         }).start();
-    }
-
-    //初始化从数据库中读取数据并填充dataItem
-    private int initData(String s) {
-        simpleDateFormat = new SimpleDateFormat(
-                getString(R.string.formatDate), Locale.getDefault());
-        databaseHelper = new DatabaseHelper(this, "ProgressNote.db", null, 1);
-        db = databaseHelper.getReadableDatabase();
-        cursor = db.query("Note", null, null,
-                null, null, null, "time desc",
-                null);//查询对应的数据
-
-        int dataCount = 0;//找到的笔记数量
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                String s0 = cursor.getString(cursor.getColumnIndex("title"));//读取标题并存入s0
-                String s1 = simpleDateFormat.format(new Date(cursor.getLong(
-                        cursor.getColumnIndex("time"))));//读取时间并存入s1
-                String s2 = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入s2
-
-                //如果字符串为空 或 标题、时间或文本中包含要查询的字符串
-                if (TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)) {
-                    //封装数据
-                    DataItem dataItem = new DataItem();
-                    dataItem.setId(Integer.parseInt(cursor.getString(cursor
-                            .getColumnIndex("id"))));//读取编号，需从字符串型转换成整型
-                    dataItem.setTitle(s0);
-                    dataItem.setDate(s1);
-                    dataItem.setBody(s2);
-                    dataList.add(dataItem);
-                    dataCount++;
-                }
-            } while (cursor.moveToNext());
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-        db.close();
-
-        return dataCount;//返回找到的笔记数量
     }
 
     //通过id寻找item的下标
@@ -547,8 +494,9 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
                         searchText = searchEt.getText().toString();
+                        refreshData(searchText);
                         Toast.makeText(MainActivity.this,
-                                "找到" + refreshData(searchText) + "条笔记", Toast.LENGTH_SHORT).show();
+                                "找到" + dataList.size() + "条笔记", Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做

@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -241,7 +242,6 @@ public class DatabaseOperateUtil {
     }
 
     public Bitmap readIcon() { //从数据库中读取头像
-        SQLiteDatabase db = noteDbHelper.getReadableDatabase();
         AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(context, noteDbHelper);
         byte[] imgData = avatarDatabaseUtil.readImage();
         if (imgData != null) {
@@ -269,33 +269,32 @@ public class DatabaseOperateUtil {
     }
 
     //初始化从数据库中读取数据并填充dataItem
-    public int initData(String s, List<DataItem> dataList) {
+    public List<DataItem> initData(String s) {
+        List<DataItem> dataList = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                String.valueOf(R.string.formatDate_User), Locale.getDefault());
+                context.getString(R.string.formatDate), Locale.getDefault());
         SQLiteDatabase db = noteDbHelper.getReadableDatabase();
         Cursor cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
                 null);//查询对应的数据
 
-        int dataCount = 0;//找到的笔记数量
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                String s0 = cursor.getString(cursor.getColumnIndex("title"));//读取标题并存入s0
-                String s1 = simpleDateFormat.format(new Date(cursor.getLong(
-                        cursor.getColumnIndex("time"))));//读取时间并存入s1
-                String s2 = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入s2
+                String title = cursor.getString(cursor.getColumnIndex("title"));//读取标题并存入title
+                String time = simpleDateFormat.format(new Date(cursor.getLong(
+                        cursor.getColumnIndex("time"))));//读取时间并存入time
+                String content = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入content
 
                 //如果字符串为空 或 标题、时间或文本中包含要查询的字符串
-                if (TextUtils.isEmpty(s) || (s0 + s1 + s2).contains(s)) {
+                if (TextUtils.isEmpty(s) || (title + time + content).contains(s)) {
                     //封装数据
                     DataItem dataItem = new DataItem();
                     dataItem.setId(Integer.parseInt(cursor.getString(cursor
                             .getColumnIndex("id"))));//读取编号，需从字符串型转换成整型
-                    dataItem.setTitle(s0);
-                    dataItem.setDate(s1);
-                    dataItem.setBody(s2);
+                    dataItem.setTitle(title);
+                    dataItem.setDate(time);
+                    dataItem.setBody(content);
                     dataList.add(dataItem);
-                    dataCount++;
                 }
             } while (cursor.moveToNext());
         }
@@ -303,8 +302,7 @@ public class DatabaseOperateUtil {
             cursor.close();
         }
         db.close();
-
-        return dataCount;//返回找到的笔记数量
+        return dataList;//返回笔记数据集
     }
 
 }

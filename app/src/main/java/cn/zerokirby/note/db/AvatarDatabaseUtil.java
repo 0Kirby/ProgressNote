@@ -25,7 +25,6 @@ public class AvatarDatabaseUtil {
         cv.put("avatar", bitmapToBytes(context, bitmap));//图片转为二进制
         db.update("User", cv, "rowid = ?", new String[]{"1"});
         db.close();
-        bitmap = null;
     }
 
     public byte[] readImage() {
@@ -37,6 +36,7 @@ public class AvatarDatabaseUtil {
             imgData = cur.getBlob(cur.getColumnIndex("avatar"));
         }
         cur.close();
+        db.close();
         return imgData;
     }
 
@@ -51,13 +51,12 @@ public class AvatarDatabaseUtil {
             //设置位图的压缩格式，质量为80%，并放入字节数组输出流中
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             //将字节数组输出流转化为字节数组byte[]
-            byte[] imagedata = baos.toByteArray();
-            return imagedata;
+            return baos.toByteArray();
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
                 baos.close();
-                bitmap = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
