@@ -34,6 +34,7 @@ import java.util.Objects;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.NoteChangeConstant;
+import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
@@ -226,8 +227,12 @@ public class LoginActivity extends BaseActivity {
             public void run() {//在子线程中进行网络操作
                 try {
                     //基础登录
+                    SystemUtil systemUtil = new SystemUtil();
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
-                    RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password).build();
+                    RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password)
+                            .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
+                            .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
+                            .add("brand", systemUtil.getDeviceBrand()).build();
                     Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/LoginServlet").post(requestBody).build();
                     Response response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
