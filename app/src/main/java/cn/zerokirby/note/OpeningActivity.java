@@ -58,7 +58,7 @@ public class OpeningActivity extends BaseActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        int userId = databaseOperateUtil.getUserId();
+        int userId = databaseOperateUtil.getUserInfo().getUserId();
         if (userId != 0) {
             if (modifySync) {
                 boolean launch = sharedPreferences.getBoolean("launch_sync", false);

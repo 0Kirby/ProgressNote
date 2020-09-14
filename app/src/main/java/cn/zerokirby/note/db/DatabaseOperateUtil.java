@@ -47,33 +47,7 @@ public class DatabaseOperateUtil {
     public DatabaseOperateUtil(Context context) {
         this.context = context;
         this.noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
-        this.userId = getUserId();
-    }
-
-    public int getUserId() {
-        int id = 0;
-        SQLiteDatabase db = noteDbHelper.getReadableDatabase();
-        Cursor cursor = db.query("User", null, "rowid = ?",
-                new String[]{"1"}, null, null, null,
-                null);//查询对应的数据
-        if (cursor.moveToFirst())
-            id = cursor.getInt(cursor.getColumnIndex("userId"));  //读取id
-        cursor.close();
-        db.close();
-        return id;
-    }
-
-    public String getUsername() {
-        String username = "";
-        SQLiteDatabase db = noteDbHelper.getReadableDatabase();
-        Cursor cursor = db.query("User", null, "rowid = ?",
-                new String[]{"1"}, null, null, null,
-                null);//查询对应的数据
-        if (cursor.moveToFirst())
-            username = cursor.getString(cursor.getColumnIndex("username"));  //读取用户名
-        cursor.close();
-        db.close();
-        return username;
+        this.userId = getUserInfo().getUserId();
     }
 
     public void sendRequestWithOkHttpSC(Handler handler) {
@@ -258,10 +232,18 @@ public class DatabaseOperateUtil {
                 new String[]{"1"}, null, null, null,
                 null);//查询对应的数据
         if (cursor.moveToFirst()) {
+            user.setValid(true); //默认为有效用户
             user.setUserId(cursor.getInt(cursor.getColumnIndex("userId")));  //读取ID
             user.setUsername(cursor.getString(cursor.getColumnIndex("username")));  //读取用户名
+            user.setPassword(cursor.getString(cursor.getColumnIndex("password")));  //读取密码
+            user.setLanguage(cursor.getString(cursor.getColumnIndex("language"))); //读取语言
+            user.setVersion(cursor.getString(cursor.getColumnIndex("version")));  //读取版本
+            user.setDisplay(cursor.getString(cursor.getColumnIndex("display")));  //读取显示信息
+            user.setModel(cursor.getString(cursor.getColumnIndex("model")));  //读取型号
+            user.setBrand(cursor.getString(cursor.getColumnIndex("brand")));  //读取品牌
+            user.setRegisterTime(cursor.getLong(cursor.getColumnIndex("registerTime")));  //读取注册时间
             user.setLastUse(cursor.getLong(cursor.getColumnIndex("lastUse")));  //读取上次登录时间
-            user.setLastSync(cursor.getLong(cursor.getColumnIndex("lastSync")));//读取上次同步时间
+            user.setLastSync(cursor.getLong(cursor.getColumnIndex("lastSync")));  //读取上次同步时间
         }
         cursor.close();
         db.close();

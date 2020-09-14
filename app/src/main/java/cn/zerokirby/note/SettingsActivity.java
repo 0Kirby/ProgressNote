@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -18,17 +19,24 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
-import cn.zerokirby.note.db.DatabaseHelper;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.noteData.NoteChangeConstant;
-import cn.zerokirby.note.util.AppUtil;
-import okhttp3.*;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Objects;
+
+import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.noteData.NoteChangeConstant;
+import cn.zerokirby.note.util.AppUtil;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -74,7 +82,7 @@ public class SettingsActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        userId = databaseOperateUtil.getUserId();  //读取id
+        userId = databaseOperateUtil.getUserInfo().getUserId();  //读取id
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
@@ -91,17 +99,16 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
-        @SuppressLint("DefaultLocale")
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
             Preference preference = findPreference("version");
             if(preference != null) {
-                preference.setSummary(String.format("版本号：%s\n构建日期：%d\n包名：%s",
-                                AppUtil.getVersionName(getActivity()),
-                                AppUtil.getVersionCode(getActivity()),
-                                AppUtil.getPackageName(getActivity())));
+                preference.setSummary(String.format(Locale.getDefault(), "版本号：%s\n构建日期：%d\n包名：%s",
+                        AppUtil.getVersionName(getActivity()),
+                        AppUtil.getVersionCode(getActivity()),
+                        AppUtil.getPackageName(getActivity())));
             }
 
             checkUpdatePref = findPreference("check_update");

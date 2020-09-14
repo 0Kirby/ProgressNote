@@ -112,7 +112,7 @@ public class FeedbackActivity extends BaseActivity {
                     progressBar.setVisibility(View.GONE);
                     boolean isCookieSaved = ShareUtil.getBoolean(FeedbackActivity.this, IS_FIRST_LOGOUT, false);
                     DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(FeedbackActivity.this);
-                    int userId = databaseOperateUtil.getUserId();
+                    int userId = databaseOperateUtil.getUserInfo().getUserId();
                     if (userId == 0 && !isCookieSaved && CookieManager.getInstance().hasCookies()) {
                         ShareUtil.putBoolean(FeedbackActivity.this, IS_COOKIE_SAVED, true);
                         String cookie = CookieManager.getInstance().getCookie(getDomain(url));//取出cookie
@@ -136,12 +136,12 @@ public class FeedbackActivity extends BaseActivity {
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
 
 
-        int userId = databaseOperateUtil.getUserId();
+        int userId = databaseOperateUtil.getUserInfo().getUserId();
         if (userId != 0) {
             //用户的openid
             String openid = String.valueOf(userId); // 用户的openid
             //用户的nickname
-            String nickname = databaseOperateUtil.getUsername(); // 用户的nickname
+            String nickname = databaseOperateUtil.getUserInfo().getUsername(); // 用户的nickname
             //用户的头像url
             String headimgurl = "https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet?userId=" + openid;  // 用户的头像url
             //post的数据

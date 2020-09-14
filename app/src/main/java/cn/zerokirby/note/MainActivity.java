@@ -436,7 +436,7 @@ public class MainActivity extends BaseActivity {
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        isLogin = databaseOperateUtil.getUserId();
+        isLogin = databaseOperateUtil.getUserInfo().getUserId();
 
         avatar = headView.findViewById(R.id.user_avatar);
 
@@ -593,7 +593,7 @@ public class MainActivity extends BaseActivity {
     //自动同步数据
     public void modifySync(Activity activity) {
         DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
-        int userId = databaseOperateUtil.getUserId();//检测用户是否登录
+        int userId = databaseOperateUtil.getUserInfo().getUserId();//检测用户是否登录
         if (userId != 0) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
