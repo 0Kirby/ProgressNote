@@ -18,7 +18,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
@@ -29,24 +28,24 @@ import cn.zerokirby.note.MainActivity;
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseHelper;
 
-public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.ViewHolder> {
+public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.ViewHolder> {
 
     private MainActivity mainActivity;
-    private List<DataItem> mDataItemList;
+    private List<NoteItem> mNoteItemList;
 
     private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
 
     //构造器
-    public DataAdapterSpecial(MainActivity mainActivity, List<DataItem> dataItemList) {
+    public NoteAdapterSpecial(MainActivity mainActivity, List<NoteItem> noteItemList) {
         this.mainActivity = mainActivity;
-        mDataItemList = dataItemList;
+        mNoteItemList = noteItemList;
     }
 
     //获取item数量
     @Override
     public int getItemCount() {
-        return mDataItemList.size();
+        return mNoteItemList.size();
     }
 
     //设置item中的View
@@ -115,25 +114,25 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DataItem dataItem = mDataItemList.get(position);//此item
+        NoteItem noteItem = mNoteItemList.get(position);//此item
 
         //相同的年月只显示一次
-        String year_month0 = dataItem.getYear() + dataItem.getMonth();//此item的年月
+        String year_month0 = noteItem.getYear() + noteItem.getMonth();//此item的年月
 
         holder.yearMonth.setText(year_month0);//设置年月
-        holder.titleSpecial.setText(String.valueOf(dataItem.getTitle()));//设置标题
+        holder.titleSpecial.setText(String.valueOf(noteItem.getTitle()));//设置标题
         try {//设置星期 时分秒
-            holder.dayTime.setText(dataItem.getPassDay(mainActivity) + " " + dataItem.getTime());
+            holder.dayTime.setText(noteItem.getPassDay(mainActivity) + " " + noteItem.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        holder.bodySpecial.setText(dataItem.getBody());//设置内容
+        holder.bodySpecial.setText(noteItem.getBody());//设置内容
         holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置伸展图标
 
         boolean flag = true;
-        for (int i = 0; i < mDataItemList.size(); i++) {//列表的所有item
+        for (int i = 0; i < mNoteItemList.size(); i++) {//列表的所有item
             //如果年月相同 且 不是列表中最上面的一个
-            if ((mDataItemList.get(i).getYear() + mDataItemList.get(i).getMonth()).equals(year_month0)
+            if ((mNoteItemList.get(i).getYear() + mNoteItemList.get(i).getMonth()).equals(year_month0)
                     && position > i) {
                 flag = false;
                 break;
@@ -145,7 +144,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             holder.yearMonth.setVisibility(View.GONE);//设置年月不可见
 
         ViewGroup.LayoutParams layoutParams = holder.layoutDrawer.getLayoutParams();//获取内容抽屉参数
-        if (dataItem.getFlag()) {//如果状态为展开
+        if (noteItem.getFlag()) {//如果状态为展开
             layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;//高度为自适应
             holder.spreadButton.setRotation(180);//设置旋转角度为180
         } else {//如果状态为收起
@@ -155,7 +154,7 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.layoutDrawer.setLayoutParams(layoutParams);//设置内容抽屉高度
 
         //最后一行显示扩展，以免伸展按钮被悬浮按钮遮挡，难以点击
-        if (position == mDataItemList.size() - 1) {
+        if (position == mNoteItemList.size() - 1) {
             holder.extendView.setVisibility(View.VISIBLE);
         } else {
             holder.extendView.setVisibility(View.GONE);
@@ -175,9 +174,9 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
             @Override
             public void onClick(View view) {
                 //传送数据的id并启动EditingActivity
-                int position = holder.getAdapterPosition();
-                DataItem dataItem = mDataItemList.get(position);
-                int id = dataItem.getId();
+                int position = holder.getBindingAdapterPosition();
+                NoteItem noteItem = mNoteItemList.get(position);
+                int id = noteItem.getId();
                 Intent intent = new Intent(view.getContext(), EditingActivity.class);
                 intent.putExtra("noteId", id);
                 view.getContext().startActivity(intent);
@@ -188,28 +187,13 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                int position = holder.getAdapterPosition();
-                DataItem dataItem = mDataItemList.get(position);
-                int id = dataItem.getId();
-
-                /*暂时不用
-                MyDialog myDialog=new MyDialog();
-
-                //向MyDialog传递对话框类型flag和笔记的id
-                Bundle bundle = new Bundle();
-                bundle.putInt("flag", 0);
-                bundle.putInt("id", id);
-                myDialog.setArguments(bundle);
-
-                //获取碎片管理器
-                FragmentManager fragmentManager = ((AppCompatActivity)view.getContext()).getSupportFragmentManager();
-                //启动对话框碎片
-                myDialog.show(fragmentManager,"MyDialog");
-                */
+                int position = holder.getBindingAdapterPosition();
+                NoteItem noteItem = mNoteItemList.get(position);
+                int id = noteItem.getId();
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
                 builder.setTitle("提示");
-                builder.setMessage("是否要删除“" + dataItem.getTitle() + "”？");
+                builder.setMessage("是否要删除“" + noteItem.getTitle() + "”？");
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
@@ -220,13 +204,8 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
                         Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
-                        //mainActivity.modifySync(mainActivity);
-                        //mainActivity.deleteItemById(id);
-
-                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                        intent.putExtra("operation_type", 2);
-                        intent.putExtra("note_id", id);
-                        LocalBroadcastManager.getInstance(mainActivity).sendBroadcast(intent);
+                        mainActivity.modifySync(mainActivity);
+                        mainActivity.deleteNoteById(id);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -245,22 +224,22 @@ public class DataAdapterSpecial extends RecyclerView.Adapter<DataAdapterSpecial.
         holder.spreadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final int position = holder.getAdapterPosition();
-                final DataItem dataItem = mDataItemList.get(position);
+                final int position = holder.getBindingAdapterPosition();
+                final NoteItem noteItem = mNoteItemList.get(position);
                 final ValueAnimator valueAnimator;//伸展动画
                 final int bodyHeight = holder.bodySpecial.getLayout().getHeight();//计算bodySpecial的实际高度
 
-                if (dataItem.getFlag()) {//如果状态为展开
+                if (noteItem.getFlag()) {//如果状态为展开
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//文字动画1，消失;
                     valueAnimator = getValueAnimator(holder.layoutDrawer, bodyHeight, 0, position);//设置抽屉动画为收起
                     rotateExpandIcon(holder.spreadButton, 180, 0);//伸展按钮的旋转动画
-                    dataItem.setFlag(false);//设置状态为收起
+                    noteItem.setFlag(false);//设置状态为收起
 
                 } else {//如果状态为收起
                     holder.bodySpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//文字动画2，出现;
                     valueAnimator = getValueAnimator(holder.layoutDrawer, 0, bodyHeight, position);//设置抽屉动画为展开
                     rotateExpandIcon(holder.spreadButton, 0, 180);//伸展按钮的旋转动画
-                    dataItem.setFlag(true);//设置状态为展开
+                    noteItem.setFlag(true);//设置状态为展开
                 }
 
                 valueAnimator.start();//开始抽屉的伸缩动画

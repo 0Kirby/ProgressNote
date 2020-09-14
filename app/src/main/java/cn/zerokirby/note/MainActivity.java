@@ -52,9 +52,10 @@ import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.noteData.DataAdapter;
-import cn.zerokirby.note.noteData.DataAdapterSpecial;
-import cn.zerokirby.note.noteData.DataItem;
+import cn.zerokirby.note.noteData.NoteAdapter;
+import cn.zerokirby.note.noteData.NoteAdapterSpecial;
+import cn.zerokirby.note.noteData.NoteChangeConstant;
+import cn.zerokirby.note.noteData.NoteItem;
 import cn.zerokirby.note.userData.IconUtil;
 import cn.zerokirby.note.userData.UriUtil;
 import cn.zerokirby.note.userData.User;
@@ -62,11 +63,11 @@ import cn.zerokirby.note.userData.User;
 public class MainActivity extends BaseActivity {
 
     private DatabaseOperateUtil databaseOperateUtil;
-    private List<DataItem> dataList;
+    private List<NoteItem> dataList;
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
-    private DataAdapter dataAdapter;
-    private DataAdapterSpecial dataAdapterSpecial;
+    private NoteAdapter noteAdapter;
+    private NoteAdapterSpecial noteAdapterSpecial;
     private Animation adapterAlpha1;//动画1，消失
     private Animation adapterAlpha2;//动画2，出现
     private String searchText;//用来保存在查找对话框输入的文字
@@ -120,18 +121,18 @@ public class MainActivity extends BaseActivity {
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
         dataList = new ArrayList<>();
-        dataAdapter = new DataAdapter(MainActivity.this, dataList);//初始化适配器
-        dataAdapterSpecial = new DataAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
+        noteAdapter = new NoteAdapter(MainActivity.this, dataList);//初始化适配器
+        noteAdapterSpecial = new NoteAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         if (arrangement == 0) {//网格模式
             if (isMobile(MainActivity.this))//手机模式
                 layoutManager.setSpanCount(2);//设置列数为2
             else//平板模式
                 layoutManager.setSpanCount(3);//设置列数为3
-            recyclerView.setAdapter(dataAdapter);//设置适配器
+            recyclerView.setAdapter(noteAdapter);//设置适配器
         } else {//单列模式
             layoutManager.setSpanCount(1);//设置列数为1
-            recyclerView.setAdapter(dataAdapterSpecial);//设置适配器
+            recyclerView.setAdapter(noteAdapterSpecial);//设置适配器
         }
         recyclerView.setLayoutManager(layoutManager);//设置笔记布局
 
@@ -302,9 +303,9 @@ public class MainActivity extends BaseActivity {
         dataList.clear();
         dataList.addAll(databaseOperateUtil.initData(s));
         if (arrangement == 0)
-            dataAdapter.notifyDataSetChanged();//通知adapter更新
+            noteAdapter.notifyDataSetChanged();//通知adapter更新
         else
-            dataAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
+            noteAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
         checkLoginStatus();//检查登录状态
         recyclerView.startAnimation(adapterAlpha2);
     }
@@ -330,8 +331,8 @@ public class MainActivity extends BaseActivity {
     //通过id寻找item的下标
     private int findItemIndexById(int id) {
         int index = 0;
-        for (DataItem dataItem : dataList) {
-            if (dataItem.getId() == id)
+        for (NoteItem noteItem : dataList) {
+            if (noteItem.getId() == id)
                 break;
             index++;
         }
@@ -339,59 +340,98 @@ public class MainActivity extends BaseActivity {
     }
 
     //为dataList添加笔记
-    public void addItem(DataItem dataItem) {
-        dataItem.setFlag(true);//设置添加后状态为展开
+    public void addNote(NoteItem noteItem) {
+        if(noteItem == null) return;
 
-        dataList.add(0, dataItem);//将数据插入到dataList头部
+        noteItem.setFlag(true);//设置添加后状态为展开
+
+        dataList.add(0, noteItem);//将数据插入到dataList头部
 
         if (arrangement == 0)
-            dataAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
+            noteAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
         else {
-            dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
-            dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
+            noteAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
+            noteAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
     }
 
     //删除dataList的笔记
-    public void deleteItemById(int id) {
+    public void deleteNoteById(int id) {
         int index = findItemIndexById(id);
 
         dataList.remove(index);//移除原位置的item
 
         if (arrangement == 0)
-            dataAdapter.notifyItemRemoved(index);//通知adapter移除原位置的item
+            noteAdapter.notifyItemRemoved(index);//通知adapter移除原位置的item
         else {
-            dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置item
-            dataAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
+            noteAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置item
+            noteAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
         }
     }
 
     //修改dataList的笔记
-    public void modifyItem(DataItem dataItem) {
-        dataItem.setFlag(true);//设置修改后状态为展开
+    public void modifyNote(NoteItem noteItem) {
+        if(noteItem == null) return;
 
-        int index = findItemIndexById(dataItem.getId());
+        noteItem.setFlag(true);//设置修改后状态为展开
+
+        int index = findItemIndexById(noteItem.getId());
 
         dataList.remove(index);//移除dataList原位置数据
-        dataList.add(0, dataItem);//将数据插入到dataList头部
+        dataList.add(0, noteItem);//将数据插入到dataList头部
 
         if (arrangement == 0) {
-            dataAdapter.notifyItemRemoved(index);//通知adapter移除原位置数据
-            dataAdapter.notifyItemInserted(0);//通知adapter有数据插入到头部
+            noteAdapter.notifyItemRemoved(index);//通知adapter移除原位置数据
+            noteAdapter.notifyItemInserted(0);//通知adapter有数据插入到头部
         } else {
             if (index == 0)
-                dataAdapterSpecial.notifyItemChanged(0);//通知adapterSpecial更新0号item
+                noteAdapterSpecial.notifyItemChanged(0);//通知adapterSpecial更新0号item
             else {
-                dataAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置数据
-                dataAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
-                dataAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
-                dataAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
+                noteAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置数据
+                noteAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
+                noteAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
+                noteAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
             }
         }
 
         recyclerView.scrollToPosition(0);//移动到头部
+    }
+
+    //使用广播接收器处理笔记更新结果
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int operation_type = intent.getIntExtra("operation_type", 0);
+            NoteItem noteItem = intent.getParcelableExtra("note_data");
+            int note_id = intent.getIntExtra("note_id", 0);
+
+            if(operation_type != 0) modifySync(MainActivity.this);
+
+            switch (operation_type) {
+                case NoteChangeConstant.ADD_NOTE:
+                    addNote(noteItem);
+                    break;
+                case NoteChangeConstant.DELETE_NOTE_BY_ID:
+                    deleteNoteById(note_id);
+                    break;
+                case NoteChangeConstant.MODIFY_NOTE:
+                    modifyNote(noteItem);
+                    break;
+                case NoteChangeConstant.REFRESH_DATA:
+                    refreshData("");
+                    break;
+                case NoteChangeConstant.CHECK_LOGIN_STATUS:
+                    checkLoginStatus();
+                    break;
+                case NoteChangeConstant.MODIFY_SYNC:
+                    modifySync(MainActivity.this);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
@@ -510,7 +550,7 @@ public class MainActivity extends BaseActivity {
             case R.id.arrangement:
                 if (arrangement == 0) {
                     layoutManager.setSpanCount(1);//设置列数为1
-                    recyclerView.setAdapter(dataAdapterSpecial);//设置适配器Special
+                    recyclerView.setAdapter(noteAdapterSpecial);//设置适配器Special
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
                 } else {
@@ -518,7 +558,7 @@ public class MainActivity extends BaseActivity {
                         layoutManager.setSpanCount(2);//设置列数为2
                     else//平板模式
                         layoutManager.setSpanCount(3);//设置列数为3
-                    recyclerView.setAdapter(dataAdapter);//设置适配器
+                    recyclerView.setAdapter(noteAdapter);//设置适配器
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
                     arrangement = 0;
                 }
@@ -574,38 +614,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    //使用广播接收器处理笔记更新结果
-    class LocalReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int operation_type = intent.getIntExtra("operation_type", 0);
-            DataItem dataItem = intent.getParcelableExtra("note_data");
-            int note_id = intent.getIntExtra("note_id", 0);
-
-            if (operation_type != 0) modifySync(MainActivity.this);
-
-            switch (operation_type) {
-                case 1:
-                    addItem(dataItem);
-                    break;
-                case 2:
-                    deleteItemById(note_id);
-                    break;
-                case 3:
-                    modifyItem(dataItem);
-                    break;
-                case 4:
-                    checkLoginStatus();
-                    break;
-                case 5:
-                    refreshData("");
-                    break;
-                case 0:
-                    break;
-            }
-        }
-    }
-
     private void updateTextView() {//更新TextView显示用户信息
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(getString(R.string.formatDate_User), Locale.getDefault());
         User user = databaseOperateUtil.getUserInfo();
@@ -629,7 +637,7 @@ public class MainActivity extends BaseActivity {
             case CHOOSE_PHOTO:
                 if (resultCode == RESULT_OK) {
                     Toast.makeText(this, "打开成功", Toast.LENGTH_SHORT).show();
-                    iconUtil.handleImage(data);
+                    if(data != null) iconUtil.handleImage(data);
                 } else
                     Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
                 break;

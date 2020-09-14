@@ -26,7 +26,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
-import cn.zerokirby.note.noteData.DataItem;
+import cn.zerokirby.note.noteData.NoteChangeConstant;
+import cn.zerokirby.note.noteData.NoteItem;
 
 public class EditingActivity extends BaseActivity {
 
@@ -41,7 +42,7 @@ public class EditingActivity extends BaseActivity {
     private SQLiteDatabase db;
     private Cursor cursor;
     private ContentValues values;
-    private DataItem dataItem;
+    private NoteItem noteItem;
 
     private static int type;
     private Menu cMenu;
@@ -93,7 +94,11 @@ public class EditingActivity extends BaseActivity {
                     insertData();
                 else//编辑，执行数据库更新操作
                     updateData();
-                //MainActivity.instance.modifySync(EditingActivity.this);
+
+                Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                intent.putExtra("operation_type", NoteChangeConstant.MODIFY_SYNC);
+                LocalBroadcastManager.getInstance(EditingActivity.this).sendBroadcast(intent);
+
                 break;
             case R.id.delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
@@ -107,13 +112,14 @@ public class EditingActivity extends BaseActivity {
                         Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
-                        //MainActivity.instance.modifySync(EditingActivity.this);
-                        //MainActivity.instance.deleteItemById(type);
+                        Intent intent1 = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                        intent1.putExtra("operation_type", NoteChangeConstant.MODIFY_SYNC);
+                        LocalBroadcastManager.getInstance(EditingActivity.this).sendBroadcast(intent1);
 
-                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                        intent.putExtra("operation_type", 3);
-                        intent.putExtra("note_id", type);
-                        LocalBroadcastManager.getInstance(EditingActivity.this).sendBroadcast(intent);
+                        Intent intent2 = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                        intent2.putExtra("operation_type", NoteChangeConstant.DELETE_NOTE_BY_ID);
+                        intent2.putExtra("note_id", type);
+                        LocalBroadcastManager.getInstance(EditingActivity.this).sendBroadcast(intent2);
 
                         finish();//关闭当前活动并返回到主活动
                     }
@@ -218,7 +224,11 @@ public class EditingActivity extends BaseActivity {
                         insertData();
                     else//编辑，执行数据库更新操作
                         updateData();
-                    //MainActivity.instance.modifySync(EditingActivity.this);
+
+                    Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                    intent.putExtra("operation_type", NoteChangeConstant.MODIFY_SYNC);
+                    LocalBroadcastManager.getInstance(EditingActivity.this).sendBroadcast(intent);
+
                     finish();
                 }
             });
@@ -260,10 +270,10 @@ public class EditingActivity extends BaseActivity {
         values.put("time", currentTime);
         values.put("content", content);
 
-        dataItem = new DataItem();
-        dataItem.setTitle(title);
-        dataItem.setDate(simpleDateFormat.format(date));
-        dataItem.setBody(content);
+        noteItem = new NoteItem();
+        noteItem.setTitle(title);
+        noteItem.setDate(simpleDateFormat.format(date));
+        noteItem.setBody(content);
     }
 
     //添加数据
@@ -279,12 +289,11 @@ public class EditingActivity extends BaseActivity {
         cMenu.getItem(0).setVisible(true);//显示删除按钮
 
         //添加数据到dataList
-        dataItem.setId(type);
-        //MainActivity.instance.addItem(dataItem);
+        noteItem.setId(type);
 
         Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-        intent.putExtra("operation_type", 1);
-        intent.putExtra("note_data", dataItem);
+        intent.putExtra("operation_type", NoteChangeConstant.ADD_NOTE);
+        intent.putExtra("note_data", noteItem);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -295,15 +304,13 @@ public class EditingActivity extends BaseActivity {
         values.clear();
         Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         db.close();
-        //MainActivity.instance.refreshData("");
 
         //修改dataList数据
-        dataItem.setId(type);
-        //MainActivity.instance.modifyItem(dataItem);
+        noteItem.setId(type);
 
         Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-        intent.putExtra("operation_type", 3);
-        intent.putExtra("note_data", dataItem);
+        intent.putExtra("operation_type", NoteChangeConstant.MODIFY_NOTE);
+        intent.putExtra("note_data", noteItem);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

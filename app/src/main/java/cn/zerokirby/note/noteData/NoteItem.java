@@ -12,20 +12,20 @@ import java.util.Objects;
 import cn.zerokirby.note.MainActivity;
 import cn.zerokirby.note.R;
 
-public class DataItem implements Parcelable {
+public class NoteItem implements Parcelable {
     private int id;
     private String title;
     private String body;
     private String date;
 
-    public DataItem(int id, String title, String body, String date) {
+    public NoteItem(int id, String title, String body, String date) {
         this.id = id;
         this.title = title;
         this.body = body;
         this.date = date;
     }
 
-    public DataItem() {
+    public NoteItem() {
     }
 
     public int getId() {
@@ -154,17 +154,17 @@ public class DataItem implements Parcelable {
         dest.writeString(date);
     }
 
-    public static final Parcelable.Creator<DataItem> CREATOR
-            = new Parcelable.Creator<DataItem>() {
+    public static final Parcelable.Creator<NoteItem> CREATOR
+            = new Parcelable.Creator<NoteItem>() {
         @Override
-        public DataItem createFromParcel(Parcel source) {
-            return new DataItem(source.readInt(), source.readString(),
+        public NoteItem createFromParcel(Parcel source) {
+            return new NoteItem(source.readInt(), source.readString(),
                     source.readString(), source.readString());
         }
 
         @Override
-        public DataItem[] newArray(int size) {
-            return new DataItem[size];
+        public NoteItem[] newArray(int size) {
+            return new NoteItem[size];
         }
     };
 }

@@ -1,5 +1,6 @@
 package cn.zerokirby.note;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.noteData.NoteChangeConstant;
 import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
@@ -59,6 +61,7 @@ public class LoginActivity extends BaseActivity {
     private EditText codeEditText;
     private CheckBox usernameCheckBox;
     private CheckBox passwordCheckBox;
+    @SuppressLint("StaticFieldLeak")
     static Activity loginActivity;
 
     @Override
@@ -122,9 +125,8 @@ public class LoginActivity extends BaseActivity {
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
 
-                        //MainActivity.instance.checkLoginStatus();
                         Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                        intent.putExtra("operation_type", 4);
+                        intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
                         LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(intent);
 
                         finish();
@@ -238,10 +240,10 @@ public class LoginActivity extends BaseActivity {
                         requestBody = new FormBody.Builder().add("userId", userId).build();
                         request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
                         response = client.newCall(request).execute();
-                        InputStream inputStream = response.body().byteStream();
+                        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
                         ByteArrayOutputStream output = new ByteArrayOutputStream();
                         byte[] buffer = new byte[1024];//缓冲区大小
-                        int n = 0;
+                        int n;
                         while (-1 != (n = inputStream.read(buffer))) {
                             output.write(buffer, 0, n);
                         }

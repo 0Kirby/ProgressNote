@@ -28,6 +28,7 @@ import java.util.Objects;
 
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.noteData.NoteChangeConstant;
 import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
@@ -107,9 +108,8 @@ public class RegisterActivity extends BaseActivity {
                         db.close();
                         LoginActivity.loginActivity.finish();
 
-                        //MainActivity.instance.checkLoginStatus();
                         Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                        intent.putExtra("operation_type", 4);
+                        intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
                         LocalBroadcastManager.getInstance(RegisterActivity.this).sendBroadcast(intent);
 
                         finish();

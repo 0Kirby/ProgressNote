@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.noteData.DataItem;
+import cn.zerokirby.note.noteData.NoteItem;
 import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.userData.User;
 import okhttp3.FormBody;
@@ -269,8 +269,8 @@ public class DatabaseOperateUtil {
     }
 
     //初始化从数据库中读取数据并填充dataItem
-    public List<DataItem> initData(String s) {
-        List<DataItem> dataList = new ArrayList<>();
+    public List<NoteItem> initData(String s) {
+        List<NoteItem> dataList = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
                 context.getString(R.string.formatDate), Locale.getDefault());
         SQLiteDatabase db = noteDbHelper.getReadableDatabase();
@@ -288,13 +288,13 @@ public class DatabaseOperateUtil {
                 //如果字符串为空 或 标题、时间或文本中包含要查询的字符串
                 if (TextUtils.isEmpty(s) || (title + time + content).contains(s)) {
                     //封装数据
-                    DataItem dataItem = new DataItem();
-                    dataItem.setId(Integer.parseInt(cursor.getString(cursor
+                    NoteItem noteItem = new NoteItem();
+                    noteItem.setId(Integer.parseInt(cursor.getString(cursor
                             .getColumnIndex("id"))));//读取编号，需从字符串型转换成整型
-                    dataItem.setTitle(title);
-                    dataItem.setDate(time);
-                    dataItem.setBody(content);
-                    dataList.add(dataItem);
+                    noteItem.setTitle(title);
+                    noteItem.setDate(time);
+                    noteItem.setBody(content);
+                    dataList.add(noteItem);
                 }
             } while (cursor.moveToNext());
         }

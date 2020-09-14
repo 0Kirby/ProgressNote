@@ -1,5 +1,6 @@
 package cn.zerokirby.note;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.noteData.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
 import okhttp3.*;
 import org.json.JSONArray;
@@ -33,6 +35,7 @@ public class SettingsActivity extends BaseActivity {
     private static final int UPDATE = 1;
     private static int userId;
     private static String versionName = "";
+    @SuppressLint("StaticFieldLeak")
     private static Preference checkUpdatePref;
     private static Handler handler;
     private static final String MODIFY_SYNC = "modify_sync";
@@ -76,7 +79,7 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
                 if (msg.what == UPDATE) {
-                    if (AppUtil.getVersionName(SettingsActivity.this).equals(versionName))//如果从服务器获取的版本名称和本地相等
+                    if (Objects.equals(AppUtil.getVersionName(SettingsActivity.this), versionName))//如果从服务器获取的版本名称和本地相等
                         checkUpdatePref.setSummary("当前已是最新版本");
                     else
                         checkUpdatePref.setSummary("有新版本发布，请至天天笔记主页下载");
@@ -88,10 +91,19 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        @SuppressLint("DefaultLocale")
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
-            findPreference("version").setSummary(String.format("版本号：%s\n构建日期：%d\n包名：%s", AppUtil.getVersionName(getActivity()), AppUtil.getVersionCode(getActivity()), AppUtil.getPackageName(getActivity())));
+
+            Preference preference = findPreference("version");
+            if(preference != null) {
+                preference.setSummary(String.format("版本号：%s\n构建日期：%d\n包名：%s",
+                                AppUtil.getVersionName(getActivity()),
+                                AppUtil.getVersionCode(getActivity()),
+                                AppUtil.getPackageName(getActivity())));
+            }
+
             checkUpdatePref = findPreference("check_update");
             if (userId == 0)//如果用户没有登录，不能使用同步功能
             {
@@ -103,7 +115,7 @@ public class SettingsActivity extends BaseActivity {
         @Override
         public boolean onPreferenceTreeClick(Preference preference) {
             Intent browser = new Intent("android.intent.action.VIEW");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());//显示清除提示
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());//显示清除提示
             DatabaseHelper databaseHelper = new DatabaseHelper(getActivity(), "ProgressNote.db", null, 1);
 
             switch (preference.getKey()) {
@@ -112,7 +124,7 @@ public class SettingsActivity extends BaseActivity {
                     checkUpdate();
                     break;
                 case "delete_note":
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
                     boolean modifySync = sharedPreferences.getBoolean(MODIFY_SYNC, false);
                     builder.setTitle("警告");
                     if (modifySync)
@@ -126,9 +138,8 @@ public class SettingsActivity extends BaseActivity {
                             db.execSQL("Delete from Note");//清空笔记表
                             db.close();
 
-                            //MainActivity.instance.refreshData("");
                             Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                            intent.putExtra("operation_type", 5);
+                            intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
                             LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
 
                             Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
@@ -169,9 +180,8 @@ public class SettingsActivity extends BaseActivity {
                                 }
                             }).start();
 
-                            //MainActivity.instance.refreshData("");
                             Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                            intent.putExtra("operation_type", 5);
+                            intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
                             LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
 
                             Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
