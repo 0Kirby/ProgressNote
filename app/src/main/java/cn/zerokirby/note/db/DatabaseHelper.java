@@ -1,9 +1,9 @@
 package cn.zerokirby.note.db;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -27,19 +27,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "time long, "
             + "content text) ";//建表
 
-    private Context mContext;
-
-    public DatabaseHelper(Context context, String name,
-                          SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
-        mContext = context;
+    public DatabaseHelper(String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(getContext(), name, factory, version);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) { //创建时调用
         db.execSQL(CREATE_USER); //创建表
         db.execSQL(CREATE_NOTE); //创建表
-        //Toast.makeText(mContext, "创建数据库成功！", Toast.LENGTH_SHORT).show();
     }
 
     @Override

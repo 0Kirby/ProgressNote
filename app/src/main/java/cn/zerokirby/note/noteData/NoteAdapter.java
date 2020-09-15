@@ -16,10 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import cn.zerokirby.note.EditingActivity;
-import cn.zerokirby.note.MainActivity;
+import cn.zerokirby.note.activity.EditingActivity;
+import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseHelper;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
@@ -89,14 +91,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        dbHelper = new DatabaseHelper(mainActivity,
-                                "ProgressNote.db", null, 1);
+                        dbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
-                        mainActivity.modifySync(mainActivity);
+                        mainActivity.modifySync();
                         mainActivity.deleteNoteById(id);
                     }
                 });

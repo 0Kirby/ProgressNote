@@ -1,4 +1,4 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.zerokirby.note.R;
 
 /*
  *  描述： 引导页
@@ -197,7 +201,7 @@ public class GuideActivity extends BaseActivity implements View.OnClickListener 
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
+        public boolean isViewFromObject(@NotNull View view, @NotNull Object object) {
             return view == object;
         }
 
@@ -209,7 +213,7 @@ public class GuideActivity extends BaseActivity implements View.OnClickListener 
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(ViewGroup container, int position, @NotNull Object object) {
             container.removeView(mList.get(position));
         }
     }

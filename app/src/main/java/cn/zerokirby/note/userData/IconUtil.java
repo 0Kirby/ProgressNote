@@ -108,8 +108,8 @@ public class IconUtil {//关于操作图标的方法
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//解码位图
             avatar.setImageBitmap(bitmap);//给ImageView设置头像
-            DatabaseHelper userDbHelper = new DatabaseHelper(activity, "ProgressNote.db", null, 1);
-            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(activity, userDbHelper);
+            DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
+            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(userDbHelper);
             avatarDatabaseUtil.saveImage(bitmap);
         } else
             Toast.makeText(activity, "打开失败", Toast.LENGTH_SHORT).show();
@@ -119,10 +119,10 @@ public class IconUtil {//关于操作图标的方法
         new Thread(new Runnable() {
             @Override
             public void run() {
-                File file = new File(Objects.requireNonNull(UriUtil.getPath(activity, cropImageUri)));
+                File file = new File(Objects.requireNonNull(UriUtil.getPath(cropImageUri)));
                 final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
-                DatabaseHelper userDbHelper = new DatabaseHelper(activity, "ProgressNote.db", null, 1);
-                AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(activity, userDbHelper);
+                DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
+                AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(userDbHelper);
                 final int id = avatarDatabaseUtil.getUserId();//获取用户id
                 userDbHelper.close();
                 OkHttpClient client = new OkHttpClient();

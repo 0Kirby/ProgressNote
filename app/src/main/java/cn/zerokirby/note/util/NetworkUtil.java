@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 public class NetworkUtil {//获取网络状态
     public static final String wifi = "wifi";
     public static final String moblie2g = "2G";
@@ -14,8 +16,8 @@ public class NetworkUtil {//获取网络状态
     /**
      * @return true 表示网络可用
      */
-    public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean isNetworkAvailable() {
+        ConnectivityManager connectivity = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             if (info != null && info.isConnected()) {
@@ -30,13 +32,10 @@ public class NetworkUtil {//获取网络状态
 
     /**
      * 判断网络类型 0是wifi 1 是手机 -1 未联网
-     *
-     * @param context
-     * @return
      */
-    public static int isWifi(Context context) {
+    public static int isWifi() {
         int type = -1;
-        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             if (info != null && info.isConnected()) {
@@ -52,13 +51,10 @@ public class NetworkUtil {//获取网络状态
 
     /**
      * 判断当前网络类型
-     *
-     * @param context
-     * @return
      */
-    public static String getNetworkType(Context context) {
+    public static String getNetworkType() {
         String strNetworkType = null;
-        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             if (info != null && info.isConnected()) {

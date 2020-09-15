@@ -1,4 +1,4 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.NoteChangeConstant;
@@ -81,13 +82,13 @@ public class SettingsActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
         userId = databaseOperateUtil.getUserInfo().getUserId();  //读取id
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
                 if (msg.what == UPDATE) {
-                    if (Objects.equals(AppUtil.getVersionName(SettingsActivity.this), versionName))//如果从服务器获取的版本名称和本地相等
+                    if (Objects.equals(AppUtil.getVersionName(), versionName))//如果从服务器获取的版本名称和本地相等
                         checkUpdatePref.setSummary("当前已是最新版本");
                     else
                         checkUpdatePref.setSummary("有新版本发布，请至天天笔记主页下载");
@@ -106,9 +107,9 @@ public class SettingsActivity extends BaseActivity {
             Preference preference = findPreference("version");
             if(preference != null) {
                 preference.setSummary(String.format(Locale.getDefault(), "版本号：%s\n构建日期：%d\n包名：%s",
-                        AppUtil.getVersionName(getActivity()),
-                        AppUtil.getVersionCode(getActivity()),
-                        AppUtil.getPackageName(getActivity())));
+                        AppUtil.getVersionName(),
+                        AppUtil.getVersionCode(),
+                        AppUtil.getPackageName()));
             }
 
             checkUpdatePref = findPreference("check_update");
@@ -123,7 +124,7 @@ public class SettingsActivity extends BaseActivity {
         public boolean onPreferenceTreeClick(Preference preference) {
             Intent browser = new Intent("android.intent.action.VIEW");
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());//显示清除提示
-            DatabaseHelper databaseHelper = new DatabaseHelper(getActivity(), "ProgressNote.db", null, 1);
+            DatabaseHelper databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
 
             switch (preference.getKey()) {
                 case "check_update":
@@ -149,7 +150,7 @@ public class SettingsActivity extends BaseActivity {
                             intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
                             LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
 
-                            Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
+                            Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
                     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -191,7 +192,7 @@ public class SettingsActivity extends BaseActivity {
                             intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
                             LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
 
-                            Toast.makeText(getActivity(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
+                            Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
                     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -226,7 +227,7 @@ public class SettingsActivity extends BaseActivity {
                     requireActivity().startActivity(browser);
                     break;
                 case "ui":
-                    browser.setData(Uri.parse("https://github.com/BlueEra"));
+                    browser.setData(Uri.parse("https://github.com/BlueOcean1998"));
                     requireActivity().startActivity(browser);
                     break;
                 case "theme":

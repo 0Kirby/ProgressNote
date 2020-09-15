@@ -1,7 +1,6 @@
 package cn.zerokirby.note.db;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -10,19 +9,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class AvatarDatabaseUtil {
+
     private DatabaseHelper dbHelper;
-    private Context context;
 
     //要操作数据库操作实例首先得得到数据库操作实例
-    public AvatarDatabaseUtil(Context context, DatabaseHelper dbHelper) {
-        this.context = context;
+    public AvatarDatabaseUtil(DatabaseHelper dbHelper) {
         this.dbHelper = dbHelper;
     }
 
     public void saveImage(Bitmap bitmap) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("avatar", bitmapToBytes(context, bitmap));//图片转为二进制
+        cv.put("avatar", bitmapToBytes(bitmap));//图片转为二进制
         db.update("User", cv, "rowid = ?", new String[]{"1"});
         db.close();
     }
@@ -41,7 +39,7 @@ public class AvatarDatabaseUtil {
     }
 
     //图片转为二进制数据
-    private byte[] bitmapToBytes(Context context, Bitmap bitmap) {
+    private byte[] bitmapToBytes(Bitmap bitmap) {
 
         //将图片转化为位图
         int size = bitmap.getWidth() * bitmap.getHeight();

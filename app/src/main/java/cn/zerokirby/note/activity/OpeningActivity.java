@@ -1,4 +1,4 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,8 +13,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.util.ShareUtil;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 public class OpeningActivity extends BaseActivity {
 
@@ -57,7 +60,7 @@ public class OpeningActivity extends BaseActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
         int userId = databaseOperateUtil.getUserInfo().getUserId();
         if (userId != 0) {
             if (modifySync) {
@@ -67,8 +70,8 @@ public class OpeningActivity extends BaseActivity {
                         @Override
                         public boolean handleMessage(@NonNull Message msg) {
                             if (msg.what == SC) {
-                                Toast.makeText(OpeningActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(OpeningActivity.this);
+                                Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                                 databaseOperateUtil.updateSyncTime();
                                 mHandler.removeMessages(0);
                                 myThread.start();
@@ -94,9 +97,9 @@ public class OpeningActivity extends BaseActivity {
 
     //判断程序是否第一次运行
     private boolean isFirst() {
-        boolean isFirst = ShareUtil.getBoolean(this, IS_FIRST, true);
+        boolean isFirst = ShareUtil.getBoolean(IS_FIRST, true);
         if (isFirst) {
-            ShareUtil.putBoolean(this, IS_FIRST, false);
+            ShareUtil.putBoolean(IS_FIRST, false);
             //是第一次运行
             return true;
         } else {

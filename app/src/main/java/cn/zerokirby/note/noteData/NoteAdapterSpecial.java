@@ -23,10 +23,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.ParseException;
 import java.util.List;
 
-import cn.zerokirby.note.EditingActivity;
-import cn.zerokirby.note.MainActivity;
+import cn.zerokirby.note.activity.EditingActivity;
+import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseHelper;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.ViewHolder> {
 
@@ -121,11 +123,8 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
 
         holder.yearMonth.setText(year_month0);//设置年月
         holder.titleSpecial.setText(String.valueOf(noteItem.getTitle()));//设置标题
-        try {//设置星期 时分秒
-            holder.dayTime.setText(noteItem.getPassDay(mainActivity) + " " + noteItem.getTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        //设置星期 时分秒
+        holder.dayTime.setText(noteItem.getPassDay() + " " + noteItem.getTime());
         holder.bodySpecial.setText(noteItem.getBody());//设置内容
         holder.spreadButton.setImageResource(R.drawable.ic_expand_more_black_24dp);//设置伸展图标
 
@@ -197,14 +196,13 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        dbHelper = new DatabaseHelper(mainActivity,
-                                "ProgressNote.db", null, 1);
+                        dbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(mainActivity, mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
-                        mainActivity.modifySync(mainActivity);
+                        mainActivity.modifySync();
                         mainActivity.deleteNoteById(id);
                     }
                 });

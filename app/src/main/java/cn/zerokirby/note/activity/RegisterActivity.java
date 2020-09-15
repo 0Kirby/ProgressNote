@@ -1,4 +1,4 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.NoteChangeConstant;
@@ -37,6 +38,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 
 public class RegisterActivity extends BaseActivity {
@@ -92,10 +95,10 @@ public class RegisterActivity extends BaseActivity {
             @Override
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
                 if (msg.what == REGISTER) {
-                    Toast.makeText(RegisterActivity.this, responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                    Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     progressBar.setVisibility(View.GONE);
                     if (responseData.equals("注册成功！")) {
-                        DatabaseHelper userDbHelper = new DatabaseHelper(RegisterActivity.this, "ProgressNote.db", null, 1);
+                        DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
                         SQLiteDatabase db = userDbHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
                         values.put("userId", userId);
@@ -125,13 +128,13 @@ public class RegisterActivity extends BaseActivity {
             public void onClick(View v) {
                 if (usernameCheckBox.isChecked()) {
                     passwordCheckBox.setEnabled(true);
-                    ShareUtil.putBoolean(RegisterActivity.this, USERNAME, true);
+                    ShareUtil.putBoolean(USERNAME, true);
                 } else {//取消复选框时删除存储在本地的用户名和密码
                     passwordCheckBox.setEnabled(false);
-                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(RegisterActivity.this);
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                     databaseOperateUtil.setUserColumnNull("username");
                     databaseOperateUtil.setUserColumnNull("password");
-                    ShareUtil.putBoolean(RegisterActivity.this, USERNAME, false);
+                    ShareUtil.putBoolean(USERNAME, false);
                 }
             }
         });
@@ -140,11 +143,11 @@ public class RegisterActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (passwordCheckBox.isChecked())
-                    ShareUtil.putBoolean(RegisterActivity.this, PASSWORD, true);
+                    ShareUtil.putBoolean(PASSWORD, true);
                 else {//取消复选框时删除存储在本地的密码
-                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(RegisterActivity.this);
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                     databaseOperateUtil.setUserColumnNull("password");
-                    ShareUtil.putBoolean(RegisterActivity.this, PASSWORD, false);
+                    ShareUtil.putBoolean(PASSWORD, false);
                 }
             }
         });
@@ -231,8 +234,8 @@ public class RegisterActivity extends BaseActivity {
     }
 
     private void setRemember() {//设定CheckBox
-        boolean username = ShareUtil.getBoolean(this, USERNAME, false);//从SharedPreferences里取布尔值
-        boolean password = ShareUtil.getBoolean(this, PASSWORD, false);
+        boolean username = ShareUtil.getBoolean(USERNAME, false);//从SharedPreferences里取布尔值
+        boolean password = ShareUtil.getBoolean(PASSWORD, false);
         usernameCheckBox.setChecked(username);//根据用户设定来显示复选框的勾
         passwordCheckBox.setChecked(password);
         if (!username)

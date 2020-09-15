@@ -1,8 +1,11 @@
 package cn.zerokirby.note.userData;
 
+import android.content.res.Configuration;
 import android.os.Build;
 
 import java.util.Locale;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 public class SystemUtil {//系统信息工具类
 
@@ -51,6 +54,12 @@ public class SystemUtil {//系统信息工具类
      */
     public String getDeviceBrand() {
         return android.os.Build.BRAND;
+    }
+
+    //判断是否是手机模式
+    public static boolean isMobile() {
+        return (getContext().getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) < Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
 }

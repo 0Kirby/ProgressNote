@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="false"
         android:icon="@mipmap/icon"
         android:label="@string/chinese_name"
@@ -16,22 +17,22 @@
         android:supportsRtl="true"
         android:theme="@style/BlueAppTheme">
         <activity
-            android:name=".FeedbackActivity"
+            android:name=".activity.FeedbackActivity"
             android:label="@string/feedback" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="cn.zerokirby.note.MainActivity" />
+                android:value="cn.zerokirby.note.activity.MainActivity" />
         </activity>
-        <activity android:name=".GuideActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".BaseActivity" />
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".activity.GuideActivity" />
+        <activity android:name=".activity.RegisterActivity" />
+        <activity android:name=".activity.BaseActivity" />
+        <activity android:name=".activity.LoginActivity" />
         <activity
-            android:name=".EditingActivity"
+            android:name=".activity.EditingActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -40,7 +41,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OpeningActivity"
+            android:name=".activity.OpeningActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +50,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

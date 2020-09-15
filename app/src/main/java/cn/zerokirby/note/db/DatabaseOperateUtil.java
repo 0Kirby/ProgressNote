@@ -1,7 +1,6 @@
 package cn.zerokirby.note.db;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -31,6 +30,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 public class DatabaseOperateUtil {
 
     private final int SC = 1;//服务器同步到客户端
@@ -41,12 +42,10 @@ public class DatabaseOperateUtil {
     private long time;
     private String title;
     private String content;
-    private Context context;
     private DatabaseHelper noteDbHelper;
 
-    public DatabaseOperateUtil(Context context) {
-        this.context = context;
-        this.noteDbHelper = new DatabaseHelper(context, "ProgressNote.db", null, 1);
+    public DatabaseOperateUtil() {
+        this.noteDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
         this.userId = getUserInfo().getUserId();
     }
 
@@ -216,7 +215,7 @@ public class DatabaseOperateUtil {
     }
 
     public Bitmap readIcon() { //从数据库中读取头像
-        AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(context, noteDbHelper);
+        AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(noteDbHelper);
         byte[] imgData = avatarDatabaseUtil.readImage();
         if (imgData != null) {
             //将字节数组转化为位图，将位图显示为图片
@@ -254,21 +253,21 @@ public class DatabaseOperateUtil {
     public List<NoteItem> initData(String s) {
         List<NoteItem> dataList = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                context.getString(R.string.formatDate), Locale.getDefault());
+                getContext().getString(R.string.formatDate), Locale.getDefault());
         SQLiteDatabase db = noteDbHelper.getReadableDatabase();
         Cursor cursor = db.query("Note", null, null,
                 null, null, null, "time desc",
                 null);//查询对应的数据
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if(cursor != null && cursor.moveToFirst()) {
             do {
                 String title = cursor.getString(cursor.getColumnIndex("title"));//读取标题并存入title
                 String time = simpleDateFormat.format(new Date(cursor.getLong(
                         cursor.getColumnIndex("time"))));//读取时间并存入time
                 String content = cursor.getString(cursor.getColumnIndex("content"));////读取文本并存入content
 
-                //如果字符串为空 或 标题、时间或文本中包含要查询的字符串
-                if (TextUtils.isEmpty(s) || (title + time + content).contains(s)) {
+                //如果字符串为空 或 标题、时间（年月日）或文本中包含要查询的字符串
+                if(TextUtils.isEmpty(s) || (title + time.substring(0, 11) + content).contains(s)) {
                     //封装数据
                     NoteItem noteItem = new NoteItem();
                     noteItem.setId(Integer.parseInt(cursor.getString(cursor

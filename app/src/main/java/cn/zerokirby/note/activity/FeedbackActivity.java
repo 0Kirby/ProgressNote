@@ -1,5 +1,6 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.Objects;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.userData.SystemUtil;
 import cn.zerokirby.note.util.AppUtil;
@@ -58,6 +60,7 @@ public class FeedbackActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,17 +113,17 @@ public class FeedbackActivity extends BaseActivity {
                 if (newProgress == 100) {
                     //加载完毕让进度条消失
                     progressBar.setVisibility(View.GONE);
-                    boolean isCookieSaved = ShareUtil.getBoolean(FeedbackActivity.this, IS_FIRST_LOGOUT, false);
-                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(FeedbackActivity.this);
+                    boolean isCookieSaved = ShareUtil.getBoolean(IS_FIRST_LOGOUT, false);
+                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                     int userId = databaseOperateUtil.getUserInfo().getUserId();
                     if (userId == 0 && !isCookieSaved && CookieManager.getInstance().hasCookies()) {
-                        ShareUtil.putBoolean(FeedbackActivity.this, IS_COOKIE_SAVED, true);
+                        ShareUtil.putBoolean(IS_COOKIE_SAVED, true);
                         String cookie = CookieManager.getInstance().getCookie(getDomain(url));//取出cookie
                         String[] strArr = cookie.split(";");
                         String userInfo = strArr[0];
                         String session = strArr[1];
-                        ShareUtil.putString(FeedbackActivity.this, USER_INFO, userInfo);//保存
-                        ShareUtil.putString(FeedbackActivity.this, SESSION, session);
+                        ShareUtil.putString(USER_INFO, userInfo);//保存
+                        ShareUtil.putString(SESSION, session);
 
                     }
                 }
@@ -131,9 +134,9 @@ public class FeedbackActivity extends BaseActivity {
 
         SystemUtil systemUtil = new SystemUtil();
         String osVersion = systemUtil.getSystemVersion();//获取系统版本
-        String netType = NetworkUtil.getNetworkType(this);//获取网络类型
-        String clientVersion = AppUtil.getVersionName(this);//获取版本号
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        String netType = NetworkUtil.getNetworkType();//获取网络类型
+        String clientVersion = AppUtil.getVersionName();//获取版本号
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
 
 
         int userId = databaseOperateUtil.getUserInfo().getUserId();
@@ -204,14 +207,14 @@ public class FeedbackActivity extends BaseActivity {
 
     //判断是否第一次进入游客状态以对cookie进行操作，保证游客身份的唯一性
     private void cookieUtil() {
-        boolean isFirstLogout = ShareUtil.getBoolean(this, IS_FIRST_LOGOUT, true);
+        boolean isFirstLogout = ShareUtil.getBoolean(IS_FIRST_LOGOUT, true);
         CookieManager.getInstance().removeAllCookies(null);
         CookieManager.getInstance().flush();
         if (isFirstLogout) {//第一次成为游客状态，不写入cookie
-            ShareUtil.putBoolean(this, IS_FIRST_LOGOUT, false);
+            ShareUtil.putBoolean(IS_FIRST_LOGOUT, false);
         } else {//否则写入cookie数据
-            String userInfo = ShareUtil.getString(this, USER_INFO, null);
-            String session = ShareUtil.getString(this, SESSION, null);
+            String userInfo = ShareUtil.getString(USER_INFO, null);
+            String session = ShareUtil.getString(SESSION, null);
             CookieManager.getInstance().setCookie(getDomain(url), userInfo);
             CookieManager.getInstance().setCookie(getDomain(url), session);
         }

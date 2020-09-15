@@ -1,7 +1,6 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -51,6 +49,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseOperateUtil;
 import cn.zerokirby.note.noteData.NoteAdapter;
 import cn.zerokirby.note.noteData.NoteAdapterSpecial;
@@ -59,6 +58,9 @@ import cn.zerokirby.note.noteData.NoteItem;
 import cn.zerokirby.note.userData.IconUtil;
 import cn.zerokirby.note.userData.UriUtil;
 import cn.zerokirby.note.userData.User;
+
+import static cn.zerokirby.note.MyApplication.getContext;
+import static cn.zerokirby.note.userData.SystemUtil.isMobile;
 
 public class MainActivity extends BaseActivity {
 
@@ -101,31 +103,25 @@ public class MainActivity extends BaseActivity {
     private Handler handler;
     private IconUtil iconUtil;
 
-    //判断是否是手机模式
-    public static boolean isMobile(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) < Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //初始化数据库操作工具类
-        databaseOperateUtil = new DatabaseOperateUtil(this);
+        databaseOperateUtil = new DatabaseOperateUtil();
 
         //获取动画
-        adapterAlpha1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.adapter_alpha1);
-        adapterAlpha2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.adapter_alpha2);
+        adapterAlpha1 = AnimationUtils.loadAnimation(getContext(), R.anim.adapter_alpha1);
+        adapterAlpha2 = AnimationUtils.loadAnimation(getContext(), R.anim.adapter_alpha2);
 
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
         dataList = new ArrayList<>();
-        noteAdapter = new NoteAdapter(MainActivity.this, dataList);//初始化适配器
-        noteAdapterSpecial = new NoteAdapterSpecial(MainActivity.this, dataList);//初始化适配器Special
+        noteAdapter = new NoteAdapter(this, dataList);//初始化适配器
+        noteAdapterSpecial = new NoteAdapterSpecial(this, dataList);//初始化适配器Special
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         if (arrangement == 0) {//网格模式
-            if (isMobile(MainActivity.this))//手机模式
+            if (isMobile())//手机模式
                 layoutManager.setSpanCount(2);//设置列数为2
             else//平板模式
                 layoutManager.setSpanCount(3);//设置列数为3
@@ -176,7 +172,6 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
 
         //初始化ProgressDialog，这里为AlertDialog+ProgressBar
-
         AlertDialog.Builder progressBuilder = new AlertDialog.Builder(this);//显示查找提示
         progressBuilder.setTitle("请稍后");
         progressBuilder.setMessage("同步中...");
@@ -194,13 +189,13 @@ public class MainActivity extends BaseActivity {
                     case CS:
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
-                        Toast.makeText(MainActivity.this, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                        Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                         databaseOperateUtil.updateSyncTime();
                         refreshData("");
                         break;
                     case UPLOAD:
-                        Toast.makeText(MainActivity.this, "上传成功！", Toast.LENGTH_SHORT).show();//上传头像成功
+                        Toast.makeText(getContext(), "上传成功！", Toast.LENGTH_SHORT).show();//上传头像成功
                         break;
                 }
                 return false;
@@ -216,7 +211,7 @@ public class MainActivity extends BaseActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.login_btn:
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);//启动登录
+                        Intent intent = new Intent(getContext(), LoginActivity.class);//启动登录
                         startActivity(intent);
                         break;
                     case R.id.sync_SC:
@@ -227,7 +222,7 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                                 databaseOperateUtil.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
                             }
                         });
@@ -246,7 +241,7 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                                 databaseOperateUtil.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
                             }
                         });
@@ -258,7 +253,7 @@ public class MainActivity extends BaseActivity {
                         builder.show();
                         break;
                     case R.id.settings:
-                        intent = new Intent(MainActivity.this, SettingsActivity.class);//启动设置
+                        intent = new Intent(getContext(), SettingsActivity.class);//启动设置
                         startActivity(intent);
                         break;
                     case R.id.exit_login:
@@ -268,9 +263,9 @@ public class MainActivity extends BaseActivity {
                         builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(MainActivity.this);
+                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
                                 databaseOperateUtil.exitLogin();
-                                Toast.makeText(MainActivity.this, "已退出登录！", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "已退出登录！", Toast.LENGTH_SHORT).show();
                                 drawerLayout.closeDrawers();
                                 checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
                             }
@@ -284,7 +279,7 @@ public class MainActivity extends BaseActivity {
                         builder.show();
                         break;
                     case R.id.help:
-                        intent = new Intent(MainActivity.this, GuideActivity.class);//启动引导页
+                        intent = new Intent(getContext(), GuideActivity.class);//启动引导页
                         startActivity(intent);
                         break;
                 }
@@ -302,10 +297,11 @@ public class MainActivity extends BaseActivity {
         //初始化笔记数据
         dataList.clear();
         dataList.addAll(databaseOperateUtil.initData(s));
+
         if (arrangement == 0)
             noteAdapter.notifyDataSetChanged();//通知adapter更新
-        else
-            noteAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
+        else noteAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
+
         checkLoginStatus();//检查登录状态
         recyclerView.startAnimation(adapterAlpha2);
     }
@@ -318,9 +314,9 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshData(searchText);
-                        Toast.makeText(MainActivity.this,
-                                "找到" + dataList.size() + "条笔记", Toast.LENGTH_SHORT).show();
+                        //清空搜索内容
+                        refreshData("");
+                        searchText = "";
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -407,7 +403,7 @@ public class MainActivity extends BaseActivity {
             NoteItem noteItem = intent.getParcelableExtra("note_data");
             int note_id = intent.getIntExtra("note_id", 0);
 
-            if(operation_type != 0) modifySync(MainActivity.this);
+            if(operation_type != 0) modifySync();
 
             switch (operation_type) {
                 case NoteChangeConstant.ADD_NOTE:
@@ -426,7 +422,7 @@ public class MainActivity extends BaseActivity {
                     checkLoginStatus();
                     break;
                 case NoteChangeConstant.MODIFY_SYNC:
-                    modifySync(MainActivity.this);
+                    modifySync();
                     break;
                 default:
                     break;
@@ -435,7 +431,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
         isLogin = databaseOperateUtil.getUserInfo().getUserId();
 
         avatar = headView.findViewById(R.id.user_avatar);
@@ -521,7 +517,7 @@ public class MainActivity extends BaseActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.search_button:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示查找提示
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示查找提示
                 builder.setTitle("提示");
                 builder.setMessage("请输入要查找的内容\n");
 
@@ -535,7 +531,7 @@ public class MainActivity extends BaseActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
                         searchText = searchEt.getText().toString();
                         refreshData(searchText);
-                        Toast.makeText(MainActivity.this,
+                        Toast.makeText(getContext(),
                                 "找到" + dataList.size() + "条笔记", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -554,7 +550,7 @@ public class MainActivity extends BaseActivity {
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
                     arrangement = 1;
                 } else {
-                    if (isMobile(MainActivity.this))//手机模式
+                    if (isMobile())//手机模式
                         layoutManager.setSpanCount(2);//设置列数为2
                     else//平板模式
                         layoutManager.setSpanCount(3);//设置列数为3
@@ -582,7 +578,7 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
             if ((System.currentTimeMillis() - exitTime) > 2000) {
-                Toast.makeText(this, getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.exitApp), Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
                 return true;
             }
@@ -591,8 +587,8 @@ public class MainActivity extends BaseActivity {
     }
 
     //自动同步数据
-    public void modifySync(Activity activity) {
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil(this);
+    public void modifySync() {
+        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
         int userId = databaseOperateUtil.getUserInfo().getUserId();//检测用户是否登录
         if (userId != 0) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -604,7 +600,7 @@ public class MainActivity extends BaseActivity {
                         if (msg.what == CS) {
                             databaseOperateUtil.updateSyncTime();
                             updateTextView();
-                            Toast.makeText(activity, "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                            Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
                         }
                         return true;
                     }
@@ -636,17 +632,17 @@ public class MainActivity extends BaseActivity {
         switch (requestCode) {
             case CHOOSE_PHOTO:
                 if (resultCode == RESULT_OK) {
-                    Toast.makeText(this, "打开成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "打开成功", Toast.LENGTH_SHORT).show();
                     if(data != null) iconUtil.handleImage(data);
                 } else
-                    Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
                 break;
             case PHOTO_REQUEST_CUT:
                 if (resultCode == RESULT_OK) {
-                    iconUtil.displayImage(UriUtil.getPath(this, iconUtil.getCropImageUri()));
+                    iconUtil.displayImage(UriUtil.getPath(iconUtil.getCropImageUri()));
                     iconUtil.uploadImage(handler);
                 } else
-                    Toast.makeText(this, "取消操作", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
             default:
                 break;
         }
@@ -659,7 +655,7 @@ public class MainActivity extends BaseActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 iconUtil.openAlbum();
             } else {
-                Toast.makeText(this, "未授权外置存储读写权限，无法使用！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "未授权外置存储读写权限，无法使用！", Toast.LENGTH_SHORT).show();
             }
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }

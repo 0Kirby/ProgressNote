@@ -13,18 +13,20 @@ import java.util.Objects;
 
 import cn.zerokirby.note.BuildConfig;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 
 public class AppUtil {
     /**
      * 获取应用程序名称
      */
-    public static synchronized String getAppName(Context context) {
+    public static synchronized String getAppName() {
         try {
-            PackageManager packageManager = context.getPackageManager();
+            PackageManager packageManager = getContext().getPackageManager();
             PackageInfo packageInfo = packageManager.getPackageInfo(
-                    context.getPackageName(), 0);
+                    getContext().getPackageName(), 0);
             int labelRes = packageInfo.applicationInfo.labelRes;
-            return context.getResources().getString(labelRes);
+            return getContext().getResources().getString(labelRes);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -34,14 +36,13 @@ public class AppUtil {
     /**
      * [获取应用程序版本名称信息]
      *
-     * @param context
      * @return 当前应用的版本名称
      */
-    public static synchronized String getVersionName(Context context) {
+    public static synchronized String getVersionName() {
         try {
-            PackageManager packageManager = context.getPackageManager();
+            PackageManager packageManager = getContext().getPackageManager();
             PackageInfo packageInfo = packageManager.getPackageInfo(
-                    context.getPackageName(), 0);
+                    getContext().getPackageName(), 0);
             return packageInfo.versionName;
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,33 +54,23 @@ public class AppUtil {
     /**
      * [获取应用程序版本名称信息]
      *
-     * @param context
      * @return 当前应用的版本名称
      */
-    public static synchronized int getVersionCode(Context context) {
-        try {
-            PackageManager packageManager = context.getPackageManager();
-            PackageInfo packageInfo = packageManager.getPackageInfo(
-                    context.getPackageName(), 0);
-            return BuildConfig.VERSION_CODE;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
+    public static synchronized int getVersionCode() {
+        return BuildConfig.VERSION_CODE;
     }
 
 
     /**
      * [获取应用程序版本名称信息]
      *
-     * @param context
      * @return 当前应用的版本名称
      */
-    public static synchronized String getPackageName(Context context) {
+    public static synchronized String getPackageName() {
         try {
-            PackageManager packageManager = context.getPackageManager();
+            PackageManager packageManager = getContext().getPackageManager();
             PackageInfo packageInfo = packageManager.getPackageInfo(
-                    context.getPackageName(), 0);
+                    getContext().getPackageName(), 0);
             return packageInfo.packageName;
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,17 +81,15 @@ public class AppUtil {
 
     /**
      * 获取图标 bitmap
-     *
-     * @param context
      */
-    public static synchronized Bitmap getBitmap(Context context) {
+    public static synchronized Bitmap getBitmap() {
         PackageManager packageManager = null;
         ApplicationInfo applicationInfo;
         try {
-            packageManager = context.getApplicationContext()
+            packageManager = getContext().getApplicationContext()
                     .getPackageManager();
             applicationInfo = packageManager.getApplicationInfo(
-                    context.getPackageName(), 0);
+                    getContext().getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
             applicationInfo = null;
         }
@@ -111,13 +100,11 @@ public class AppUtil {
 
     /**
      * 获取渠道名称 channel
-     *
-     * @param context
      */
-    public static synchronized String getChannel(Context context) {
-        PackageManager packageManager = context.getPackageManager();
+    public static synchronized String getChannel() {
+        PackageManager packageManager = getContext().getPackageManager();
         try {
-            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            PackageInfo packageInfo = packageManager.getPackageInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
             Bundle metaData = packageInfo.applicationInfo.metaData;
             return metaData.getString("CHANNEL");
         } catch (PackageManager.NameNotFoundException e) {

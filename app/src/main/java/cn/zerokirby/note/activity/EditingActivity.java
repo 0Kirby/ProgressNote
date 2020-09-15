@@ -1,4 +1,4 @@
-package cn.zerokirby.note;
+package cn.zerokirby.note.activity;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,9 +25,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.db.DatabaseHelper;
 import cn.zerokirby.note.noteData.NoteChangeConstant;
 import cn.zerokirby.note.noteData.NoteItem;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 public class EditingActivity extends BaseActivity {
 
@@ -109,7 +112,7 @@ public class EditingActivity extends BaseActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {//点击删除则执行删除操作
                         db = dbHelper.getWritableDatabase();
                         db.delete("Note", "id = ?", new String[]{String.valueOf(type)});//查找对应id
-                        Toast.makeText(EditingActivity.this, getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
                         db.close();
 
                         Intent intent1 = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
@@ -183,8 +186,7 @@ public class EditingActivity extends BaseActivity {
         date = new Date(System.currentTimeMillis());
         noteTime.setText(simpleDateFormat.format(date));
 
-        dbHelper = new DatabaseHelper(this,
-                "ProgressNote.db", null, 1);
+        dbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
         db = dbHelper.getReadableDatabase();
         cursor = db.query("Note", null, "id = ?", noteId,
                 null, null, null, null);//查询对应的数据
@@ -284,7 +286,7 @@ public class EditingActivity extends BaseActivity {
         type = cur.getInt(0);//获取新建记录的id
         cur.close();
         db.close();
-        Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.editNote);//切换标题
         cMenu.getItem(0).setVisible(true);//显示删除按钮
 
@@ -302,7 +304,7 @@ public class EditingActivity extends BaseActivity {
         db.update("Note", values, "id = ?",
                 new String[]{String.valueOf(type)});
         values.clear();
-        Toast.makeText(EditingActivity.this, getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         db.close();
 
         //修改dataList数据
