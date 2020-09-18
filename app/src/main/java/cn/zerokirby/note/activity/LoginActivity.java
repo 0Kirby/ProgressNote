@@ -32,10 +32,10 @@ import java.io.InputStream;
 import java.util.Objects;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.db.DatabaseHelper;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.noteData.NoteChangeConstant;
-import cn.zerokirby.note.userData.SystemUtil;
+import cn.zerokirby.note.data.DatabaseHelper;
+import cn.zerokirby.note.data.UserDataHelper;
+import cn.zerokirby.note.noteutil.NoteChangeConstant;
+import cn.zerokirby.note.userutil.SystemUtil;
 import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
@@ -129,6 +129,7 @@ public class LoginActivity extends BaseActivity {
                         db.update("User", values, "rowid = ?", new String[]{"1"});
                         db.close();
 
+                        //发送本地广播通知MainActivity改变登录状态
                         Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
                         intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
                         LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(intent);
@@ -149,9 +150,9 @@ public class LoginActivity extends BaseActivity {
                     ShareUtil.putBoolean(USERNAME, true);
                 } else {//取消复选框时删除存储在本地的用户名和密码
                     passwordCheckBox.setEnabled(false);
-                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                    databaseOperateUtil.setUserColumnNull("username");
-                    databaseOperateUtil.setUserColumnNull("password");
+                    UserDataHelper userDataHelper = new UserDataHelper();
+                    userDataHelper.setUserColumnNull("username");
+                    userDataHelper.setUserColumnNull("password");
                     ShareUtil.putBoolean(USERNAME, false);
                 }
             }
@@ -163,8 +164,8 @@ public class LoginActivity extends BaseActivity {
                 if (passwordCheckBox.isChecked())
                     ShareUtil.putBoolean(PASSWORD, true);
                 else {//取消复选框时删除存储在本地的密码
-                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                    databaseOperateUtil.setUserColumnNull("password");
+                    UserDataHelper userDataHelper = new UserDataHelper();
+                    userDataHelper.setUserColumnNull("password");
                     ShareUtil.putBoolean(PASSWORD, false);
                 }
             }
@@ -299,8 +300,8 @@ public class LoginActivity extends BaseActivity {
         usernameCheckBox.setChecked(username);//根据用户设定来显示复选框的勾
         passwordCheckBox.setChecked(password);
         if (username) {
-            DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-            String[] string = databaseOperateUtil.getLogin();//获取用户名和密码
+            UserDataHelper userDataHelper = new UserDataHelper();
+            String[] string = userDataHelper.getLogin();//获取用户名和密码
             usernameEditText.setText(string[0]);
             if (password)
                 passwordEditText.setText(string[1]);

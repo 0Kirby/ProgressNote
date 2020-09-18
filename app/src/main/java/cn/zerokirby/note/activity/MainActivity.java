@@ -50,22 +50,25 @@ import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.noteData.NoteAdapter;
-import cn.zerokirby.note.noteData.NoteAdapterSpecial;
-import cn.zerokirby.note.noteData.NoteChangeConstant;
-import cn.zerokirby.note.noteData.NoteItem;
-import cn.zerokirby.note.userData.IconUtil;
-import cn.zerokirby.note.userData.UriUtil;
-import cn.zerokirby.note.userData.User;
+import cn.zerokirby.note.data.NoteDataHelper;
+import cn.zerokirby.note.data.UserDataHelper;
+import cn.zerokirby.note.noteutil.NoteAdapter;
+import cn.zerokirby.note.noteutil.NoteAdapterSpecial;
+import cn.zerokirby.note.noteutil.NoteChangeConstant;
+import cn.zerokirby.note.noteutil.Note;
+import cn.zerokirby.note.userutil.IconUtil;
+import cn.zerokirby.note.userutil.UriUtil;
+import cn.zerokirby.note.userutil.User;
 
 import static cn.zerokirby.note.MyApplication.getContext;
-import static cn.zerokirby.note.userData.SystemUtil.isMobile;
+import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
 
 public class MainActivity extends BaseActivity {
 
-    private DatabaseOperateUtil databaseOperateUtil;
-    private List<NoteItem> dataList;
+    private NoteDataHelper noteDataHelper;
+    private UserDataHelper userDataHelper;
+
+    public List<Note> noteList;
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
@@ -78,12 +81,15 @@ public class MainActivity extends BaseActivity {
     private LocalReceiver localReceiver;
     private LocalBroadcastManager localBroadcastManager;
 
-    private static int arrangement = 0;//排列方式，0为网格，1为列表
-    private final int SC = 1;//服务器同步到客户端
-    private final int CS = 2;//客户端同步到服务器
-    private final int UPLOAD = 3;//上传图片
-    private final int CHOOSE_PHOTO = 4;//选择图片
-    private final int PHOTO_REQUEST_CUT = 5;//请求裁剪图片
+    private final static int GRID = 0;//网格
+    private final static int LIST = 1;//列表
+    private static int arrangement = GRID;//排列方式，1为列表
+
+    private final static int SC = 1;//服务器同步到客户端
+    private final static int CS = 2;//客户端同步到服务器
+    private final static int UPLOAD = 3;//上传图片
+    private final static int CHOOSE_PHOTO = 4;//选择图片
+    private final static int PHOTO_REQUEST_CUT = 5;//请求裁剪图片
     private long exitTime = 0;//实现再按一次退出的间隔时间
 
     private NavigationView navigationView;//左侧布局
@@ -108,7 +114,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //初始化数据库操作工具类
-        databaseOperateUtil = new DatabaseOperateUtil();
+        noteDataHelper = new NoteDataHelper();
+        userDataHelper = new UserDataHelper();
 
         //获取动画
         adapterAlpha1 = AnimationUtils.loadAnimation(getContext(), R.anim.adapter_alpha1);
@@ -116,17 +123,17 @@ public class MainActivity extends BaseActivity {
 
         //获取recyclerView
         recyclerView = findViewById(R.id.recyclerView);
-        dataList = new ArrayList<>();
-        noteAdapter = new NoteAdapter(this, dataList);//初始化适配器
-        noteAdapterSpecial = new NoteAdapterSpecial(this, dataList);//初始化适配器Special
+        noteList = new ArrayList<>();
+        noteAdapter = new NoteAdapter(this, noteList);//初始化适配器
+        noteAdapterSpecial = new NoteAdapterSpecial(this, noteList);//初始化适配器Special
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        if (arrangement == 0) {//网格模式
-            if (isMobile())//手机模式
+        if(arrangement == GRID) {
+            if(isMobile())//手机模式
                 layoutManager.setSpanCount(2);//设置列数为2
             else//平板模式
                 layoutManager.setSpanCount(3);//设置列数为3
             recyclerView.setAdapter(noteAdapter);//设置适配器
-        } else {//单列模式
+        } else if(arrangement == LIST) {
             layoutManager.setSpanCount(1);//设置列数为1
             recyclerView.setAdapter(noteAdapterSpecial);//设置适配器
         }
@@ -143,10 +150,10 @@ public class MainActivity extends BaseActivity {
         floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), EditingActivity.class);
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), EditingActivity.class);
                 intent.putExtra("noteId", 0);//传递0，表示新建
-                v.getContext().startActivity(intent);
+                startActivity(intent);
             }
         });
 
@@ -181,17 +188,15 @@ public class MainActivity extends BaseActivity {
 
 
         handler = new Handler(new Handler.Callback() {//用于异步消息处理
-
             @Override
             public boolean handleMessage(@NonNull Message msg) {
                 switch (msg.what) {
-                    case SC:
-                    case CS:
+                    case SC: case CS:
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
                         Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                        databaseOperateUtil.updateSyncTime();
+                        UserDataHelper userDataHelper = new UserDataHelper();
+                        userDataHelper.updateSyncTime();
                         refreshData("");
                         break;
                     case UPLOAD:
@@ -222,8 +227,8 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                                databaseOperateUtil.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
+                                UserDataHelper userDataHelper = new UserDataHelper();
+                                userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -241,8 +246,8 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                                databaseOperateUtil.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
+                                UserDataHelper userDataHelper = new UserDataHelper();
+                                userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
                             }
                         });
                         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -263,8 +268,8 @@ public class MainActivity extends BaseActivity {
                         builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                                databaseOperateUtil.exitLogin();
+                                UserDataHelper userDataHelper = new UserDataHelper();
+                                userDataHelper.exitLogin();
                                 Toast.makeText(getContext(), "已退出登录！", Toast.LENGTH_SHORT).show();
                                 drawerLayout.closeDrawers();
                                 checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
@@ -287,7 +292,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        databaseOperateUtil.getInfo();
+        userDataHelper.getInfo();
         refreshData("");
     }
 
@@ -295,12 +300,13 @@ public class MainActivity extends BaseActivity {
     public void refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
         //初始化笔记数据
-        dataList.clear();
-        dataList.addAll(databaseOperateUtil.initData(s));
+        noteList.clear();
+        noteList.addAll(noteDataHelper.initNote(s));
 
-        if (arrangement == 0)
+        if(arrangement == GRID)
             noteAdapter.notifyDataSetChanged();//通知adapter更新
-        else noteAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
+        else if(arrangement == LIST)
+            noteAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
 
         checkLoginStatus();//检查登录状态
         recyclerView.startAnimation(adapterAlpha2);
@@ -327,25 +333,25 @@ public class MainActivity extends BaseActivity {
     //通过id寻找item的下标
     private int findItemIndexById(int id) {
         int index = 0;
-        for (NoteItem noteItem : dataList) {
-            if (noteItem.getId() == id)
+        for (Note note : noteList) {
+            if (note.getId() == id)
                 break;
             index++;
         }
         return index;
     }
 
-    //为dataList添加笔记
-    public void addNote(NoteItem noteItem) {
-        if(noteItem == null) return;
+    //为noteList添加笔记
+    public void addNote(Note note) {
+        if(note == null) return;
 
-        noteItem.setFlag(true);//设置添加后状态为展开
+        note.setFlag(true);//设置添加后状态为展开
 
-        dataList.add(0, noteItem);//将数据插入到dataList头部
+        noteList.add(0, note);//将数据插入到noteList头部
 
-        if (arrangement == 0)
+        if(arrangement == GRID)
             noteAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
-        else {
+        else if(arrangement == LIST) {
             noteAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
             noteAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
         }
@@ -353,36 +359,36 @@ public class MainActivity extends BaseActivity {
         recyclerView.scrollToPosition(0);//移动到头部
     }
 
-    //删除dataList的笔记
+    //删除noteList的笔记
     public void deleteNoteById(int id) {
         int index = findItemIndexById(id);
 
-        dataList.remove(index);//移除原位置的item
+        noteList.remove(index);//移除原位置的item
 
-        if (arrangement == 0)
+        if (arrangement == GRID)
             noteAdapter.notifyItemRemoved(index);//通知adapter移除原位置的item
-        else {
+        else if(arrangement == LIST) {
             noteAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置item
             noteAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
         }
     }
 
-    //修改dataList的笔记
-    public void modifyNote(NoteItem noteItem) {
-        if(noteItem == null) return;
+    //修改noteList的笔记
+    public void modifyNote(Note note) {
+        if(note == null) return;
 
-        noteItem.setFlag(true);//设置修改后状态为展开
+        note.setFlag(true);//设置修改后状态为展开
 
-        int index = findItemIndexById(noteItem.getId());
+        int index = findItemIndexById(note.getId());
 
-        dataList.remove(index);//移除dataList原位置数据
-        dataList.add(0, noteItem);//将数据插入到dataList头部
+        noteList.remove(index);//移除noteList原位置数据
+        noteList.add(0, note);//将数据插入到noteList头部
 
-        if (arrangement == 0) {
+        if(arrangement == GRID) {
             noteAdapter.notifyItemRemoved(index);//通知adapter移除原位置数据
             noteAdapter.notifyItemInserted(0);//通知adapter有数据插入到头部
-        } else {
-            if (index == 0)
+        } else if(arrangement == LIST) {
+            if(index == 0)
                 noteAdapterSpecial.notifyItemChanged(0);//通知adapterSpecial更新0号item
             else {
                 noteAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置数据
@@ -400,20 +406,20 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int operation_type = intent.getIntExtra("operation_type", 0);
-            NoteItem noteItem = intent.getParcelableExtra("note_data");
+            Note note = intent.getParcelableExtra("note_data");
             int note_id = intent.getIntExtra("note_id", 0);
 
             if(operation_type != 0) modifySync();
 
             switch (operation_type) {
                 case NoteChangeConstant.ADD_NOTE:
-                    addNote(noteItem);
+                    addNote(note);
                     break;
                 case NoteChangeConstant.DELETE_NOTE_BY_ID:
                     deleteNoteById(note_id);
                     break;
                 case NoteChangeConstant.MODIFY_NOTE:
-                    modifyNote(noteItem);
+                    modifyNote(note);
                     break;
                 case NoteChangeConstant.REFRESH_DATA:
                     refreshData("");
@@ -421,18 +427,14 @@ public class MainActivity extends BaseActivity {
                 case NoteChangeConstant.CHECK_LOGIN_STATUS:
                     checkLoginStatus();
                     break;
-                case NoteChangeConstant.MODIFY_SYNC:
-                    modifySync();
-                    break;
-                default:
-                    break;
+                default: break;
             }
         }
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-        isLogin = databaseOperateUtil.getUserInfo().getUserId();
+        UserDataHelper userDataHelper = new UserDataHelper();
+        isLogin = userDataHelper.getUserInfo().getUserId();
 
         avatar = headView.findViewById(R.id.user_avatar);
 
@@ -477,7 +479,7 @@ public class MainActivity extends BaseActivity {
         } else {//用户已经登录
 
             //显示头像，并启用修改头像按钮
-            avatar.setImageBitmap(databaseOperateUtil.readIcon());
+            avatar.setImageBitmap(userDataHelper.readIcon());
 
             avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -532,7 +534,7 @@ public class MainActivity extends BaseActivity {
                         searchText = searchEt.getText().toString();
                         refreshData(searchText);
                         Toast.makeText(getContext(),
-                                "找到" + dataList.size() + "条笔记", Toast.LENGTH_SHORT).show();
+                                "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
@@ -544,19 +546,19 @@ public class MainActivity extends BaseActivity {
                 builder.show();
                 break;
             case R.id.arrangement:
-                if (arrangement == 0) {
+                if (arrangement == GRID) {
                     layoutManager.setSpanCount(1);//设置列数为1
                     recyclerView.setAdapter(noteAdapterSpecial);//设置适配器Special
                     item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
-                    arrangement = 1;
-                } else {
+                    arrangement = LIST;
+                } else if(arrangement == LIST) {
                     if (isMobile())//手机模式
                         layoutManager.setSpanCount(2);//设置列数为2
                     else//平板模式
                         layoutManager.setSpanCount(3);//设置列数为3
                     recyclerView.setAdapter(noteAdapter);//设置适配器
                     item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
-                    arrangement = 0;
+                    arrangement = GRID;
                 }
                 recyclerView.setLayoutManager(layoutManager);//设置笔记布局
 
@@ -588,8 +590,8 @@ public class MainActivity extends BaseActivity {
 
     //自动同步数据
     public void modifySync() {
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-        int userId = databaseOperateUtil.getUserInfo().getUserId();//检测用户是否登录
+        UserDataHelper userDataHelper = new UserDataHelper();
+        int userId = userDataHelper.getUserInfo().getUserId();//检测用户是否登录
         if (userId != 0) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
@@ -598,21 +600,21 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public boolean handleMessage(@NonNull Message msg) {
                         if (msg.what == CS) {
-                            databaseOperateUtil.updateSyncTime();
+                            userDataHelper.updateSyncTime();
                             updateTextView();
                             Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
                         }
                         return true;
                     }
                 });
-                databaseOperateUtil.sendRequestWithOkHttpCS(handler);
+                userDataHelper.sendRequestWithOkHttpCS(handler);
             }
         }
     }
 
     private void updateTextView() {//更新TextView显示用户信息
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(getString(R.string.formatDate_User), Locale.getDefault());
-        User user = databaseOperateUtil.getUserInfo();
+        User user = userDataHelper.getUserInfo();
         userId.setVisibility(View.VISIBLE);//显示“用户ID”
         username.setVisibility(View.VISIBLE);//显示“用户名”
         lastSync.setVisibility(View.VISIBLE);//显示“上次同步”

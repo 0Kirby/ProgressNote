@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion = '29.0.3'
     ndkVersion "21.3.6528147"
     defaultConfig {
         applicationId "cn.zerokirby.note"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode Integer.valueOf(getDate())
-        versionName "2.13.2"
+        versionName "2.14.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

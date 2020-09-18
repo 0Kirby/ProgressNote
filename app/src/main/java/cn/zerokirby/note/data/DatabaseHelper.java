@@ -1,4 +1,4 @@
-package cn.zerokirby.note.db;
+package cn.zerokirby.note.data;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;

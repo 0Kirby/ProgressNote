@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
+import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.util.ShareUtil;
 
 import static cn.zerokirby.note.MyApplication.getContext;
@@ -60,8 +60,8 @@ public class OpeningActivity extends BaseActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-        int userId = databaseOperateUtil.getUserInfo().getUserId();
+        UserDataHelper userDataHelper = new UserDataHelper();
+        int userId = userDataHelper.getUserInfo().getUserId();
         if (userId != 0) {
             if (modifySync) {
                 boolean launch = sharedPreferences.getBoolean("launch_sync", false);
@@ -71,8 +71,8 @@ public class OpeningActivity extends BaseActivity {
                         public boolean handleMessage(@NonNull Message msg) {
                             if (msg.what == SC) {
                                 Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                                DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                                databaseOperateUtil.updateSyncTime();
+                                UserDataHelper userDataHelper = new UserDataHelper();
+                                userDataHelper.updateSyncTime();
                                 mHandler.removeMessages(0);
                                 myThread.start();
                             }
@@ -80,7 +80,7 @@ public class OpeningActivity extends BaseActivity {
                         }
                     });
 
-                    databaseOperateUtil.sendRequestWithOkHttpSC(handler);
+                    userDataHelper.sendRequestWithOkHttpSC(handler);
                 } else {
                     myThread.start();
                     mHandler.removeMessages(0);

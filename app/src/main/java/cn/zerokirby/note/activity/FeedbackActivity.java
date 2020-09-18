@@ -24,8 +24,8 @@ import androidx.appcompat.widget.Toolbar;
 import java.util.Objects;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.userData.SystemUtil;
+import cn.zerokirby.note.data.UserDataHelper;
+import cn.zerokirby.note.userutil.SystemUtil;
 import cn.zerokirby.note.util.AppUtil;
 import cn.zerokirby.note.util.NetworkUtil;
 import cn.zerokirby.note.util.ShareUtil;
@@ -114,8 +114,8 @@ public class FeedbackActivity extends BaseActivity {
                     //加载完毕让进度条消失
                     progressBar.setVisibility(View.GONE);
                     boolean isCookieSaved = ShareUtil.getBoolean(IS_FIRST_LOGOUT, false);
-                    DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-                    int userId = databaseOperateUtil.getUserInfo().getUserId();
+                    UserDataHelper userDataHelper = new UserDataHelper();
+                    int userId = userDataHelper.getUserInfo().getUserId();
                     if (userId == 0 && !isCookieSaved && CookieManager.getInstance().hasCookies()) {
                         ShareUtil.putBoolean(IS_COOKIE_SAVED, true);
                         String cookie = CookieManager.getInstance().getCookie(getDomain(url));//取出cookie
@@ -136,15 +136,15 @@ public class FeedbackActivity extends BaseActivity {
         String osVersion = systemUtil.getSystemVersion();//获取系统版本
         String netType = NetworkUtil.getNetworkType();//获取网络类型
         String clientVersion = AppUtil.getVersionName();//获取版本号
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
+        UserDataHelper userDataHelper = new UserDataHelper();
 
 
-        int userId = databaseOperateUtil.getUserInfo().getUserId();
+        int userId = userDataHelper.getUserInfo().getUserId();
         if (userId != 0) {
             //用户的openid
             String openid = String.valueOf(userId); // 用户的openid
             //用户的nickname
-            String nickname = databaseOperateUtil.getUserInfo().getUsername(); // 用户的nickname
+            String nickname = userDataHelper.getUserInfo().getUsername(); // 用户的nickname
             //用户的头像url
             String headimgurl = "https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet?userId=" + openid;  // 用户的头像url
             //post的数据

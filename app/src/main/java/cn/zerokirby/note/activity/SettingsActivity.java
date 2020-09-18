@@ -29,15 +29,17 @@ import java.util.Locale;
 import java.util.Objects;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.db.DatabaseHelper;
-import cn.zerokirby.note.db.DatabaseOperateUtil;
-import cn.zerokirby.note.noteData.NoteChangeConstant;
+import cn.zerokirby.note.data.DatabaseHelper;
+import cn.zerokirby.note.data.UserDataHelper;
+import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static cn.zerokirby.note.MyApplication.getContext;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -48,6 +50,9 @@ public class SettingsActivity extends BaseActivity {
     private static Preference checkUpdatePref;
     private static Handler handler;
     private static final String MODIFY_SYNC = "modify_sync";
+
+    private static Intent intent;//本地广播发送
+    private static LocalBroadcastManager localBroadcastManager;//本地广播管理器
 
     private static void checkUpdate() {//检查更新
         new Thread(new Runnable() {
@@ -75,15 +80,22 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.settings, new SettingsFragment())
                 .commit();
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        DatabaseOperateUtil databaseOperateUtil = new DatabaseOperateUtil();
-        userId = databaseOperateUtil.getUserInfo().getUserId();  //读取id
+
+        intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+        intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
+        localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+
+        UserDataHelper userDataHelper = new UserDataHelper();
+        userId = userDataHelper.getUserInfo().getUserId();//读取id
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
@@ -146,9 +158,12 @@ public class SettingsActivity extends BaseActivity {
                             db.execSQL("Delete from Note");//清空笔记表
                             db.close();
 
-                            Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                            intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
-                            LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
+                            //发送本地广播通知MainActivity刷新数据
+                            localBroadcastManager.sendBroadcast(intent);
+
+                            //清除intent中的extras
+                            Bundle bundle = intent.getExtras();
+                            if(bundle != null) bundle.clear();
 
                             Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
@@ -188,9 +203,12 @@ public class SettingsActivity extends BaseActivity {
                                 }
                             }).start();
 
-                            Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                            intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
-                            LocalBroadcastManager.getInstance(requireActivity()).sendBroadcast(intent);
+                            //发送本地广播通知MainActivity刷新数据
+                            localBroadcastManager.sendBroadcast(intent);
+
+                            //清除intent中的extras
+                            Bundle bundle = intent.getExtras();
+                            if(bundle != null) bundle.clear();
 
                             Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }

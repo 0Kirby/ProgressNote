@@ -1,4 +1,4 @@
-package cn.zerokirby.note.userData;
+package cn.zerokirby.note.userutil;
 
 public class User {
 

@@ -1,4 +1,4 @@
-package cn.zerokirby.note.userData;
+package cn.zerokirby.note.userutil;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,8 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-import cn.zerokirby.note.db.AvatarDatabaseUtil;
-import cn.zerokirby.note.db.DatabaseHelper;
+import cn.zerokirby.note.data.AvatarDataHelper;
+import cn.zerokirby.note.data.DatabaseHelper;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -69,17 +69,17 @@ public class IconUtil {//关于操作图标的方法
     }
 
     private void startPhotoZoom(Uri uri) {//图片缩放
-        File CropPhoto = new File(activity.getExternalCacheDir(), "crop.jpg");//创建临时文件
+        File cropPhoto = new File(activity.getExternalCacheDir(), "crop.jpg");//创建临时文件
         try {
-            if (CropPhoto.exists()) {//如果临时文件存在则删除，否则新建
-                CropPhoto.delete();
+            if (cropPhoto.exists()) {//如果临时文件存在则删除，否则新建
+                cropPhoto.delete();
             }
-            CropPhoto.createNewFile();
+            cropPhoto.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        cropImageUri = Uri.fromFile(CropPhoto);//获取裁剪图片的地址
+        cropImageUri = Uri.fromFile(cropPhoto);//获取裁剪图片的地址
         Intent intent = new Intent("com.android.camera.action.CROP");//设置intent类型为裁剪图片
         intent.setDataAndType(uri, "image/*");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -109,8 +109,8 @@ public class IconUtil {//关于操作图标的方法
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//解码位图
             avatar.setImageBitmap(bitmap);//给ImageView设置头像
             DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-            AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(userDbHelper);
-            avatarDatabaseUtil.saveImage(bitmap);
+            AvatarDataHelper avatarDataHelper = new AvatarDataHelper(userDbHelper);
+            avatarDataHelper.saveImage(bitmap);
         } else
             Toast.makeText(activity, "打开失败", Toast.LENGTH_SHORT).show();
     }
@@ -122,8 +122,8 @@ public class IconUtil {//关于操作图标的方法
                 File file = new File(Objects.requireNonNull(UriUtil.getPath(cropImageUri)));
                 final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
                 DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-                AvatarDatabaseUtil avatarDatabaseUtil = new AvatarDatabaseUtil(userDbHelper);
-                final int id = avatarDatabaseUtil.getUserId();//获取用户id
+                AvatarDataHelper avatarDataHelper = new AvatarDataHelper(userDbHelper);
+                final int id = avatarDataHelper.getUserId();//获取用户id
                 userDbHelper.close();
                 OkHttpClient client = new OkHttpClient();
                 RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型为jpg

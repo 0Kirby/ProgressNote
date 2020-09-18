@@ -1,4 +1,4 @@
-package cn.zerokirby.note.userData;
+package cn.zerokirby.note.userutil;
 
 import android.content.res.Configuration;
 import android.os.Build;
