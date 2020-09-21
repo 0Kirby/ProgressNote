@@ -217,4 +217,9 @@ public class EditingActivity extends BaseActivity {
         } else finish();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        noteDataHelper.close();
+    }
 }

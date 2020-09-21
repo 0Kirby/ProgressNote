@@ -263,20 +263,6 @@ public class UserDataHelper {
     }
 
     /**
-     * 从数据库中读取头像
-     * @return Bitmap
-     */
-    public Bitmap readIcon() {
-        AvatarDataHelper avatarDataHelper = new AvatarDataHelper(databaseHelper);
-        byte[] imgData = avatarDataHelper.readImage();
-        if (imgData != null) {
-            //将字节数组转化为位图，将位图显示为图片
-            return BitmapFactory.decodeByteArray(imgData, 0, imgData.length);
-        }
-        return null;
-    }
-
-    /**
      * 获取用户信息
      * @return User 用户对象
      */
@@ -307,6 +293,52 @@ public class UserDataHelper {
             if(cursor != null) cursor.close();
             if(db != null) db.close();
         }
+    }
+
+    /**
+     * 更新登录状态
+     * @param user 用户类
+     */
+    public void updateLoginStatus(User user, boolean isFirstLogin) {
+        try {
+            db = databaseHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
+            values.put("userId", user.getUserId());
+            values.put("username", user.getUsername());
+            values.put("password", user.getPassword());
+            values.put("lastUse", System.currentTimeMillis());
+            values.put("registerTime", user.getRegisterTime());
+            if(user.getLastSync() != 0) values.put("lastSync", user.getLastSync());
+            if(isFirstLogin) values.putNull("avatar");
+            db.update("User", values, "rowid = ?", new String[]{"1"});
+        } finally {
+            if(db != null) db.close();
+        }
+    }
+
+    /**
+     * 将用户ID、用户名、密码存储到本地
+     * @param bytes 带有用户id、用户名和密码的比特串
+     */
+    public void saveUserNameAndPassword(byte[] bytes) {
+        try {
+            db = databaseHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            if (bytes.length != 0)
+                values.put("avatar", bytes);
+            else values.putNull("avatar");
+            db.update("User", values, "rowid = ?", new String[]{"1"});
+            db.close();
+        } finally {
+            if(db != null) db.close();
+        }
+    }
+
+    /**
+     * 关闭数据库，防止内存泄漏
+     */
+    public void close() {
+        if(databaseHelper !=null) databaseHelper.close();
     }
 
 }

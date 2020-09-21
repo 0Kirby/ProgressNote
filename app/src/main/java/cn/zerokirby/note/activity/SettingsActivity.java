@@ -96,6 +96,7 @@ public class SettingsActivity extends BaseActivity {
 
         UserDataHelper userDataHelper = new UserDataHelper();
         userId = userDataHelper.getUserInfo().getUserId();//读取id
+        userDataHelper.close();
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理

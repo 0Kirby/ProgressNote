@@ -50,6 +50,7 @@ import java.util.Objects;
 
 import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.R;
+import cn.zerokirby.note.data.AvatarDataHelper;
 import cn.zerokirby.note.data.NoteDataHelper;
 import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteAdapter;
@@ -195,7 +196,6 @@ public class MainActivity extends BaseActivity {
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
                         Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        UserDataHelper userDataHelper = new UserDataHelper();
                         userDataHelper.updateSyncTime();
                         refreshData("");
                         break;
@@ -227,7 +227,6 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
-                                UserDataHelper userDataHelper = new UserDataHelper();
                                 userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
                             }
                         });
@@ -246,7 +245,6 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                                 progressDialog.show();
-                                UserDataHelper userDataHelper = new UserDataHelper();
                                 userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
                             }
                         });
@@ -268,7 +266,6 @@ public class MainActivity extends BaseActivity {
                         builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                UserDataHelper userDataHelper = new UserDataHelper();
                                 userDataHelper.exitLogin();
                                 Toast.makeText(getContext(), "已退出登录！", Toast.LENGTH_SHORT).show();
                                 drawerLayout.closeDrawers();
@@ -433,7 +430,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        UserDataHelper userDataHelper = new UserDataHelper();
+        AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
         isLogin = userDataHelper.getUserInfo().getUserId();
 
         avatar = headView.findViewById(R.id.user_avatar);
@@ -479,7 +476,8 @@ public class MainActivity extends BaseActivity {
         } else {//用户已经登录
 
             //显示头像，并启用修改头像按钮
-            avatar.setImageBitmap(userDataHelper.readIcon());
+            avatar.setImageBitmap(avatarDataHelper.readIcon());
+            avatarDataHelper.close();
 
             avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -498,10 +496,12 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    //注销广播接收器，关闭数据库
     @Override
     protected void onDestroy() {
         super.onDestroy();
         localBroadcastManager.unregisterReceiver(localReceiver);
+        noteDataHelper.close();
     }
 
     @Override
@@ -590,7 +590,6 @@ public class MainActivity extends BaseActivity {
 
     //自动同步数据
     public void modifySync() {
-        UserDataHelper userDataHelper = new UserDataHelper();
         int userId = userDataHelper.getUserInfo().getUserId();//检测用户是否登录
         if (userId != 0) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

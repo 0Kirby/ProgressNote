@@ -2,9 +2,7 @@ package cn.zerokirby.note.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,10 +30,10 @@ import java.io.InputStream;
 import java.util.Objects;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.data.DatabaseHelper;
 import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.userutil.SystemUtil;
+import cn.zerokirby.note.userutil.User;
 import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
@@ -48,10 +46,12 @@ import static cn.zerokirby.note.MyApplication.getContext;
 
 public class LoginActivity extends BaseActivity {
 
+    private UserDataHelper userDataHelper;
+
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final int LOGIN = 1;//登录
-    private String userId = "0";
+    private int userId;
     private String responseData;
     private String username;
     private String password;
@@ -82,6 +82,8 @@ public class LoginActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         loginActivity = this;
+
+        userDataHelper = new UserDataHelper();
 
         usernameEditText = findViewById(R.id.username);
         passwordEditText = findViewById(R.id.password);
@@ -117,17 +119,14 @@ public class LoginActivity extends BaseActivity {
                     Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     progressBar.setVisibility(View.GONE);
                     if (responseData.equals("登录成功！")) {
-                        DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-                        SQLiteDatabase db = userDbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
-                        values.put("userId", userId);
-                        values.put("username", username);
-                        values.put("password", password);
-                        values.put("lastUse", System.currentTimeMillis());
-                        values.put("registerTime", registerTime);
-                        values.put("lastSync", syncTime);
-                        db.update("User", values, "rowid = ?", new String[]{"1"});
-                        db.close();
+                        User user = new User();
+                        user.setUserId(userId);
+                        user.setUsername(username);
+                        user.setPassword(password);
+                        user.setLastUse(System.currentTimeMillis());
+                        user.setRegisterTime(registerTime);
+                        user.setLastSync(syncTime);
+                        userDataHelper.updateLoginStatus(user, false);
 
                         //发送本地广播通知MainActivity改变登录状态
                         Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
@@ -153,6 +152,7 @@ public class LoginActivity extends BaseActivity {
                     UserDataHelper userDataHelper = new UserDataHelper();
                     userDataHelper.setUserColumnNull("username");
                     userDataHelper.setUserColumnNull("password");
+                    userDataHelper.close();
                     ShareUtil.putBoolean(USERNAME, false);
                 }
             }
@@ -166,6 +166,7 @@ public class LoginActivity extends BaseActivity {
                 else {//取消复选框时删除存储在本地的密码
                     UserDataHelper userDataHelper = new UserDataHelper();
                     userDataHelper.setUserColumnNull("password");
+                    userDataHelper.close();
                     ShareUtil.putBoolean(PASSWORD, false);
                 }
             }
@@ -246,10 +247,12 @@ public class LoginActivity extends BaseActivity {
                     if (responseData.equals("登录成功！"))//登陆成功的情况下才处理头像
                     {
                         client = new OkHttpClient();
-                        requestBody = new FormBody.Builder().add("userId", userId).build();
+                        requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
                         request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
                         response = client.newCall(request).execute();
                         InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+
+                        //将用户ID、用户名、密码存储到本地
                         ByteArrayOutputStream output = new ByteArrayOutputStream();
                         byte[] buffer = new byte[1024];//缓冲区大小
                         int n;
@@ -259,15 +262,8 @@ public class LoginActivity extends BaseActivity {
                         inputStream.close();
                         output.close();
                         byte[] bytes = output.toByteArray();
-                        DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-                        SQLiteDatabase db = userDbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
-                        if (bytes.length != 0)
-                            values.put("avatar", bytes);
-                        else
-                            values.putNull("avatar");
-                        db.update("User", values, "rowid = ?", new String[]{"1"});
-                        db.close();
+
+                        userDataHelper.saveUserNameAndPassword(bytes);
                     }
                     Message message = new Message();
                     message.what = LOGIN;
@@ -288,7 +284,7 @@ public class LoginActivity extends BaseActivity {
                 registerTime = jsonObject.getLong("RegisterTime");
                 syncTime = jsonObject.getLong("SyncTime");
             }
-            userId = jsonObject.getString("Id");//取出ID字段
+            userId = Integer.parseInt(jsonObject.getString("Id"));//取出ID字段
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -302,6 +298,7 @@ public class LoginActivity extends BaseActivity {
         if (username) {
             UserDataHelper userDataHelper = new UserDataHelper();
             String[] string = userDataHelper.getLogin();//获取用户名和密码
+            userDataHelper.close();
             usernameEditText.setText(string[0]);
             if (password)
                 passwordEditText.setText(string[1]);

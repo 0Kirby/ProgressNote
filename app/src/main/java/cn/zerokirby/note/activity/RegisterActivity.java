@@ -27,10 +27,10 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.data.DatabaseHelper;
 import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.userutil.SystemUtil;
+import cn.zerokirby.note.userutil.User;
 import cn.zerokirby.note.util.CodeUtil;
 import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
@@ -44,10 +44,12 @@ import static cn.zerokirby.note.MyApplication.getContext;
 
 public class RegisterActivity extends BaseActivity {
 
+    private UserDataHelper userDataHelper;
+
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final int REGISTER = 2;//注册
-    private String userId;
+    private int userId;
     private String responseData;
     private String username;
     private String password;
@@ -64,6 +66,8 @@ public class RegisterActivity extends BaseActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        userDataHelper = new UserDataHelper();
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
@@ -98,17 +102,14 @@ public class RegisterActivity extends BaseActivity {
                     Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     progressBar.setVisibility(View.GONE);
                     if (responseData.equals("注册成功！")) {
-                        DatabaseHelper userDbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-                        SQLiteDatabase db = userDbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
-                        values.put("userId", userId);
-                        values.put("username", username);
-                        values.put("password", password);
-                        values.put("lastUse", System.currentTimeMillis());
-                        values.put("registerTime", System.currentTimeMillis());//生成注册时间
-                        values.putNull("avatar");
-                        db.update("User", values, "rowid = ?", new String[]{"1"});
-                        db.close();
+                        User user = new User();
+                        user.setUserId(userId);
+                        user.setUsername(username);
+                        user.setPassword(password);
+                        user.setLastUse(System.currentTimeMillis());
+                        user.setRegisterTime(System.currentTimeMillis());
+                        userDataHelper.updateLoginStatus(user, true);
+
                         LoginActivity.loginActivity.finish();
 
                         //发送本地广播通知MainActivity改变登录状态
@@ -135,6 +136,7 @@ public class RegisterActivity extends BaseActivity {
                     UserDataHelper userDataHelper = new UserDataHelper();
                     userDataHelper.setUserColumnNull("username");
                     userDataHelper.setUserColumnNull("password");
+                    userDataHelper.close();
                     ShareUtil.putBoolean(USERNAME, false);
                 }
             }
@@ -148,6 +150,7 @@ public class RegisterActivity extends BaseActivity {
                 else {//取消复选框时删除存储在本地的密码
                     UserDataHelper userDataHelper = new UserDataHelper();
                     userDataHelper.setUserColumnNull("password");
+                    userDataHelper.close();
                     ShareUtil.putBoolean(PASSWORD, false);
                 }
             }
@@ -228,7 +231,7 @@ public class RegisterActivity extends BaseActivity {
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
             responseData = jsonObject.getString("Result");//取出Result字段
-            userId = jsonObject.getString("Id");//取出ID字段
+            userId = jsonObject.getInt("Id");//取出ID字段
         } catch (JSONException e) {
             e.printStackTrace();
         }

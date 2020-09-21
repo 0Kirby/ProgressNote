@@ -3,12 +3,10 @@ package cn.zerokirby.note.noteutil;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -19,18 +17,12 @@ import java.util.List;
 import cn.zerokirby.note.activity.EditingActivity;
 import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.R;
-import cn.zerokirby.note.data.DatabaseHelper;
-
-import static cn.zerokirby.note.MyApplication.getContext;
-
+import cn.zerokirby.note.data.NoteDataHelper;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     private MainActivity mainActivity;
     private List<Note> mNoteList;
-
-    private DatabaseHelper dbHelper;
-    private SQLiteDatabase db;
 
     //构造器
     public NoteAdapter(MainActivity mainActivity, List<Note> noteList) {
@@ -107,11 +99,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                 builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        dbHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-                        db = dbHelper.getWritableDatabase();
-                        db.delete("Note", "id = ?", new String[]{String.valueOf(id)});//查找对应id
-                        Toast.makeText(getContext(), mainActivity.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
-                        db.close();
+                        NoteDataHelper noteDataHelper = new NoteDataHelper();
+                        noteDataHelper.deleteNote(id);
+                        noteDataHelper.close();
 
                         mainActivity.modifySync();
                         mainActivity.deleteNoteById(id);

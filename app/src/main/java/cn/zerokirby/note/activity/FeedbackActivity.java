@@ -116,6 +116,7 @@ public class FeedbackActivity extends BaseActivity {
                     boolean isCookieSaved = ShareUtil.getBoolean(IS_FIRST_LOGOUT, false);
                     UserDataHelper userDataHelper = new UserDataHelper();
                     int userId = userDataHelper.getUserInfo().getUserId();
+                    userDataHelper.close();
                     if (userId == 0 && !isCookieSaved && CookieManager.getInstance().hasCookies()) {
                         ShareUtil.putBoolean(IS_COOKIE_SAVED, true);
                         String cookie = CookieManager.getInstance().getCookie(getDomain(url));//取出cookie
@@ -145,6 +146,7 @@ public class FeedbackActivity extends BaseActivity {
             String openid = String.valueOf(userId); // 用户的openid
             //用户的nickname
             String nickname = userDataHelper.getUserInfo().getUsername(); // 用户的nickname
+            userDataHelper.close();
             //用户的头像url
             String headimgurl = "https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet?userId=" + openid;  // 用户的头像url
             //post的数据

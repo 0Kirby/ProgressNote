@@ -62,6 +62,7 @@ public class OpeningActivity extends BaseActivity {
         boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
         UserDataHelper userDataHelper = new UserDataHelper();
         int userId = userDataHelper.getUserInfo().getUserId();
+        userDataHelper.close();
         if (userId != 0) {
             if (modifySync) {
                 boolean launch = sharedPreferences.getBoolean("launch_sync", false);
@@ -73,6 +74,7 @@ public class OpeningActivity extends BaseActivity {
                                 Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
                                 UserDataHelper userDataHelper = new UserDataHelper();
                                 userDataHelper.updateSyncTime();
+                                userDataHelper.close();
                                 mHandler.removeMessages(0);
                                 myThread.start();
                             }
