@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Objects;
 
 import cn.zerokirby.note.data.AvatarDataHelper;
-import cn.zerokirby.note.data.DatabaseHelper;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -35,8 +34,8 @@ public class IconUtil {//关于操作图标的方法
     private final int UPLOAD = 3;//上传图片
     private final int CHOOSE_PHOTO = 4;//选择图片
     private final int PHOTO_REQUEST_CUT = 5;//请求裁剪图片
-    private Activity activity;
-    private ImageView avatar;
+    private final Activity activity;
+    private final ImageView avatar;
     private Uri cropImageUri;
 
     public IconUtil(Activity activity, ImageView avatar) {

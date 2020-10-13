@@ -3,8 +3,6 @@ package cn.zerokirby.note.data;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 
@@ -27,12 +25,12 @@ public class UserDataHelper {
     private final static int SC = 1;//服务器同步到客户端
     private final static int CS = 2;//客户端同步到服务器
 
-    private DatabaseHelper databaseHelper;
+    private final DatabaseHelper databaseHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
 
     private String responseData;
-    private int userId;
+    private final int userId;
     private int noteId;
     private long time;
     private String title;
@@ -45,6 +43,7 @@ public class UserDataHelper {
 
     /**
      * 服务器数据同步到本地
+     *
      * @param handler 主线程处理器
      */
     public void sendRequestWithOkHttpSC(Handler handler) {
@@ -65,7 +64,7 @@ public class UserDataHelper {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    if(response != null) response.close();
+                    if (response != null) response.close();
                 }
             }
         }).start();
@@ -73,6 +72,7 @@ public class UserDataHelper {
 
     /**
      * 本地数据同步到服务器
+     *
      * @param handler 主线程处理器
      */
     public void sendRequestWithOkHttpCS(Handler handler) {
@@ -92,7 +92,7 @@ public class UserDataHelper {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    if(response != null) response.close();
+                    if (response != null) response.close();
                 }
             }
         }).start();
@@ -100,6 +100,7 @@ public class UserDataHelper {
 
     /**
      * 将接收到的JSON字符串转化为笔记数据保存到数据库中
+     *
      * @param jsonData 接收到的JSON字符串
      */
     private void parseJSONWithJSONArray(String jsonData) {//处理JSON
@@ -126,12 +127,13 @@ public class UserDataHelper {
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 将笔记数据转化为JSON字符串
+     *
      * @return String 生成的JSON字符串
      */
     private String makeJSONArray() {
@@ -158,14 +160,15 @@ public class UserDataHelper {
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null) cursor.close();
-            if(db != null) db.close();
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
         return null;
     }
 
     /**
      * 获取记住的用户名和密码
+     *
      * @return String[] 用户名和密码
      */
     public String[] getLogin() {
@@ -183,13 +186,14 @@ public class UserDataHelper {
             }
             return str;
         } finally {
-            if(cursor != null) cursor.close();
-            if(db != null) db.close();
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 将User表的某列为空
+     *
      * @param column 列名
      */
     public void setUserColumnNull(String column) {
@@ -199,7 +203,7 @@ public class UserDataHelper {
             values.putNull(column);//将该列置为空
             db.update("User", values, "rowid = ?", new String[]{"1"});
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
@@ -213,7 +217,7 @@ public class UserDataHelper {
             values.put("lastSync", System.currentTimeMillis());
             db.update("User", values, "rowid = ?", new String[]{"1"});
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
@@ -228,7 +232,7 @@ public class UserDataHelper {
             values.put("lastSync", 0);
             db.update("user", values, "rowid = ?", new String[]{"1"});
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
@@ -257,13 +261,14 @@ public class UserDataHelper {
             } else
                 db.update("User", values, "rowid = ?", new String[]{"1"});//更新
         } finally {
-            if(cursor != null) cursor.close();
-            if(db != null) db.close();
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 获取用户信息
+     *
      * @return User 用户对象
      */
     public User getUserInfo() {
@@ -290,13 +295,14 @@ public class UserDataHelper {
             }
             return user;
         } finally {
-            if(cursor != null) cursor.close();
-            if(db != null) db.close();
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 更新登录状态
+     *
      * @param user 用户类
      */
     public void updateLoginStatus(User user, boolean isFirstLogin) {
@@ -308,16 +314,17 @@ public class UserDataHelper {
             values.put("password", user.getPassword());
             values.put("lastUse", System.currentTimeMillis());
             values.put("registerTime", user.getRegisterTime());
-            if(user.getLastSync() != 0) values.put("lastSync", user.getLastSync());
-            if(isFirstLogin) values.putNull("avatar");
+            if (user.getLastSync() != 0) values.put("lastSync", user.getLastSync());
+            if (isFirstLogin) values.putNull("avatar");
             db.update("User", values, "rowid = ?", new String[]{"1"});
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 将用户ID、用户名、密码存储到本地
+     *
      * @param bytes 带有用户id、用户名和密码的比特串
      */
     public void saveUserNameAndPassword(byte[] bytes) {
@@ -330,7 +337,7 @@ public class UserDataHelper {
             db.update("User", values, "rowid = ?", new String[]{"1"});
             db.close();
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
@@ -338,7 +345,7 @@ public class UserDataHelper {
      * 关闭数据库，防止内存泄漏
      */
     public void close() {
-        if(databaseHelper !=null) databaseHelper.close();
+        if (databaseHelper != null) databaseHelper.close();
     }
 
 }

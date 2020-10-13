@@ -12,7 +12,7 @@ import cn.endureblaze.theme.ThemeUtil;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private static List<Activity> activities = new ArrayList<>();
+    private static final List<Activity> activities = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +23,8 @@ public class BaseActivity extends AppCompatActivity {
 
     //退出程序
     public static void finishAll() {
-        for(Activity activity: activities) {
-            if(!activity.isFinishing()) {
+        for (Activity activity : activities) {
+            if (!activity.isFinishing()) {
                 activity.finish();
             }
         }

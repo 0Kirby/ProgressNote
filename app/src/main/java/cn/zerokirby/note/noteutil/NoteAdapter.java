@@ -14,15 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.activity.EditingActivity;
 import cn.zerokirby.note.activity.MainActivity;
-import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.NoteDataHelper;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
-    private MainActivity mainActivity;
-    private List<Note> mNoteList;
+    private final MainActivity mainActivity;
+    private final List<Note> mNoteList;
 
     //构造器
     public NoteAdapter(MainActivity mainActivity, List<Note> noteList) {

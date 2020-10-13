@@ -118,7 +118,7 @@ public class SettingsActivity extends BaseActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
             Preference preference = findPreference("version");
-            if(preference != null) {
+            if (preference != null) {
                 preference.setSummary(String.format(Locale.getDefault(), "版本号：%s\n构建日期：%d\n包名：%s",
                         AppUtil.getVersionName(),
                         AppUtil.getVersionCode(),
@@ -164,7 +164,7 @@ public class SettingsActivity extends BaseActivity {
 
                             //清除intent中的extras
                             Bundle bundle = intent.getExtras();
-                            if(bundle != null) bundle.clear();
+                            if (bundle != null) bundle.clear();
 
                             Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }
@@ -209,7 +209,7 @@ public class SettingsActivity extends BaseActivity {
 
                             //清除intent中的extras
                             Bundle bundle = intent.getExtras();
-                            if(bundle != null) bundle.clear();
+                            if (bundle != null) bundle.clear();
 
                             Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
                         }

@@ -26,6 +26,7 @@ public class Note implements Parcelable {
         this.content = content;
         this.time = time;
     }
+
     public Note() {
 
     }
@@ -33,6 +34,7 @@ public class Note implements Parcelable {
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -40,6 +42,7 @@ public class Note implements Parcelable {
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -47,6 +50,7 @@ public class Note implements Parcelable {
     public String getContent() {
         return content;
     }
+
     public void setContent(String content) {
         this.content = content;
     }
@@ -54,6 +58,7 @@ public class Note implements Parcelable {
     public String getTime() {
         return time;
     }
+
     public void setTime(String time) {
         this.time = time;
     }
@@ -66,7 +71,7 @@ public class Note implements Parcelable {
     //获取MM月，若为第一位为0，则去掉0
     public String getMonth() {
         String month = time.substring(5, 8);
-        if(month.substring(0, 1).equals("0"))
+        if (month.startsWith("0"))
             month = month.substring(1);
         return month;
     }
@@ -74,7 +79,7 @@ public class Note implements Parcelable {
     //获取dd日，若为第一位为0，则去掉0
     public String getDay() {
         String day = time.substring(8, 11);
-        if(day.substring(0, 1).equals("0")) {
+        if (day.startsWith("0")) {
             day = day.substring(1);
         }
         return day;
@@ -89,28 +94,35 @@ public class Note implements Parcelable {
         Date nowTime = null;
         try {
             nowTime = simpleDateFormat.parse(time);
-        } catch(ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         long diff = 0;
-        if(nowTime != null) diff = System.currentTimeMillis() - nowTime.getTime();
+        if (nowTime != null) diff = System.currentTimeMillis() - nowTime.getTime();
         int days = (int) (diff / (1000 * 60 * 60 * 24));
 
-        if(days == 0)
+        if (days == 0)
             return "今天";
-        else if(days == 1)
+        else if (days == 1)
             return "昨天";
-        else if(days < 7) {
+        else if (days < 7) {
             Calendar calendar = Calendar.getInstance();
             int weekday = (7 + calendar.get(Calendar.DAY_OF_WEEK) - days) % 7;
             switch (weekday) {
-                case 0: return getDay() + " 星期六";
-                case 1: return getDay() + " 星期日";
-                case 2: return getDay() + " 星期一";
-                case 3: return getDay() + " 星期二";
-                case 4: return getDay() + " 星期三";
-                case 5: return getDay() + " 星期四";
-                case 6: return getDay() + " 星期五";
+                case 0:
+                    return getDay() + " 星期六";
+                case 1:
+                    return getDay() + " 星期日";
+                case 2:
+                    return getDay() + " 星期一";
+                case 3:
+                    return getDay() + " 星期二";
+                case 4:
+                    return getDay() + " 星期三";
+                case 5:
+                    return getDay() + " 星期四";
+                case 6:
+                    return getDay() + " 星期五";
             }
         }
         return getDay();

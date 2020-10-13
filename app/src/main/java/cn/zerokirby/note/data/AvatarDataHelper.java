@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class AvatarDataHelper {
 
-    private DatabaseHelper databaseHelper;
+    private final DatabaseHelper databaseHelper;
     private SQLiteDatabase db;
     private Cursor cursor;
 
@@ -22,6 +22,7 @@ public class AvatarDataHelper {
 
     /**
      * 保存图片
+     *
      * @param bitmap 图片对象
      */
     public void saveImage(Bitmap bitmap) {
@@ -31,12 +32,13 @@ public class AvatarDataHelper {
             cv.put("avatar", bitmapToBytes(bitmap));//图片转为二进制
             db.update("User", cv, "rowid = ?", new String[]{"1"});
         } finally {
-            if(db != null) db.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 读取图片
+     *
      * @return byte[]
      */
     public byte[] readImage() {
@@ -50,13 +52,14 @@ public class AvatarDataHelper {
             }
             return imgData;
         } finally {
-            if(cursor !=null) cursor.close();
-            if(db != null) db.close();
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
 
     /**
      * 从数据库中读取头像
+     *
      * @return Bitmap
      */
     public Bitmap readIcon() {
@@ -93,6 +96,7 @@ public class AvatarDataHelper {
 
     /**
      * 获取用户id
+     *
      * @return int 用户id
      */
     public int getUserId() {
@@ -107,8 +111,8 @@ public class AvatarDataHelper {
             }
             return id;
         } finally {
-            if(cursor != null) cursor.close();
-            if(db !=null) db.close();
+            if (cursor != null) cursor.close();
+            if (db != null) db.close();
         }
     }
 
@@ -116,7 +120,7 @@ public class AvatarDataHelper {
      * 关闭数据库，防止内存泄漏
      */
     public void close() {
-        if(databaseHelper !=null) databaseHelper.close();
+        if (databaseHelper != null) databaseHelper.close();
     }
 
 }

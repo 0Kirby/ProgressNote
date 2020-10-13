@@ -1,8 +1,6 @@
 package cn.zerokirby.note.activity;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -169,13 +167,9 @@ public class RegisterActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {//当三个输入框同时不为空且验证码正确时，按钮生效
-                if (usernameEditText.length() > 0 && passwordEditText.length() > 0
-                        && codeEditText.getText().toString().equalsIgnoreCase(code)) {
-                    registerButton.setEnabled(true);
-                } else//否则按钮失效
-                {
-                    registerButton.setEnabled(false);
-                }
+                //否则按钮失效
+                registerButton.setEnabled(usernameEditText.length() > 0 && passwordEditText.length() > 0
+                        && codeEditText.getText().toString().equalsIgnoreCase(code));
             }
         };
 

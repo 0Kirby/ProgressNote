@@ -16,7 +16,7 @@ public class UriUtil {
      * Framework Documents, as well as the _data field for the MediaStore and
      * other file-based ContentProviders.
      *
-     * @param uri     The Uri to query.
+     * @param uri The Uri to query.
      * @author paulburke
      */
     public static String getPath(final Uri uri) {

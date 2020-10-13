@@ -53,10 +53,10 @@ import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.AvatarDataHelper;
 import cn.zerokirby.note.data.NoteDataHelper;
 import cn.zerokirby.note.data.UserDataHelper;
+import cn.zerokirby.note.noteutil.Note;
 import cn.zerokirby.note.noteutil.NoteAdapter;
 import cn.zerokirby.note.noteutil.NoteAdapterSpecial;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
-import cn.zerokirby.note.noteutil.Note;
 import cn.zerokirby.note.userutil.IconUtil;
 import cn.zerokirby.note.userutil.UriUtil;
 import cn.zerokirby.note.userutil.User;
@@ -128,13 +128,13 @@ public class MainActivity extends BaseActivity {
         noteAdapter = new NoteAdapter(this, noteList);//初始化适配器
         noteAdapterSpecial = new NoteAdapterSpecial(this, noteList);//初始化适配器Special
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        if(arrangement == GRID) {
-            if(isMobile())//手机模式
+        if (arrangement == GRID) {
+            if (isMobile())//手机模式
                 layoutManager.setSpanCount(2);//设置列数为2
             else//平板模式
                 layoutManager.setSpanCount(3);//设置列数为3
             recyclerView.setAdapter(noteAdapter);//设置适配器
-        } else if(arrangement == LIST) {
+        } else if (arrangement == LIST) {
             layoutManager.setSpanCount(1);//设置列数为1
             recyclerView.setAdapter(noteAdapterSpecial);//设置适配器
         }
@@ -192,7 +192,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
                 switch (msg.what) {
-                    case SC: case CS:
+                    case SC:
+                    case CS:
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
                         Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
@@ -300,9 +301,9 @@ public class MainActivity extends BaseActivity {
         noteList.clear();
         noteList.addAll(noteDataHelper.initNote(s));
 
-        if(arrangement == GRID)
+        if (arrangement == GRID)
             noteAdapter.notifyDataSetChanged();//通知adapter更新
-        else if(arrangement == LIST)
+        else if (arrangement == LIST)
             noteAdapterSpecial.notifyDataSetChanged();//通知adapterSpecial更新
 
         checkLoginStatus();//检查登录状态
@@ -340,15 +341,15 @@ public class MainActivity extends BaseActivity {
 
     //为noteList添加笔记
     public void addNote(Note note) {
-        if(note == null) return;
+        if (note == null) return;
 
         note.setFlag(true);//设置添加后状态为展开
 
         noteList.add(0, note);//将数据插入到noteList头部
 
-        if(arrangement == GRID)
+        if (arrangement == GRID)
             noteAdapter.notifyItemInserted(0);//通知adapter插入数据到头部
-        else if(arrangement == LIST) {
+        else if (arrangement == LIST) {
             noteAdapterSpecial.notifyItemInserted(0);//通知adapterSpecial有数据插入到头部
             noteAdapterSpecial.notifyItemChanged(1);//通知adapterSpecial更新1号item，隐藏多余的年月
         }
@@ -364,7 +365,7 @@ public class MainActivity extends BaseActivity {
 
         if (arrangement == GRID)
             noteAdapter.notifyItemRemoved(index);//通知adapter移除原位置的item
-        else if(arrangement == LIST) {
+        else if (arrangement == LIST) {
             noteAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置item
             noteAdapterSpecial.notifyItemChanged(index);//通知adapterSpecial更新代替原位置的item，显示被隐藏的年月
         }
@@ -372,7 +373,7 @@ public class MainActivity extends BaseActivity {
 
     //修改noteList的笔记
     public void modifyNote(Note note) {
-        if(note == null) return;
+        if (note == null) return;
 
         note.setFlag(true);//设置修改后状态为展开
 
@@ -381,11 +382,11 @@ public class MainActivity extends BaseActivity {
         noteList.remove(index);//移除noteList原位置数据
         noteList.add(0, note);//将数据插入到noteList头部
 
-        if(arrangement == GRID) {
+        if (arrangement == GRID) {
             noteAdapter.notifyItemRemoved(index);//通知adapter移除原位置数据
             noteAdapter.notifyItemInserted(0);//通知adapter有数据插入到头部
-        } else if(arrangement == LIST) {
-            if(index == 0)
+        } else if (arrangement == LIST) {
+            if (index == 0)
                 noteAdapterSpecial.notifyItemChanged(0);//通知adapterSpecial更新0号item
             else {
                 noteAdapterSpecial.notifyItemRemoved(index);//通知adapterSpecial移除原位置数据
@@ -398,35 +399,64 @@ public class MainActivity extends BaseActivity {
         recyclerView.scrollToPosition(0);//移动到头部
     }
 
-    //使用广播接收器处理笔记更新结果
-    class LocalReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int operation_type = intent.getIntExtra("operation_type", 0);
-            Note note = intent.getParcelableExtra("note_data");
-            int note_id = intent.getIntExtra("note_id", 0);
+    @SuppressLint("RestrictedApi")
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+            case R.id.search_button:
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示查找提示
+                builder.setTitle("提示");
+                builder.setMessage("请输入要查找的内容\n");
 
-            if(operation_type != 0) modifySync();
+                LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+                View searchView = layoutInflater.inflate(R.layout.search_view, null);
+                EditText searchEt = searchView.findViewById(R.id.search_et);
+                builder.setView(searchView);
 
-            switch (operation_type) {
-                case NoteChangeConstant.ADD_NOTE:
-                    addNote(note);
-                    break;
-                case NoteChangeConstant.DELETE_NOTE_BY_ID:
-                    deleteNoteById(note_id);
-                    break;
-                case NoteChangeConstant.MODIFY_NOTE:
-                    modifyNote(note);
-                    break;
-                case NoteChangeConstant.REFRESH_DATA:
-                    refreshData("");
-                    break;
-                case NoteChangeConstant.CHECK_LOGIN_STATUS:
-                    checkLoginStatus();
-                    break;
-                default: break;
-            }
+                builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
+                        searchText = searchEt.getText().toString();
+                        refreshData(searchText);
+                        Toast.makeText(getContext(),
+                                "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                builder.show();
+                break;
+            case R.id.arrangement:
+                if (arrangement == GRID) {
+                    layoutManager.setSpanCount(1);//设置列数为1
+                    recyclerView.setAdapter(noteAdapterSpecial);//设置适配器Special
+                    item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
+                    arrangement = LIST;
+                } else if (arrangement == LIST) {
+                    if (isMobile())//手机模式
+                        layoutManager.setSpanCount(2);//设置列数为2
+                    else//平板模式
+                        layoutManager.setSpanCount(3);//设置列数为3
+                    recyclerView.setAdapter(noteAdapter);//设置适配器
+                    item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
+                    arrangement = GRID;
+                }
+                recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+
+                refreshData(searchText);
+                break;
+            case R.id.theme:
+                ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
+                break;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
@@ -511,64 +541,26 @@ public class MainActivity extends BaseActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {//开启Activity并返回结果
+        switch (requestCode) {
+            case CHOOSE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    Toast.makeText(getContext(), "打开成功", Toast.LENGTH_SHORT).show();
+                    if (data != null) iconUtil.handleImage(data);
+                } else
+                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.search_button:
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示查找提示
-                builder.setTitle("提示");
-                builder.setMessage("请输入要查找的内容\n");
-
-                LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-                View searchView = layoutInflater.inflate(R.layout.search_view, null);
-                EditText searchEt = searchView.findViewById(R.id.search_et);
-                builder.setView(searchView);
-
-                builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
-                        searchText = searchEt.getText().toString();
-                        refreshData(searchText);
-                        Toast.makeText(getContext(),
-                                "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-                builder.show();
-                break;
-            case R.id.arrangement:
-                if (arrangement == GRID) {
-                    layoutManager.setSpanCount(1);//设置列数为1
-                    recyclerView.setAdapter(noteAdapterSpecial);//设置适配器Special
-                    item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
-                    arrangement = LIST;
-                } else if(arrangement == LIST) {
-                    if (isMobile())//手机模式
-                        layoutManager.setSpanCount(2);//设置列数为2
-                    else//平板模式
-                        layoutManager.setSpanCount(3);//设置列数为3
-                    recyclerView.setAdapter(noteAdapter);//设置适配器
-                    item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
-                    arrangement = GRID;
-                }
-                recyclerView.setLayoutManager(layoutManager);//设置笔记布局
-
-                refreshData(searchText);
-                break;
-            case R.id.theme:
-                ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
+            case PHOTO_REQUEST_CUT:
+                if (resultCode == RESULT_OK) {
+                    iconUtil.displayImage(UriUtil.getPath(iconUtil.getCropImageUri()));
+                    iconUtil.uploadImage(handler);
+                } else
+                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
+            default:
                 break;
         }
-        return super.onOptionsItemSelected(item);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     //重写，实现再按一次退出以及关闭抽屉
@@ -628,26 +620,36 @@ public class MainActivity extends BaseActivity {
             lastSync.setText(String.format(getResources().getString(R.string.last_sync), "无"));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {//开启Activity并返回结果
-        switch (requestCode) {
-            case CHOOSE_PHOTO:
-                if (resultCode == RESULT_OK) {
-                    Toast.makeText(getContext(), "打开成功", Toast.LENGTH_SHORT).show();
-                    if(data != null) iconUtil.handleImage(data);
-                } else
-                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
-                break;
-            case PHOTO_REQUEST_CUT:
-                if (resultCode == RESULT_OK) {
-                    iconUtil.displayImage(UriUtil.getPath(iconUtil.getCropImageUri()));
-                    iconUtil.uploadImage(handler);
-                } else
-                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
-            default:
-                break;
+    //使用广播接收器处理笔记更新结果
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int operation_type = intent.getIntExtra("operation_type", 0);
+            Note note = intent.getParcelableExtra("note_data");
+            int note_id = intent.getIntExtra("note_id", 0);
+
+            if (operation_type != 0) modifySync();
+
+            switch (operation_type) {
+                case NoteChangeConstant.ADD_NOTE:
+                    addNote(note);
+                    break;
+                case NoteChangeConstant.DELETE_NOTE_BY_ID:
+                    deleteNoteById(note_id);
+                    break;
+                case NoteChangeConstant.MODIFY_NOTE:
+                    modifyNote(note);
+                    break;
+                case NoteChangeConstant.REFRESH_DATA:
+                    refreshData("");
+                    break;
+                case NoteChangeConstant.CHECK_LOGIN_STATUS:
+                    checkLoginStatus();
+                    break;
+                default:
+                    break;
+            }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

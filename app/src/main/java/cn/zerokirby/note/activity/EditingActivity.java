@@ -43,6 +43,21 @@ public class EditingActivity extends BaseActivity {
 
     private SimpleDateFormat simpleDateFormat;//简化日期
 
+    /**
+     * 分享笔记
+     *
+     * @param extraText 分享内容
+     */
+    public static void shareText(String extraText) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, R.string.share);
+        intent.putExtra(Intent.EXTRA_TEXT, extraText);//extraText为文本的内容
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//为Activity新建一个任务栈
+        getContext().startActivity(Intent.createChooser(
+                intent, getContext().getString(R.string.share)));//R.string.action_share同样是标题
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,10 +73,10 @@ public class EditingActivity extends BaseActivity {
         noteId = getIntent().getIntExtra("noteId", 0);//获取点击的数据id
 
         actionBar = getSupportActionBar();
-        if(actionBar != null) {
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);//设置为可以返回
 
-            if(noteId == 0) {//如果没有获取到，则设置标题为新建笔记
+            if (noteId == 0) {//如果没有获取到，则设置标题为新建笔记
                 actionBar.setTitle(R.string.newNote);
 
                 noteTime.setText(new SimpleDateFormat(getContext().getString(R.string.formatDate),
@@ -95,10 +110,12 @@ public class EditingActivity extends BaseActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 wordNum.setText(String.format(getResources().getString(R.string.num_count), s.length()));
             }
+
             @Override
             public void afterTextChanged(Editable editable) {
 
@@ -110,7 +127,7 @@ public class EditingActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar, menu);
-        if(noteId == 0) menu.getItem(0).setVisible(false);//如果笔记id为0，不显示删除按钮
+        if (noteId == 0) menu.getItem(0).setVisible(false);//如果笔记id为0，不显示删除按钮
         this.menu = menu;
         return true;
     }
@@ -118,12 +135,12 @@ public class EditingActivity extends BaseActivity {
     //设置标题栏菜单按钮的点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.save:
                 title = noteTitle.getText().toString();//修改临时保存的标题
                 content = mainText.getText().toString();//修改临时保存的内容
 
-                if(title.isEmpty() && content.isEmpty()) break;//如果没有内容则不保存
+                if (title.isEmpty() && content.isEmpty()) break;//如果没有内容则不保存
 
                 noteId = noteDataHelper.saveChange(new Note(noteId, title, content,
                         simpleDateFormat.format(new Date())));//保存修改
@@ -161,24 +178,10 @@ public class EditingActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * 分享笔记
-     * @param extraText 分享内容
-     */
-    public static void shareText(String extraText) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, R.string.share);
-        intent.putExtra(Intent.EXTRA_TEXT, extraText);//extraText为文本的内容
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//为Activity新建一个任务栈
-        getContext().startActivity(Intent.createChooser(
-                intent, getContext().getString(R.string.share)));//R.string.action_share同样是标题
-    }
-
     //重写，实现笔记内容有修改时弹出提示
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             backWarning();
             return true;
         }
@@ -187,7 +190,7 @@ public class EditingActivity extends BaseActivity {
 
     //笔记有未保存的修改点击后退键弹出警告
     private void backWarning() {
-        if(!title.equals(noteTitle.getText().toString()) || !content.equals(mainText.getText().toString())) {
+        if (!title.equals(noteTitle.getText().toString()) || !content.equals(mainText.getText().toString())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("提示");
             builder.setMessage("有尚未保存的修改\n是否保存？");
