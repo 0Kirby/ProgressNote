@@ -27,7 +27,7 @@ public class GuideActivity extends BaseActivity implements View.OnClickListener 
     private boolean mIsScrolled; //  viewpager是否处于惯性滑动
     private ViewPager mViewPager;
     //容器
-    private List<View> mList = new ArrayList<>();
+    private final List<View> mList = new ArrayList<>();
     private View view1, view2, view3, view4, view5, view6;
     //小圆点
     private ImageView point1, point2, point3, point4, point5, point6;
@@ -143,14 +143,12 @@ public class GuideActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_start:
-            case R.id.btn_back:
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                finish();
-                break;
+        int id = v.getId();
+        if (id == R.id.btn_start || id == R.id.btn_back) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            finish();
         }
     }
 

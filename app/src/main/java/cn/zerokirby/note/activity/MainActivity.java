@@ -215,76 +215,74 @@ public class MainActivity extends BaseActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.login_btn:
-                        Intent intent = new Intent(getContext(), LoginActivity.class);//启动登录
-                        startActivity(intent);
-                        break;
-                    case R.id.sync_SC:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
-                        builder.setTitle("警告");
-                        builder.setMessage("这将导致本地数据被云端数据替换\n是否继续？");
-                        builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
-                                progressDialog.show();
-                                userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
-                            }
-                        });
-                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
-                        builder.show();
-                        break;
-                    case R.id.sync_CS:
-                        builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
-                        builder.setTitle("警告");
-                        builder.setMessage("这将导致云端数据被本地数据替换\n是否继续？");
-                        builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
-                                progressDialog.show();
-                                userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
-                            }
-                        });
-                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
-                        builder.show();
-                        break;
-                    case R.id.settings:
-                        intent = new Intent(getContext(), SettingsActivity.class);//启动设置
-                        startActivity(intent);
-                        break;
-                    case R.id.exit_login:
-                        builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                        builder.setTitle("提示");
-                        builder.setMessage("是否退出登录？");
-                        builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                userDataHelper.exitLogin();
-                                Toast.makeText(getContext(), "已退出登录！", Toast.LENGTH_SHORT).show();
-                                drawerLayout.closeDrawers();
-                                checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
-                            }
-                        });
-                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.login_btn) {
+                    Intent intent = new Intent(getContext(), LoginActivity.class);//启动登录
+                    startActivity(intent);
+                } else if (itemId == R.id.sync_SC) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
+                    builder.setTitle("警告");
+                    builder.setMessage("这将导致本地数据被云端数据替换\n是否继续？");
+                    builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
+                            progressDialog.show();
+                            userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
+                        }
+                    });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                        }
+                    });
+                    builder.show();
+                } else if (itemId == R.id.sync_CS) {
+                    AlertDialog.Builder builder;
+                    builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
+                    builder.setTitle("警告");
+                    builder.setMessage("这将导致云端数据被本地数据替换\n是否继续？");
+                    builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
+                            progressDialog.show();
+                            userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
+                        }
+                    });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                        }
+                    });
+                    builder.show();
+                } else if (itemId == R.id.settings) {
+                    Intent intent;
+                    intent = new Intent(getContext(), SettingsActivity.class);//启动设置
+                    startActivity(intent);
+                } else if (itemId == R.id.exit_login) {
+                    AlertDialog.Builder builder;
+                    builder = new AlertDialog.Builder(MainActivity.this);//显示提示
+                    builder.setTitle("提示");
+                    builder.setMessage("是否退出登录？");
+                    builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            userDataHelper.exitLogin();
+                            Toast.makeText(getContext(), "已退出登录！", Toast.LENGTH_SHORT).show();
+                            drawerLayout.closeDrawers();
+                            checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
+                        }
+                    });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                            }
-                        });
-                        builder.show();
-                        break;
-                    case R.id.help:
-                        intent = new Intent(getContext(), GuideActivity.class);//启动引导页
-                        startActivity(intent);
-                        break;
+                        }
+                    });
+                    builder.show();
+                } else if (itemId == R.id.help) {
+                    Intent intent;
+                    intent = new Intent(getContext(), GuideActivity.class);//启动引导页
+                    startActivity(intent);
                 }
                 return true;
             }
@@ -402,59 +400,55 @@ public class MainActivity extends BaseActivity {
     @SuppressLint("RestrictedApi")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
-                break;
-            case R.id.search_button:
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示查找提示
-                builder.setTitle("提示");
-                builder.setMessage("请输入要查找的内容\n");
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+        } else if (itemId == R.id.search_button) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示查找提示
+            builder.setTitle("提示");
+            builder.setMessage("请输入要查找的内容\n");
 
-                LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-                View searchView = layoutInflater.inflate(R.layout.search_view, null);
-                EditText searchEt = searchView.findViewById(R.id.search_et);
-                builder.setView(searchView);
+            LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+            View searchView = layoutInflater.inflate(R.layout.search_view, null);
+            EditText searchEt = searchView.findViewById(R.id.search_et);
+            builder.setView(searchView);
 
-                builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
-                        searchText = searchEt.getText().toString();
-                        refreshData(searchText);
-                        Toast.makeText(getContext(),
-                                "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-                builder.show();
-                break;
-            case R.id.arrangement:
-                if (arrangement == GRID) {
-                    layoutManager.setSpanCount(1);//设置列数为1
-                    recyclerView.setAdapter(noteAdapterSpecial);//设置适配器Special
-                    item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
-                    arrangement = LIST;
-                } else if (arrangement == LIST) {
-                    if (isMobile())//手机模式
-                        layoutManager.setSpanCount(2);//设置列数为2
-                    else//平板模式
-                        layoutManager.setSpanCount(3);//设置列数为3
-                    recyclerView.setAdapter(noteAdapter);//设置适配器
-                    item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
-                    arrangement = GRID;
+            builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
+                    searchText = searchEt.getText().toString();
+                    refreshData(searchText);
+                    Toast.makeText(getContext(),
+                            "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
                 }
-                recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-                refreshData(searchText);
-                break;
-            case R.id.theme:
-                ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
-                break;
+                }
+            });
+            builder.show();
+        } else if (itemId == R.id.arrangement) {
+            if (arrangement == GRID) {
+                layoutManager.setSpanCount(1);//设置列数为1
+                recyclerView.setAdapter(noteAdapterSpecial);//设置适配器Special
+                item.setIcon(R.drawable.ic_view_stream_white_24dp);//设置列表按钮
+                arrangement = LIST;
+            } else if (arrangement == LIST) {
+                if (isMobile())//手机模式
+                    layoutManager.setSpanCount(2);//设置列数为2
+                else//平板模式
+                    layoutManager.setSpanCount(3);//设置列数为3
+                recyclerView.setAdapter(noteAdapter);//设置适配器
+                item.setIcon(R.drawable.ic_view_module_white_24dp);//设置网格按钮
+                arrangement = GRID;
+            }
+            recyclerView.setLayoutManager(layoutManager);//设置笔记布局
+
+            refreshData(searchText);
+        } else if (itemId == R.id.theme) {
+            ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
         }
         return super.onOptionsItemSelected(item);
     }

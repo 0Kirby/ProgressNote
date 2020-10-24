@@ -135,45 +135,42 @@ public class EditingActivity extends BaseActivity {
     //设置标题栏菜单按钮的点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save:
-                title = noteTitle.getText().toString();//修改临时保存的标题
-                content = mainText.getText().toString();//修改临时保存的内容
+        int itemId = item.getItemId();
+        if (itemId == R.id.save) {
+            title = noteTitle.getText().toString();//修改临时保存的标题
+            content = mainText.getText().toString();//修改临时保存的内容
 
-                if (title.isEmpty() && content.isEmpty()) break;//如果没有内容则不保存
+            if (title.isEmpty() && content.isEmpty())
+                return super.onOptionsItemSelected(item);//如果没有内容则不保存
 
-                noteId = noteDataHelper.saveChange(new Note(noteId, title, content,
-                        simpleDateFormat.format(new Date())));//保存修改
+            noteId = noteDataHelper.saveChange(new Note(noteId, title, content,
+                    simpleDateFormat.format(new Date())));//保存修改
 
-                menu.getItem(0).setVisible(true);//显示删除按钮
-                actionBar.setTitle(R.string.editNote);//设置为编辑笔记
-                break;
-            case R.id.delete:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
-                builder.setTitle("提示");
-                builder.setMessage("是否要删除这条笔记？");
-                builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        noteDataHelper.deleteNote(noteId);
-                        finish();
-                    }
-                });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+            menu.getItem(0).setVisible(true);//显示删除按钮
+            actionBar.setTitle(R.string.editNote);//设置为编辑笔记
+        } else if (itemId == R.id.delete) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
+            builder.setTitle("提示");
+            builder.setMessage("是否要删除这条笔记？");
+            builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    noteDataHelper.deleteNote(noteId);
+                    finish();
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-                    }
-                });
-                builder.show();
-                break;
-            case R.id.share:
-                shareText(noteTitle.getText() +
-                        "\n" + mainText.getText() + "\n" + noteTime.getText());
-                break;
-            case android.R.id.home:
-                backWarning();
-                break;
+                }
+            });
+            builder.show();
+        } else if (itemId == R.id.share) {
+            shareText(noteTitle.getText() +
+                    "\n" + mainText.getText() + "\n" + noteTime.getText());
+        } else if (itemId == android.R.id.home) {
+            backWarning();
         }
         return super.onOptionsItemSelected(item);
     }
