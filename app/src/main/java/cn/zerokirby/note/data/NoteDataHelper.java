@@ -31,7 +31,7 @@ public class NoteDataHelper {
 
     private final SimpleDateFormat simpleDateFormat;//简化日期
 
-    private final Intent intent;//本地广播发送
+    private final static String LOCAL_BROADCAST = "cn.zerokirby.note.LOCAL_BROADCAST";
     private final LocalBroadcastManager localBroadcastManager;//本地广播管理器
 
     public NoteDataHelper() {
@@ -40,7 +40,6 @@ public class NoteDataHelper {
 
         simpleDateFormat = new SimpleDateFormat(getContext().getString(R.string.formatDate), Locale.getDefault());
 
-        intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
         localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
     }
 
@@ -126,6 +125,7 @@ public class NoteDataHelper {
             values.put("content", note.getContent());
             values.put("time", System.currentTimeMillis());
 
+            Intent intent = new Intent(LOCAL_BROADCAST);
             if (note.getId() == 0) {
                 //数据库插入操作
                 db.insert("Note", null, values);
@@ -155,10 +155,6 @@ public class NoteDataHelper {
             if (values != null) values.clear();
             if (cursor != null) cursor.close();
             if (db != null) db.close();
-
-            //清除intent中的extras
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) bundle.clear();
         }
         return noteId;
     }
@@ -174,6 +170,7 @@ public class NoteDataHelper {
             db.delete("Note", "id = ?", new String[]{String.valueOf(noteId)});
 
             //发送本地广播通知MainActivity删除笔记
+            Intent intent = new Intent(LOCAL_BROADCAST);
             intent.putExtra("operation_type", NoteChangeConstant.DELETE_NOTE_BY_ID);
             intent.putExtra("note_id", noteId);
             localBroadcastManager.sendBroadcast(intent);
@@ -181,10 +178,6 @@ public class NoteDataHelper {
             Toast.makeText(getContext(), R.string.deleteSuccess, Toast.LENGTH_SHORT).show();
         } finally {
             if (db != null) db.close();
-
-            //清除intent中的extras
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) bundle.clear();
         }
     }
 

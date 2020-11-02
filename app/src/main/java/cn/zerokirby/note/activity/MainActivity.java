@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -198,7 +199,7 @@ public class MainActivity extends BaseActivity {
                         drawerLayout.closeDrawers();
                         Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
                         userDataHelper.updateSyncTime();
-                        refreshData("");
+                        refreshData();
                         break;
                     case UPLOAD:
                         Toast.makeText(getContext(), "上传成功！", Toast.LENGTH_SHORT).show();//上传头像成功
@@ -289,10 +290,13 @@ public class MainActivity extends BaseActivity {
         });
 
         userDataHelper.getInfo();
-        refreshData("");
+        refreshData();
     }
 
     //刷新数据
+    public void refreshData() {
+        refreshData("");
+    }
     public void refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
         //初始化笔记数据
@@ -317,7 +321,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void run() {
                         //清空搜索内容
-                        refreshData("");
+                        refreshData();
                         searchText = "";
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -411,6 +415,7 @@ public class MainActivity extends BaseActivity {
             LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
             View searchView = layoutInflater.inflate(R.layout.search_view, null);
             EditText searchEt = searchView.findViewById(R.id.search_et);
+            if (!TextUtils.isEmpty(searchText)) searchEt.setText(searchText);
             builder.setView(searchView);
 
             builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
@@ -422,10 +427,10 @@ public class MainActivity extends BaseActivity {
                             "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
                 }
             });
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//清空搜索信息
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-
+                    searchText = "";
                 }
             });
             builder.show();
@@ -453,6 +458,7 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
         AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
         isLogin = userDataHelper.getUserInfo().getUserId();
@@ -635,7 +641,7 @@ public class MainActivity extends BaseActivity {
                     modifyNote(note);
                     break;
                 case NoteChangeConstant.REFRESH_DATA:
-                    refreshData("");
+                    refreshData();
                     break;
                 case NoteChangeConstant.CHECK_LOGIN_STATUS:
                     checkLoginStatus();

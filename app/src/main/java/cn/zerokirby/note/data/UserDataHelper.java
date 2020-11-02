@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,15 +31,9 @@ public class UserDataHelper {
     private Cursor cursor;
 
     private String responseData;
-    private final int userId;
-    private int noteId;
-    private long time;
-    private String title;
-    private String content;
 
     public UserDataHelper() {
         databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
-        userId = getUserInfo().getUserId();
     }
 
     /**
@@ -52,9 +47,14 @@ public class UserDataHelper {
             public void run() {//在子线程中进行网络操作
                 Response response = null;
                 try {
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
-                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
-                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC").post(requestBody).build();
+                    //利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
+                    OkHttpClient client = new OkHttpClient();
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("userId", String.valueOf(getUserInfo().getUserId())).build();
+                    Log.d("Foxizz_Test", String.valueOf(getUserInfo().getUserId()));
+                    Request request = new Request.Builder()
+                            .url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC")
+                            .post(requestBody).build();
                     response = client.newCall(request).execute();
                     responseData = Objects.requireNonNull(response.body()).string();
                     parseJSONWithJSONArray(responseData);//处理JSON
@@ -82,7 +82,7 @@ public class UserDataHelper {
                 Response response = null;
                 try {
                     OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用客户端到服务器的同步servlet
-                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
+                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(getUserInfo().getUserId()))
                             .add("json", Objects.requireNonNull(makeJSONArray())).build();
                     Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
                     response = client.newCall(request).execute();
@@ -111,10 +111,10 @@ public class UserDataHelper {
             JSONArray jsonArray = new JSONArray(jsonData);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                noteId = jsonObject.getInt("NoteId");
-                time = jsonObject.getLong("Time");
-                title = jsonObject.getString("Title");
-                content = jsonObject.getString("Content");
+                int noteId = jsonObject.getInt("NoteId");
+                long time = jsonObject.getLong("Time");
+                String title = jsonObject.getString("Title");
+                String content = jsonObject.getString("Content");
 
                 ContentValues values = new ContentValues();//将笔记ID、标题、修改时间和内容存储到本地
                 values.put("id", noteId);
