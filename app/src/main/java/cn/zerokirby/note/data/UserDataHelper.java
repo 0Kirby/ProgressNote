@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +50,6 @@ public class UserDataHelper {
                     OkHttpClient client = new OkHttpClient();
                     RequestBody requestBody = new FormBody.Builder()
                             .add("userId", String.valueOf(getUserInfo().getUserId())).build();
-                    Log.d("Foxizz_Test", String.valueOf(getUserInfo().getUserId()));
                     Request request = new Request.Builder()
                             .url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC")
                             .post(requestBody).build();
