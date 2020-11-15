@@ -1,5 +1,6 @@
 package cn.zerokirby.note.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,14 +49,24 @@ public class EditingActivity extends BaseActivity {
      *
      * @param extraText 分享内容
      */
-    public static void shareText(String extraText) {
+    public static void shareText(Context context, String extraText) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_SUBJECT, R.string.share);
         intent.putExtra(Intent.EXTRA_TEXT, extraText);//extraText为文本的内容
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//为Activity新建一个任务栈
-        getContext().startActivity(Intent.createChooser(
-                intent, getContext().getString(R.string.share)));//R.string.action_share同样是标题
+        context.startActivity(intent);//R.string.action_share同样是标题
+    }
+
+    private String handleText() {
+        String content = "";
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        if (action != null && action.equals(Intent.ACTION_SEND) && type.equals("text/plain")) {
+            content = intent.getStringExtra(Intent.EXTRA_TEXT);
+        }
+        return content;
     }
 
     @Override
@@ -81,6 +92,7 @@ public class EditingActivity extends BaseActivity {
 
                 noteTime.setText(new SimpleDateFormat(getContext().getString(R.string.formatDate),
                         Locale.getDefault()).format(new Date()));
+
             } else {
                 actionBar.setTitle(R.string.editNote);//否则设置为编辑笔记
 
@@ -121,6 +133,8 @@ public class EditingActivity extends BaseActivity {
 
             }
         });
+
+        mainText.setText(handleText());
     }
 
     //获取标题栏菜单
@@ -167,7 +181,7 @@ public class EditingActivity extends BaseActivity {
             });
             builder.show();
         } else if (itemId == R.id.share) {
-            shareText(noteTitle.getText() +
+            shareText(getContext(), noteTitle.getText() +
                     "\n" + mainText.getText() + "\n" + noteTime.getText());
         } else if (itemId == android.R.id.home) {
             backWarning();
