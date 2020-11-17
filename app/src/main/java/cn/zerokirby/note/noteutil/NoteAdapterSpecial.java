@@ -190,9 +190,7 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
                         NoteDataHelper noteDataHelper = new NoteDataHelper();
                         noteDataHelper.deleteNote(id);
                         noteDataHelper.close();
-
                         mainActivity.modifySync();
-                        mainActivity.deleteNoteById(id);
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做

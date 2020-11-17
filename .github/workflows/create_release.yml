@@ -18,7 +18,7 @@ jobs:
       - name: Assemble release with Gradle
         run: chmod +x gradlew &&./gradlew assembleRelease
       - name: Find filename and set env
-        run: echo ::set-env name=FILENAME::`basename app/build/outputs/apk/release/*.apk`
+        run: echo "FILENAME=`basename app/build/outputs/apk/release/*.apk`" >> $GITHUB_ENV
       - name: Sign APK
         run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} app/build/outputs/apk/release/${{ env.FILENAME }} zerokirby
       - name: Create Release
