@@ -27,7 +27,6 @@
     <string name="action_register">点此注册</string>
     <string name="filter_username">0123456789abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <string name="register_hint">还没有账号？</string>
-    <string name="title_activity_user">当前用户</string>
     <string name="login_userId">用户ID：%1$d</string>
     <string name="login_username">用户名：%1$s</string>
     <string name="last_login">上次登录：%1$s</string>
@@ -51,7 +50,6 @@
     <string name="dot">圆点</string>
     <string name="title_activity_settings">设置</string>
     <string name="sync_header">自动同步</string>
-    <string name="sync_title">自动同步</string>
     <string name="attachment_title">启动应用时</string>
     <string name="remember_username">记住用户名</string>
     <string name="remember_password">记住密码</string>
