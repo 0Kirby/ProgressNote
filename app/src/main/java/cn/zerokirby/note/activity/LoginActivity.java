@@ -185,13 +185,9 @@ public class LoginActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {//当三个输入框同时不为空且验证码正确时，按钮生效
-                if (usernameEditText.length() > 0 && passwordEditText.length() > 0
-                        && codeEditText.getText().toString().equalsIgnoreCase(code)) {
-                    loginButton.setEnabled(true);
-                } else//否则按钮失效
-                {
-                    loginButton.setEnabled(false);
-                }
+                //否则按钮失效
+                loginButton.setEnabled(usernameEditText.length() > 0 && passwordEditText.length() > 0
+                        && codeEditText.getText().toString().equalsIgnoreCase(code));
             }
         };
 

@@ -102,9 +102,9 @@ public class SettingsActivity extends BaseActivity {
             public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
                 if (msg.what == UPDATE) {
                     if (Objects.equals(AppUtil.getVersionName(), versionName))//如果从服务器获取的版本名称和本地相等
-                        checkUpdatePref.setSummary("当前已是最新版本");
+                        checkUpdatePref.setSummary(getString(R.string.latest_version));
                     else
-                        checkUpdatePref.setSummary("有新版本发布，请至天天笔记主页下载");
+                        checkUpdatePref.setSummary(getString(R.string.download_new_version));
                 }
                 return false;
             }
@@ -119,7 +119,7 @@ public class SettingsActivity extends BaseActivity {
 
             Preference preference = findPreference("version");
             if (preference != null) {
-                preference.setSummary(String.format(Locale.getDefault(), "版本号：%s\n构建日期：%d\n包名：%s",
+                preference.setSummary(String.format(Locale.getDefault(), getResources().getString(R.string.version_info),
                         AppUtil.getVersionName(),
                         AppUtil.getVersionCode(),
                         AppUtil.getPackageName()));
@@ -141,18 +141,18 @@ public class SettingsActivity extends BaseActivity {
 
             switch (preference.getKey()) {
                 case "check_update":
-                    checkUpdatePref.setSummary("检查中...");
+                    checkUpdatePref.setSummary(getResources().getString(R.string.checking));
                     checkUpdate();
                     break;
                 case "delete_note":
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
                     boolean modifySync = sharedPreferences.getBoolean(MODIFY_SYNC, false);
-                    builder.setTitle("警告");
+                    builder.setTitle(R.string.warning);
                     if (modifySync)
-                        builder.setMessage("您已开启自动同步\n在清除本地笔记的同时，\n云端笔记也将被清除\n此操作无法恢复\n是否继续？");
+                        builder.setMessage(R.string.delete_note_notice);
                     else
-                        builder.setMessage("这将清除本地所有笔记\n此操作无法恢复\n是否继续？");
-                    builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
+                        builder.setMessage(R.string.delete_note_warning);
+                    builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
@@ -166,10 +166,10 @@ public class SettingsActivity extends BaseActivity {
                             Bundle bundle = intent.getExtras();
                             if (bundle != null) bundle.clear();
 
-                            Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
+                            Toast.makeText(getContext(), getResources().getString(R.string.clear_successfully), Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -178,9 +178,9 @@ public class SettingsActivity extends BaseActivity {
                     builder.show();
                     break;
                 case "delete_all":
-                    builder.setTitle("警告");
-                    builder.setMessage("这将清除本地和云端所有数据并退出登录\n此操作无法恢复\n是否继续？");
-                    builder.setPositiveButton("清除", new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.warning);
+                    builder.setMessage(R.string.delete_all_notice);
+                    builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
                             SQLiteDatabase db = databaseHelper.getWritableDatabase();
@@ -211,10 +211,10 @@ public class SettingsActivity extends BaseActivity {
                             Bundle bundle = intent.getExtras();
                             if (bundle != null) bundle.clear();
 
-                            Toast.makeText(getContext(), "清除完毕！", Toast.LENGTH_SHORT).show();//显示成功提示
+                            Toast.makeText(getContext(), getResources().getString(R.string.clear_successfully), Toast.LENGTH_SHORT).show();//显示成功提示
                         }
                     });
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 

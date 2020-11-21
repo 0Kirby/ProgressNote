@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.AvatarDataHelper;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -111,7 +112,7 @@ public class IconUtil {//关于操作图标的方法
             avatarDataHelper.saveImage(bitmap);
             avatarDataHelper.close();
         } else
-            Toast.makeText(activity, "打开失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, activity.getResources().getString(R.string.open_failed), Toast.LENGTH_SHORT).show();
     }
 
     public void uploadImage(Handler handler) {//上传头像

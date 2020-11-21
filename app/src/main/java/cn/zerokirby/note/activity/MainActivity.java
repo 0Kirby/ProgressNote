@@ -182,8 +182,8 @@ public class MainActivity extends BaseActivity {
 
         //初始化ProgressDialog，这里为AlertDialog+ProgressBar
         AlertDialog.Builder progressBuilder = new AlertDialog.Builder(this);//显示查找提示
-        progressBuilder.setTitle("请稍后");
-        progressBuilder.setMessage("同步中...");
+        progressBuilder.setTitle(R.string.please_wait);
+        progressBuilder.setMessage(R.string.syncing);
         ProgressBar progressBar = new ProgressBar(this);
         progressBuilder.setView(progressBar);
         AlertDialog progressDialog = progressBuilder.create();
@@ -197,12 +197,12 @@ public class MainActivity extends BaseActivity {
                     case CS:
                         progressDialog.dismiss();
                         drawerLayout.closeDrawers();
-                        Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                        Toast.makeText(getContext(), getResources().getString(R.string.sync_successfully), Toast.LENGTH_SHORT).show();//显示解析到的内容
                         userDataHelper.updateSyncTime();
                         refreshData();
                         break;
                     case UPLOAD:
-                        Toast.makeText(getContext(), "上传成功！", Toast.LENGTH_SHORT).show();//上传头像成功
+                        Toast.makeText(getContext(), getResources().getString(R.string.upload_successfully), Toast.LENGTH_SHORT).show();//上传头像成功
                         break;
                 }
                 return false;
@@ -222,16 +222,16 @@ public class MainActivity extends BaseActivity {
                     startActivity(intent);
                 } else if (itemId == R.id.sync_SC) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
-                    builder.setTitle("警告");
-                    builder.setMessage("这将导致本地数据被云端数据替换\n是否继续？");
-                    builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.warning);
+                    builder.setMessage(R.string.sync_SC_notice);
+                    builder.setPositiveButton(R.string.sync, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                             progressDialog.show();
                             userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
                         }
                     });
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                         }
@@ -240,16 +240,16 @@ public class MainActivity extends BaseActivity {
                 } else if (itemId == R.id.sync_CS) {
                     AlertDialog.Builder builder;
                     builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
-                    builder.setTitle("警告");
-                    builder.setMessage("这将导致云端数据被本地数据替换\n是否继续？");
-                    builder.setPositiveButton("同步", new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.warning);
+                    builder.setMessage(R.string.sync_CS_notice);
+                    builder.setPositiveButton(R.string.sync, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
                             progressDialog.show();
                             userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
                         }
                     });
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                         }
@@ -262,18 +262,18 @@ public class MainActivity extends BaseActivity {
                 } else if (itemId == R.id.exit_login) {
                     AlertDialog.Builder builder;
                     builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                    builder.setTitle("提示");
-                    builder.setMessage("是否退出登录？");
-                    builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.notice);
+                    builder.setMessage(R.string.exit_notice);
+                    builder.setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             userDataHelper.exitLogin();
-                            Toast.makeText(getContext(), "已退出登录！", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getResources().getString(R.string.exit_login_notice), Toast.LENGTH_SHORT).show();
                             drawerLayout.closeDrawers();
                             checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
                         }
                     });
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -409,8 +409,8 @@ public class MainActivity extends BaseActivity {
             drawerLayout.openDrawer(GravityCompat.START);
         } else if (itemId == R.id.search_button) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示查找提示
-            builder.setTitle("提示");
-            builder.setMessage("请输入要查找的内容\n");
+            builder.setTitle(R.string.notice);
+            builder.setMessage(R.string.search_notice);
 
             LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
             View searchView = layoutInflater.inflate(R.layout.search_view, null);
@@ -418,16 +418,16 @@ public class MainActivity extends BaseActivity {
             if (!TextUtils.isEmpty(searchText)) searchEt.setText(searchText);
             builder.setView(searchView);
 
-            builder.setPositiveButton("查找", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.search, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
                     searchText = searchEt.getText().toString();
                     refreshData(searchText);
                     Toast.makeText(getContext(),
-                            "找到" + noteList.size() + "条笔记", Toast.LENGTH_SHORT).show();
+                            String.format(getResources().getString(R.string.find_notes), noteList.size()), Toast.LENGTH_SHORT).show();
                 }
             });
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//清空搜索信息
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//清空搜索信息
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     searchText = "";
@@ -481,9 +481,9 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                    builder.setTitle("提示");
-                    builder.setMessage("请先登陆后再使用！");
-                    builder.setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.notice);
+                    builder.setMessage(R.string.not_login_notice);
+                    builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -495,7 +495,7 @@ public class MainActivity extends BaseActivity {
 
             username.setVisibility(View.GONE);//隐藏“用户名”
             userId.setVisibility(View.GONE);//隐藏“用户ID”
-            lastUse.setText("尚未登陆！");//显示“尚未登陆！”
+            lastUse.setText(R.string.logout_status);//显示“尚未登陆！”
             lastUse.setTextSize(32);//设置文字大小
             lastSync.setVisibility(View.GONE);//隐藏“上次同步”
 
@@ -546,17 +546,17 @@ public class MainActivity extends BaseActivity {
         switch (requestCode) {
             case CHOOSE_PHOTO:
                 if (resultCode == RESULT_OK) {
-                    Toast.makeText(getContext(), "打开成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getResources().getString(R.string.open_successfully), Toast.LENGTH_SHORT).show();
                     if (data != null) iconUtil.handleImage(data);
                 } else
-                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getResources().getString(R.string.operation_cancelled), Toast.LENGTH_SHORT).show();
                 break;
             case PHOTO_REQUEST_CUT:
                 if (resultCode == RESULT_OK) {
                     iconUtil.displayImage(UriUtil.getPath(iconUtil.getCropImageUri()));
                     iconUtil.uploadImage(handler);
                 } else
-                    Toast.makeText(getContext(), "取消操作", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getResources().getString(R.string.operation_cancelled), Toast.LENGTH_SHORT).show();
             default:
                 break;
         }
@@ -593,7 +593,7 @@ public class MainActivity extends BaseActivity {
                         if (msg.what == CS) {
                             userDataHelper.updateSyncTime();
                             updateTextView();
-                            Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                            Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
                         }
                         return true;
                     }
@@ -617,7 +617,7 @@ public class MainActivity extends BaseActivity {
         if (user.getLastSync() != 0)//读取上次同步时间
             lastSync.setText(String.format(getResources().getString(R.string.last_sync), simpleDateFormat.format(new Date(user.getLastSync()))));
         else
-            lastSync.setText(String.format(getResources().getString(R.string.last_sync), "无"));
+            lastSync.setText(String.format(getResources().getString(R.string.last_sync), getString(R.string.empty)));
     }
 
     //使用广播接收器处理笔记更新结果
@@ -658,7 +658,7 @@ public class MainActivity extends BaseActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 iconUtil.openAlbum();
             } else {
-                Toast.makeText(getContext(), "未授权外置存储读写权限，无法使用！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.without_external_permission, Toast.LENGTH_SHORT).show();
             }
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }

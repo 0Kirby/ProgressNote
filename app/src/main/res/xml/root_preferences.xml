@@ -3,14 +3,14 @@
 
     <PreferenceCategory
         app:icon="@drawable/ic_info_black_24dp"
-        app:title="当前版本">
+        app:title="@string/current_version">
         <Preference
             android:icon="@mipmap/icon"
             android:key="version" />
         <Preference
             android:key="check_update"
-            android:summary="检查中..."
-            android:title="检查更新" />
+            android:summary="@string/checking"
+            android:title="@string/check_update" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -19,49 +19,49 @@
 
         <SwitchPreferenceCompat
             app:key="modify_sync"
-            app:summary="包括新增、编辑、保存、删除等"
-            app:title="修改笔记时" />
+            app:summary="@string/modify_note_summary"
+            app:title="@string/modify_note" />
 
         <SwitchPreferenceCompat
             app:dependency="modify_sync"
             app:key="launch_sync"
-            app:summary="适用于多台设备的场景"
+            app:summary="@string/launch_sync_summary"
             app:title="@string/attachment_title" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:icon="@drawable/ic_storage_black_24dp"
-        app:title="数据">
+        app:title="@string/data">
 
         <Preference
             app:key="delete_note"
-            app:title="清除所有笔记" />
+            app:title="@string/delete_note_summary" />
 
         <Preference
             app:key="delete_all"
-            app:title="清除所有数据" />
+            app:title="@string/delete_all_summary" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:icon="@drawable/ic_language_black_24dp"
-        app:title="关于">
+        app:title="@string/about">
 
         <Preference
             android:key="my_homepage"
             android:summary="zerokirby.cn"
-            android:title="我的主页" />
+            android:title="@string/my_homepage" />
 
         <Preference
             android:key="homepage"
             android:summary="note.zerokirby.cn"
-            android:title="天天笔记主页" />
+            android:title="@string/official_homepage" />
 
         <Preference
             android:key="blog"
             android:summary="blog.zerokirby.cn"
-            android:title="博客" />
+            android:title="@string/blog" />
 
         <Preference
             android:key="github"
@@ -70,19 +70,19 @@
 
         <Preference
             android:key="feedback"
-            android:summary="遇到bug或者有建议请告诉我们"
-            android:title="反馈" />
+            android:summary="@string/feedback_summary"
+            android:title="@string/feedback" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:icon="@drawable/ic_code_black_24dp"
-        app:title="开发者">
+        app:title="@string/developer">
 
         <Preference
             android:key="code"
             android:summary="小林卡比 GitHub@0Kirby"
-            android:title="代码" />
+            android:title="@string/code_settings" />
 
         <Preference
             android:key="ui"
@@ -92,12 +92,12 @@
         <Preference
             android:key="theme"
             android:summary="汝南京 GitHub@EndureBlaze"
-            android:title="主题" />
+            android:title="@string/theme" />
 
         <Preference
             android:key="icon"
             android:summary="Yoshi1999 哔哩哔哩@YoshiX1999"
-            android:title="图标" />
+            android:title="@string/icon" />
 
     </PreferenceCategory>
 

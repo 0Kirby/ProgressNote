@@ -99,7 +99,7 @@ public class RegisterActivity extends BaseActivity {
                 if (msg.what == REGISTER) {
                     Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     progressBar.setVisibility(View.GONE);
-                    if (responseData.equals("注册成功！")) {
+                    if (responseData.equals(getString(R.string.register_sucessfully))) {
                         User user = new User();
                         user.setUserId(userId);
                         user.setUsername(username);

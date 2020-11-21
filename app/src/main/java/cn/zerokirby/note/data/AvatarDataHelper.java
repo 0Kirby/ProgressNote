@@ -120,7 +120,7 @@ public class AvatarDataHelper {
      * 关闭数据库，防止内存泄漏
      */
     public void close() {
-        if (databaseHelper != null) databaseHelper.close();
+        databaseHelper.close();
     }
 
 }

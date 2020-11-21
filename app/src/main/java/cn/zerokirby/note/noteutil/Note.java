@@ -100,29 +100,28 @@ public class Note implements Parcelable {
         long diff = 0;
         if (nowTime != null) diff = System.currentTimeMillis() - nowTime.getTime();
         int days = (int) (diff / (1000 * 60 * 60 * 24));
-
         if (days == 0)
-            return "今天";
+            return getContext().getResources().getString(R.string.today);
         else if (days == 1)
-            return "昨天";
+            return getContext().getResources().getString(R.string.yesterday);
         else if (days < 7) {
             Calendar calendar = Calendar.getInstance();
             int weekday = (7 + calendar.get(Calendar.DAY_OF_WEEK) - days) % 7;
             switch (weekday) {
                 case 0:
-                    return getDay() + " 星期六";
+                    return getDay() + getContext().getResources().getString(R.string.saturday);
                 case 1:
-                    return getDay() + " 星期日";
+                    return getDay() + getContext().getResources().getString(R.string.sunday);
                 case 2:
-                    return getDay() + " 星期一";
+                    return getDay() + getContext().getResources().getString(R.string.monday);
                 case 3:
-                    return getDay() + " 星期二";
+                    return getDay() + getContext().getResources().getString(R.string.tuesday);
                 case 4:
-                    return getDay() + " 星期三";
+                    return getDay() + getContext().getResources().getString(R.string.wednesday);
                 case 5:
-                    return getDay() + " 星期四";
+                    return getDay() + getContext().getResources().getString(R.string.thursday);
                 case 6:
-                    return getDay() + " 星期五";
+                    return getDay() + getContext().getResources().getString(R.string.friday);
             }
         }
         return getDay();

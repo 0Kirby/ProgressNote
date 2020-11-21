@@ -157,23 +157,24 @@ public class EditingActivity extends BaseActivity {
             if (title.isEmpty() && content.isEmpty())
                 return super.onOptionsItemSelected(item);//如果没有内容则不保存
 
-            noteId = noteDataHelper.saveChange(new Note(noteId, title, content,
-                    simpleDateFormat.format(new Date())));//保存修改
+            String date = simpleDateFormat.format(new Date());
+            noteTime.setText(date);
+            noteId = noteDataHelper.saveChange(new Note(noteId, title, content, date));//保存修改
 
             menu.getItem(0).setVisible(true);//显示删除按钮
             actionBar.setTitle(R.string.editNote);//设置为编辑笔记
         } else if (itemId == R.id.delete) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
-            builder.setTitle("提示");
-            builder.setMessage("是否要删除这条笔记？");
-            builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+            builder.setTitle(R.string.notice);
+            builder.setMessage(R.string.delete_button_notice);
+            builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     noteDataHelper.deleteNote(noteId);
                     finish();
                 }
             });
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -203,9 +204,9 @@ public class EditingActivity extends BaseActivity {
     private void backWarning() {
         if (!title.equals(noteTitle.getText().toString()) || !content.equals(mainText.getText().toString())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("提示");
-            builder.setMessage("有尚未保存的修改\n是否保存？");
-            builder.setNeutralButton("保存", new DialogInterface.OnClickListener() {
+            builder.setTitle(R.string.notice);
+            builder.setMessage(R.string.unsaved_notice);
+            builder.setNeutralButton(R.string.save, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     noteDataHelper.saveChange(new Note(noteId,
@@ -215,13 +216,13 @@ public class EditingActivity extends BaseActivity {
                     finish();
                 }
             });
-            builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
                 }
             });
-            builder.setNegativeButton("不保存", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.do_not_save, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     finish();

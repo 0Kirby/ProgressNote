@@ -71,7 +71,7 @@ public class OpeningActivity extends BaseActivity {
                         @Override
                         public boolean handleMessage(@NonNull Message msg) {
                             if (msg.what == SC) {
-                                Toast.makeText(getContext(), "同步成功！", Toast.LENGTH_SHORT).show();//显示解析到的内容
+                                Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
                                 UserDataHelper userDataHelper = new UserDataHelper();
                                 userDataHelper.updateSyncTime();
                                 userDataHelper.close();

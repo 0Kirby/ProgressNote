@@ -25,6 +25,8 @@ import cn.zerokirby.note.activity.EditingActivity;
 import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.data.NoteDataHelper;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.ViewHolder> {
 
     private final MainActivity mainActivity;
@@ -182,9 +184,9 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
                 int id = note.getId();
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
-                builder.setTitle("提示");
-                builder.setMessage("是否要删除“" + note.getTitle() + "”？");
-                builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.notice);
+                builder.setMessage(String.format(getContext().getResources().getString(R.string.delete_format), note.getTitle()));
+                builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
                         NoteDataHelper noteDataHelper = new NoteDataHelper();
@@ -193,7 +195,7 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
                         mainActivity.modifySync();
                     }
                 });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//什么也不做
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
