@@ -33,6 +33,8 @@ import cn.zerokirby.note.data.DatabaseHelper;
 import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
+import cn.zerokirby.note.util.LanguageUtil;
+import cn.zerokirby.note.util.ShareUtil;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -113,6 +115,9 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private static final String LANGUAGE_ID = "langID";
+        private static final String LANGUAGE_NAME = "langName";
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -140,6 +145,30 @@ public class SettingsActivity extends BaseActivity {
             DatabaseHelper databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
 
             switch (preference.getKey()) {
+                case "language":
+                    int itemSelected = ShareUtil.getInt(LANGUAGE_ID, 0);
+                    String[] lan = {"Auto", "简体中文", "日本語"};
+                    AlertDialog dialog = new AlertDialog.Builder(requireActivity()).setTitle(R.string.setting_language_title)
+                            .setSingleChoiceItems(lan, itemSelected, (dialog1, i) -> {
+                                ShareUtil.putInt(LANGUAGE_ID, i);
+                                switch (i) {
+                                    case 0:
+                                        ShareUtil.putString(LANGUAGE_NAME, "auto");
+                                        break;
+                                    case 1:
+                                        ShareUtil.putString(LANGUAGE_NAME, "zh_cn");
+                                        break;
+                                    case 2:
+                                        ShareUtil.putString(LANGUAGE_NAME, "ja_jp");
+                                        break;
+                                }
+                                dialog1.dismiss();
+                                LanguageUtil.setLanguage();
+                                Intent intent = new Intent(requireActivity(), SettingsActivity.class);
+                                startActivity(intent);
+                            }).create();
+                    dialog.show();
+                    break;
                 case "check_update":
                     checkUpdatePref.setSummary(getResources().getString(R.string.checking));
                     checkUpdate();

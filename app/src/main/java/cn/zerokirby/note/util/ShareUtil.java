@@ -33,4 +33,16 @@ public class ShareUtil {
         return sp.getString(key, defValue);
     }
 
+    //写入整数
+    public static void putInt(String key, int value) {
+        SharedPreferences sp = getContext().getSharedPreferences(SETTINGS, Context.MODE_PRIVATE);
+        sp.edit().putInt(key, value).apply();
+    }
+
+    //读取整数
+    public static int getInt(String key, int defValue) {
+        SharedPreferences sp = getContext().getSharedPreferences(SETTINGS, Context.MODE_PRIVATE);
+        return sp.getInt(key, defValue);
+    }
+
 }

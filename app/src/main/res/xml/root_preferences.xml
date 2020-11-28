@@ -11,6 +11,9 @@
             android:key="check_update"
             android:summary="@string/checking"
             android:title="@string/check_update" />
+        <Preference
+            android:key="language"
+            android:title="@string/setting_language_title" />
     </PreferenceCategory>
 
     <PreferenceCategory

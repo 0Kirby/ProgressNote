@@ -59,7 +59,7 @@
     <string name="logout_status">ログアウト中！</string>
     <string name="check_update">アップデートを確認する</string>
     <string name="checking">更新を確認中…</string>
-    <string name="current_version">バージョン情報</string>
+    <string name="current_version">一般</string>
     <string name="version_info">バージョン：%1$s\nリリース日：%2$d\nパッケージ名：%3$s</string>
     <string name="latest_version">このバージョンは最新です</string>
     <string name="download_new_version">公式サイトへアプリを更新する</string>
@@ -117,4 +117,5 @@
     <string name="saturday">　土曜日</string>
     <string name="sunday">　日曜日</string>
     <string name="not_login_notice">ご利用前にログインしてください！</string>
+    <string name="setting_language_title">言語</string>
 </resources>
