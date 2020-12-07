@@ -65,6 +65,7 @@ public class RegisterActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         userDataHelper = new UserDataHelper();
 
         final EditText usernameEditText = findViewById(R.id.username);
