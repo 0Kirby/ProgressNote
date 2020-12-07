@@ -179,9 +179,9 @@ public class MainActivity extends BaseActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setToolBarTitle(R.string.chinese_name);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
-        LanguageUtil.setLanguage();
 
         //初始化ProgressDialog，这里为AlertDialog+ProgressBar
         AlertDialog.Builder progressBuilder = new AlertDialog.Builder(this);//显示查找提示
@@ -300,6 +300,7 @@ public class MainActivity extends BaseActivity {
     public void refreshData() {
         refreshData("");
     }
+
     public void refreshData(String s) {
         recyclerView.startAnimation(adapterAlpha1);
         //初始化笔记数据

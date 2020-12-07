@@ -33,13 +33,14 @@ import cn.zerokirby.note.data.DatabaseHelper;
 import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
-import cn.zerokirby.note.util.LanguageUtil;
 import cn.zerokirby.note.util.ShareUtil;
+import kotlin.jvm.functions.Function0;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import ren.imyan.language.LanguageUtil;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 
@@ -90,6 +91,8 @@ public class SettingsActivity extends BaseActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setToolBarTitle(R.string.title_activity_settings);
+
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
@@ -146,24 +149,26 @@ public class SettingsActivity extends BaseActivity {
 
             switch (preference.getKey()) {
                 case "language":
+                    //LanguageUtil.showLanguageDialog(getActivity(), getActivity().getResources().getString(R.string.setting_language_title), overLanguage());
                     int itemSelected = ShareUtil.getInt(LANGUAGE_ID, 0);
                     String[] lan = {"Auto", "简体中文", "日本語"};
                     AlertDialog dialog = new AlertDialog.Builder(requireActivity()).setTitle(R.string.setting_language_title)
                             .setSingleChoiceItems(lan, itemSelected, (dialog1, i) -> {
                                 ShareUtil.putInt(LANGUAGE_ID, i);
+
                                 switch (i) {
-                                    case 0:
-                                        ShareUtil.putString(LANGUAGE_NAME, "auto");
-                                        break;
                                     case 1:
-                                        ShareUtil.putString(LANGUAGE_NAME, "zh_cn");
+                                        ShareUtil.putString(LANGUAGE_NAME, "zh-rCN");
                                         break;
                                     case 2:
-                                        ShareUtil.putString(LANGUAGE_NAME, "ja_jp");
+                                        ShareUtil.putString(LANGUAGE_NAME, "ja-jp");
+                                        break;
+                                    case 0:
+                                    default:
+                                        ShareUtil.putString(LANGUAGE_NAME, "auto");
                                         break;
                                 }
                                 dialog1.dismiss();
-                                LanguageUtil.setLanguage();
                                 requireActivity().finish();
                                 //清空任务栈
                                 Intent intent = new Intent(requireActivity(), MainActivity.class);
@@ -288,6 +293,8 @@ public class SettingsActivity extends BaseActivity {
                 case "icon":
                     browser.setData(Uri.parse("https://space.bilibili.com/8333040"));
                     requireActivity().startActivity(browser);
+                    break;
+                default:
                     break;
             }
             return super.onPreferenceTreeClick(preference);
