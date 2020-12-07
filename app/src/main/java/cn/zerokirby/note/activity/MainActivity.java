@@ -61,7 +61,6 @@ import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.userutil.IconUtil;
 import cn.zerokirby.note.userutil.UriUtil;
 import cn.zerokirby.note.userutil.User;
-import cn.zerokirby.note.util.LanguageUtil;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
@@ -80,7 +79,6 @@ public class MainActivity extends BaseActivity {
     private Animation adapterAlpha2;//动画2，出现
     private String searchText;//用来保存在查找对话框输入的文字
 
-    private IntentFilter intentFilter;
     private LocalReceiver localReceiver;
     private LocalBroadcastManager localBroadcastManager;
 
@@ -98,7 +96,6 @@ public class MainActivity extends BaseActivity {
     private NavigationView navigationView;//左侧布局
     private View headView;//头部布局
     private DrawerLayout drawerLayout;//侧滑菜单的三横
-    private FloatingActionButton floatingActionButton;//悬浮按钮
     private SwipeRefreshLayout swipeRefreshLayout;//下拉刷新
 
     private int isLogin;
@@ -144,33 +141,26 @@ public class MainActivity extends BaseActivity {
         recyclerView.setLayoutManager(layoutManager);//设置笔记布局
 
         //注册本地广播监听器
-        intentFilter = new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("cn.zerokirby.note.LOCAL_BROADCAST");
         localReceiver = new LocalReceiver();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(localReceiver, intentFilter);
 
         //为悬浮按钮设置点击事件
-        floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), EditingActivity.class);
-                intent.putExtra("noteId", 0);//传递0，表示新建
-                startActivity(intent);
-            }
+        //悬浮按钮
+        FloatingActionButton floatingActionButton = findViewById(R.id.floatButton);//新建笔记按钮
+        floatingActionButton.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), EditingActivity.class);
+            intent.putExtra("noteId", 0);//传递0，表示新建
+            startActivity(intent);
         });
 
         //为下拉刷新设置事件
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        refreshDataLayout();
-                    }
-                });
+                this::refreshDataLayout);
 
         navigationView = findViewById(R.id.nav_view);
         headView = navigationView.getHeaderView(0);//获取头部布局
@@ -192,104 +182,83 @@ public class MainActivity extends BaseActivity {
         AlertDialog progressDialog = progressBuilder.create();
 
 
-        handler = new Handler(new Handler.Callback() {//用于异步消息处理
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                switch (msg.what) {
-                    case SC:
-                    case CS:
-                        progressDialog.dismiss();
-                        drawerLayout.closeDrawers();
-                        Toast.makeText(getContext(), getResources().getString(R.string.sync_successfully), Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        userDataHelper.updateSyncTime();
-                        refreshData();
-                        break;
-                    case UPLOAD:
-                        Toast.makeText(getContext(), getResources().getString(R.string.upload_successfully), Toast.LENGTH_SHORT).show();//上传头像成功
-                        break;
-                }
-                return false;
+        //用于异步消息处理
+        handler = new Handler(msg -> {
+            switch (msg.what) {
+                case SC:
+                case CS:
+                    progressDialog.dismiss();
+                    drawerLayout.closeDrawers();
+                    Toast.makeText(getContext(), getResources().getString(R.string.sync_successfully), Toast.LENGTH_SHORT).show();//显示解析到的内容
+                    userDataHelper.updateSyncTime();
+                    refreshData();
+                    break;
+                case UPLOAD:
+                    Toast.makeText(getContext(), getResources().getString(R.string.upload_successfully), Toast.LENGTH_SHORT).show();//上传头像成功
+                    break;
             }
+            return false;
         });
 
         //检查登录状态，确定隐藏哪些文字和按钮
         checkLoginStatus();
         iconUtil = new IconUtil(this, avatar);
         //设置navigationView
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-                if (itemId == R.id.login_btn) {
-                    Intent intent = new Intent(getContext(), LoginActivity.class);//启动登录
-                    startActivity(intent);
-                } else if (itemId == R.id.sync_SC) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
-                    builder.setTitle(R.string.warning);
-                    builder.setMessage(R.string.sync_SC_notice);
-                    builder.setPositiveButton(R.string.sync, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
-                            progressDialog.show();
-                            userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
-                        }
-                    });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                        }
-                    });
-                    builder.show();
-                } else if (itemId == R.id.sync_CS) {
-                    AlertDialog.Builder builder;
-                    builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
-                    builder.setTitle(R.string.warning);
-                    builder.setMessage(R.string.sync_CS_notice);
-                    builder.setPositiveButton(R.string.sync, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行同步操作
-                            progressDialog.show();
-                            userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
-                        }
-                    });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                        }
-                    });
-                    builder.show();
-                } else if (itemId == R.id.settings) {
-                    Intent intent;
-                    intent = new Intent(getContext(), SettingsActivity.class);//启动设置
-                    startActivity(intent);
-                } else if (itemId == R.id.exit_login) {
-                    AlertDialog.Builder builder;
-                    builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                    builder.setTitle(R.string.notice);
-                    builder.setMessage(R.string.exit_notice);
-                    builder.setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            userDataHelper.exitLogin();
-                            Toast.makeText(getContext(), getResources().getString(R.string.exit_login_notice), Toast.LENGTH_SHORT).show();
-                            drawerLayout.closeDrawers();
-                            checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
-                        }
-                    });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.login_btn) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);//启动登录
+                startActivity(intent);
+            } else if (itemId == R.id.sync_SC) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
+                builder.setTitle(R.string.warning);
+                builder.setMessage(R.string.sync_SC_notice);
+                builder.setPositiveButton(R.string.sync, (dialogInterface, i) -> {//点击确定则执行同步操作
+                    progressDialog.show();
+                    userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
+                });
+                //什么也不做
+                builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
+                });
+                builder.show();
+            } else if (itemId == R.id.sync_CS) {
+                AlertDialog.Builder builder;
+                builder = new AlertDialog.Builder(MainActivity.this);//显示同步提示
+                builder.setTitle(R.string.warning);
+                builder.setMessage(R.string.sync_CS_notice);
+                builder.setPositiveButton(R.string.sync, (dialogInterface, i) -> {//点击确定则执行同步操作
+                    progressDialog.show();
+                    userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
+                });
+                //什么也不做
+                builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
+                });
+                builder.show();
+            } else if (itemId == R.id.settings) {
+                Intent intent;
+                intent = new Intent(getContext(), SettingsActivity.class);//启动设置
+                startActivity(intent);
+            } else if (itemId == R.id.exit_login) {
+                AlertDialog.Builder builder;
+                builder = new AlertDialog.Builder(MainActivity.this);//显示提示
+                builder.setTitle(R.string.notice);
+                builder.setMessage(R.string.exit_notice);
+                builder.setPositiveButton(R.string.exit, (dialogInterface, i) -> {
+                    userDataHelper.exitLogin();
+                    Toast.makeText(getContext(), getResources().getString(R.string.exit_login_notice), Toast.LENGTH_SHORT).show();
+                    drawerLayout.closeDrawers();
+                    checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
+                });
+                builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
 
-                        }
-                    });
-                    builder.show();
-                } else if (itemId == R.id.help) {
-                    Intent intent;
-                    intent = new Intent(getContext(), GuideActivity.class);//启动引导页
-                    startActivity(intent);
-                }
-                return true;
+                });
+                builder.show();
+            } else if (itemId == R.id.help) {
+                Intent intent;
+                intent = new Intent(getContext(), GuideActivity.class);//启动引导页
+                startActivity(intent);
             }
+            return true;
         });
 
         userDataHelper.getInfo();
@@ -318,20 +287,12 @@ public class MainActivity extends BaseActivity {
 
     //刷新数据
     private void refreshDataLayout() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //清空搜索内容
-                        refreshData();
-                        searchText = "";
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                });
-            }
-        }).start();
+        new Thread(() -> runOnUiThread(() -> {
+            //清空搜索内容
+            refreshData();
+            searchText = "";
+            swipeRefreshLayout.setRefreshing(false);
+        })).start();
     }
 
     //通过id寻找item的下标
@@ -422,21 +383,14 @@ public class MainActivity extends BaseActivity {
             if (!TextUtils.isEmpty(searchText)) searchEt.setText(searchText);
             builder.setView(searchView);
 
-            builder.setPositiveButton(R.string.search, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行查找操作
-                    searchText = searchEt.getText().toString();
-                    refreshData(searchText);
-                    Toast.makeText(getContext(),
-                            String.format(getResources().getString(R.string.find_notes), noteList.size()), Toast.LENGTH_SHORT).show();
-                }
+            builder.setPositiveButton(R.string.search, (dialogInterface, i) -> {//点击确定则执行查找操作
+                searchText = searchEt.getText().toString();
+                refreshData(searchText);
+                Toast.makeText(getContext(),
+                        String.format(getResources().getString(R.string.find_notes), noteList.size()), Toast.LENGTH_SHORT).show();
             });
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//清空搜索信息
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    searchText = "";
-                }
-            });
+            //清空搜索信息
+            builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> searchText = "");
             builder.show();
         } else if (itemId == R.id.arrangement) {
             if (arrangement == GRID) {
@@ -481,20 +435,14 @@ public class MainActivity extends BaseActivity {
 
             //设置头像未待添加，并禁用修改头像按钮
             avatar.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
-            avatar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
-                    builder.setTitle(R.string.notice);
-                    builder.setMessage(R.string.not_login_notice);
-                    builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+            avatar.setOnClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//显示提示
+                builder.setTitle(R.string.notice);
+                builder.setMessage(R.string.not_login_notice);
+                builder.setPositiveButton(R.string.close, (dialogInterface, i) -> {
 
-                        }
-                    });
-                    builder.show();
-                }
+                });
+                builder.show();
             });
 
             username.setVisibility(View.GONE);//隐藏“用户名”
@@ -513,12 +461,7 @@ public class MainActivity extends BaseActivity {
             avatar.setImageBitmap(avatarDataHelper.readIcon());
             avatarDataHelper.close();
 
-            avatar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    iconUtil.iconClick();
-                }
-            });
+            avatar.setOnClickListener(v -> iconUtil.iconClick());
 
             updateTextView();//更新TextView
 
@@ -591,16 +534,14 @@ public class MainActivity extends BaseActivity {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
             if (modifySync) {
-                Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
-                    @Override
-                    public boolean handleMessage(@NonNull Message msg) {
-                        if (msg.what == CS) {
-                            userDataHelper.updateSyncTime();
-                            updateTextView();
-                            Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
-                        }
-                        return true;
+                //用于异步消息处理
+                Handler handler = new Handler(msg -> {
+                    if (msg.what == CS) {
+                        userDataHelper.updateSyncTime();
+                        updateTextView();
+                        Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     }
+                    return true;
                 });
                 userDataHelper.sendRequestWithOkHttpCS(handler);
             }

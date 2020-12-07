@@ -34,7 +34,6 @@ public class IconUtil {//关于操作图标的方法
 
     private final int UPLOAD = 3;//上传图片
     private final int CHOOSE_PHOTO = 4;//选择图片
-    private final int PHOTO_REQUEST_CUT = 5;//请求裁剪图片
     private final Activity activity;
     private final ImageView avatar;
     private Uri cropImageUri;
@@ -101,6 +100,8 @@ public class IconUtil {//关于操作图标的方法
         intent.putExtra(MediaStore.EXTRA_OUTPUT, cropImageUri);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         intent.putExtra("noFaceDetection", true); // no face detection
+        //请求裁剪图片
+        int PHOTO_REQUEST_CUT = 5;
         activity.startActivityForResult(intent, PHOTO_REQUEST_CUT);
     }
 
@@ -116,29 +117,26 @@ public class IconUtil {//关于操作图标的方法
     }
 
     public void uploadImage(Handler handler) {//上传头像
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                File file = new File(Objects.requireNonNull(UriUtil.getPath(cropImageUri)));
-                final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
-                AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
-                final int id = avatarDataHelper.getUserId();//获取用户id
-                avatarDataHelper.close();
-                OkHttpClient client = new OkHttpClient();
-                RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型为jpg
-                RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                        .addFormDataPart("userId", String.valueOf(id))
-                        .addFormDataPart("file", id + ".jpg", fileBody).build();
-                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/UploadAvatarServlet").post(requestBody).build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    Message message = new Message();//发送消息
-                    message.what = UPLOAD;
-                    handler.sendMessage(message);
-                    response.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {
+            File file = new File(Objects.requireNonNull(UriUtil.getPath(cropImageUri)));
+            final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
+            AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
+            final int id = avatarDataHelper.getUserId();//获取用户id
+            avatarDataHelper.close();
+            OkHttpClient client = new OkHttpClient();
+            RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型为jpg
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("userId", String.valueOf(id))
+                    .addFormDataPart("file", id + ".jpg", fileBody).build();
+            Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/UploadAvatarServlet").post(requestBody).build();
+            try {
+                Response response = client.newCall(request).execute();
+                Message message = new Message();//发送消息
+                message.what = UPLOAD;
+                handler.sendMessage(message);
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }).start();
     }

@@ -86,7 +86,7 @@ public class NetworkUtil {//获取网络状态
                             strNetworkType = moblie4g;
                             break;
                         default:
-                            if (_strSubTypeName.equalsIgnoreCase("TD-SCDMA") || _strSubTypeName.equalsIgnoreCase("WCDMA") || _strSubTypeName.equalsIgnoreCase("CDMA2000")) {
+                            if ("TD-SCDMA".equalsIgnoreCase(_strSubTypeName) || "WCDMA".equalsIgnoreCase(_strSubTypeName) || "CDMA2000".equalsIgnoreCase(_strSubTypeName)) {
                                 strNetworkType = moblie3g;
                             } else {
                                 strNetworkType = _strSubTypeName;

@@ -41,29 +41,26 @@ public class UserDataHelper {
      * @param handler 主线程处理器
      */
     public void sendRequestWithOkHttpSC(Handler handler) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {//在子线程中进行网络操作
-                Response response = null;
-                try {
-                    //利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
-                    OkHttpClient client = new OkHttpClient();
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("userId", String.valueOf(getUserInfo().getUserId())).build();
-                    Request request = new Request.Builder()
-                            .url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC")
-                            .post(requestBody).build();
-                    response = client.newCall(request).execute();
-                    responseData = Objects.requireNonNull(response.body()).string();
-                    parseJSONWithJSONArray(responseData);//处理JSON
-                    Message message = new Message();
-                    message.what = SC;
-                    handler.sendMessage(message);//通过handler发送消息请求toast
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (response != null) response.close();
-                }
+        new Thread(() -> {//在子线程中进行网络操作
+            Response response = null;
+            try {
+                //利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
+                OkHttpClient client = new OkHttpClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("userId", String.valueOf(getUserInfo().getUserId())).build();
+                Request request = new Request.Builder()
+                        .url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_SC")
+                        .post(requestBody).build();
+                response = client.newCall(request).execute();
+                responseData = Objects.requireNonNull(response.body()).string();
+                parseJSONWithJSONArray(responseData);//处理JSON
+                Message message = new Message();
+                message.what = SC;
+                handler.sendMessage(message);//通过handler发送消息请求toast
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (response != null) response.close();
             }
         }).start();
     }
@@ -74,24 +71,21 @@ public class UserDataHelper {
      * @param handler 主线程处理器
      */
     public void sendRequestWithOkHttpCS(Handler handler) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {//在子线程中进行网络操作
-                Response response = null;
-                try {
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用客户端到服务器的同步servlet
-                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(getUserInfo().getUserId()))
-                            .add("json", Objects.requireNonNull(makeJSONArray())).build();
-                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
-                    response = client.newCall(request).execute();
-                    Message message = new Message();
-                    message.what = CS;
-                    handler.sendMessage(message);//通过handler发送消息请求toast
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (response != null) response.close();
-                }
+        new Thread(() -> {//在子线程中进行网络操作
+            Response response = null;
+            try {
+                OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用客户端到服务器的同步servlet
+                RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(getUserInfo().getUserId()))
+                        .add("json", Objects.requireNonNull(makeJSONArray())).build();
+                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
+                response = client.newCall(request).execute();
+                Message message = new Message();
+                message.what = CS;
+                handler.sendMessage(message);//通过handler发送消息请求toast
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (response != null) response.close();
             }
         }).start();
     }

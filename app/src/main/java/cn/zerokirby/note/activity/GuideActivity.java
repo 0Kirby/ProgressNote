@@ -25,10 +25,8 @@ public class GuideActivity extends BaseActivity implements View.OnClickListener 
 
     private int page;
     private boolean mIsScrolled; //  viewpager是否处于惯性滑动
-    private ViewPager mViewPager;
     //容器
     private final List<View> mList = new ArrayList<>();
-    private View view1, view2, view3, view4, view5, view6;
     //小圆点
     private ImageView point1, point2, point3, point4, point5, point6;
     //跳过
@@ -57,13 +55,13 @@ public class GuideActivity extends BaseActivity implements View.OnClickListener 
         btn_back.setOnClickListener(this);
         //设置默认图片
         setPointImg(true, false, false, false, false, false);
-        mViewPager = findViewById(R.id.mViewPager);
-        view1 = View.inflate(this, R.layout.pager_item_1, null);
-        view2 = View.inflate(this, R.layout.pager_item_2, null);
-        view3 = View.inflate(this, R.layout.pager_item_3, null);
-        view4 = View.inflate(this, R.layout.pager_item_4, null);
-        view5 = View.inflate(this, R.layout.pager_item_5, null);
-        view6 = View.inflate(this, R.layout.pager_item_6, null);
+        ViewPager mViewPager = findViewById(R.id.mViewPager);
+        View view1 = View.inflate(this, R.layout.pager_item_1, null);
+        View view2 = View.inflate(this, R.layout.pager_item_2, null);
+        View view3 = View.inflate(this, R.layout.pager_item_3, null);
+        View view4 = View.inflate(this, R.layout.pager_item_4, null);
+        View view5 = View.inflate(this, R.layout.pager_item_5, null);
+        View view6 = View.inflate(this, R.layout.pager_item_6, null);
         view6.findViewById(R.id.btn_start).setOnClickListener(this);
 
         mList.add(view1);

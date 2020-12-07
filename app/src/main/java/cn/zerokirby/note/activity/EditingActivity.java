@@ -23,6 +23,7 @@ import java.util.Locale;
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.NoteDataHelper;
 import cn.zerokirby.note.noteutil.Note;
+import cn.zerokirby.note.util.YanRenUtilKt;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 
@@ -63,7 +64,7 @@ public class EditingActivity extends BaseActivity {
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
-        if (action != null && action.equals(Intent.ACTION_SEND) && type.equals("text/plain")) {
+        if (action != null && action.equals(Intent.ACTION_SEND) && "text/plain".equals(type)) {
             content = intent.getStringExtra(Intent.EXTRA_TEXT);
         }
         return content;
@@ -162,24 +163,16 @@ public class EditingActivity extends BaseActivity {
             noteId = noteDataHelper.saveChange(new Note(noteId, title, content, date));//保存修改
 
             menu.getItem(0).setVisible(true);//显示删除按钮
-            actionBar.setTitle(R.string.editNote);//设置为编辑笔记
+            actionBar.setTitle(YanRenUtilKt.getLocalString(R.string.editNote));//设置为编辑笔记
         } else if (itemId == R.id.delete) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);//显示删除提示
-            builder.setTitle(R.string.notice);
+            builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
             builder.setMessage(R.string.delete_button_notice);
-            builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    noteDataHelper.deleteNote(noteId);
-                    finish();
-                }
+            builder.setPositiveButton(R.string.delete, (dialogInterface, i) -> {
+                noteDataHelper.deleteNote(noteId);
+                finish();
             });
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
-                }
-            });
+            builder.setNegativeButton(YanRenUtilKt.getLocalString(R.string.cancel), null);
             builder.show();
         } else if (itemId == R.id.share) {
             shareText(getContext(), noteTitle.getText() +
@@ -204,30 +197,17 @@ public class EditingActivity extends BaseActivity {
     private void backWarning() {
         if (!title.equals(noteTitle.getText().toString()) || !content.equals(mainText.getText().toString())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.notice);
-            builder.setMessage(R.string.unsaved_notice);
-            builder.setNeutralButton(R.string.save, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    noteDataHelper.saveChange(new Note(noteId,
-                            noteTitle.getText().toString(),
-                            mainText.getText().toString(),
-                            simpleDateFormat.format(new Date())));//保存修改
-                    finish();
-                }
+            builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
+            builder.setMessage(YanRenUtilKt.getLocalString(R.string.unsaved_notice));
+            builder.setNeutralButton(R.string.save, (dialogInterface, i) -> {
+                noteDataHelper.saveChange(new Note(noteId,
+                        noteTitle.getText().toString(),
+                        mainText.getText().toString(),
+                        simpleDateFormat.format(new Date())));//保存修改
+                finish();
             });
-            builder.setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-            builder.setNegativeButton(R.string.do_not_save, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            });
+            builder.setPositiveButton(YanRenUtilKt.getLocalString(R.string.cancel), null);
+            builder.setNegativeButton(YanRenUtilKt.getLocalString(R.string.do_not_save), (dialogInterface, i) -> finish());
             builder.show();
         } else finish();
     }

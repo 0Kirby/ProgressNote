@@ -81,77 +81,64 @@ public class RegisterActivity extends BaseActivity {
         bitmap = CodeUtil.getInstance().createBitmap();//获取工具类生成的图片验证码对象
         code = CodeUtil.getInstance().getCode();//获取当前图片验证码的对应内容用于校验
         codeView.setImageBitmap(bitmap);
-        codeView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bitmap = CodeUtil.getInstance().createBitmap();
-                code = CodeUtil.getInstance().getCode();
-                codeView.setImageBitmap(bitmap);
-                codeEditText.setText("");
-                registerButton.setEnabled(false);
-            }
+        codeView.setOnClickListener(v -> {
+            bitmap = CodeUtil.getInstance().createBitmap();
+            code = CodeUtil.getInstance().getCode();
+            codeView.setImageBitmap(bitmap);
+            codeEditText.setText("");
+            registerButton.setEnabled(false);
         });
         setRemember();//初始化复选框
 
-        handler = new Handler(new Handler.Callback() {
+        handler = new Handler(msg -> {//用于异步消息处理
+            if (msg.what == REGISTER) {
+                Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                progressBar.setVisibility(View.GONE);
+                if (responseData.equals(getString(R.string.register_sucessfully))) {
+                    User user = new User();
+                    user.setUserId(userId);
+                    user.setUsername(username);
+                    user.setPassword(password);
+                    user.setLastUse(System.currentTimeMillis());
+                    user.setRegisterTime(System.currentTimeMillis());
+                    userDataHelper.updateLoginStatus(user, true);
 
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
-                if (msg.what == REGISTER) {
-                    Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
-                    progressBar.setVisibility(View.GONE);
-                    if (responseData.equals(getString(R.string.register_sucessfully))) {
-                        User user = new User();
-                        user.setUserId(userId);
-                        user.setUsername(username);
-                        user.setPassword(password);
-                        user.setLastUse(System.currentTimeMillis());
-                        user.setRegisterTime(System.currentTimeMillis());
-                        userDataHelper.updateLoginStatus(user, true);
+                    LoginActivity.loginActivity.finish();
 
-                        LoginActivity.loginActivity.finish();
+                    //发送本地广播通知MainActivity改变登录状态
+                    Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                    intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
+                    LocalBroadcastManager.getInstance(RegisterActivity.this).sendBroadcast(intent);
 
-                        //发送本地广播通知MainActivity改变登录状态
-                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                        intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
-                        LocalBroadcastManager.getInstance(RegisterActivity.this).sendBroadcast(intent);
-
-                        finish();
-                    }
+                    finish();
                 }
-                return false;
             }
+            return false;
         });
 
         //设置复选框的点击事件
-        usernameCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (usernameCheckBox.isChecked()) {
-                    passwordCheckBox.setEnabled(true);
-                    ShareUtil.putBoolean(USERNAME, true);
-                } else {//取消复选框时删除存储在本地的用户名和密码
-                    passwordCheckBox.setEnabled(false);
-                    UserDataHelper userDataHelper = new UserDataHelper();
-                    userDataHelper.setUserColumnNull("username");
-                    userDataHelper.setUserColumnNull("password");
-                    userDataHelper.close();
-                    ShareUtil.putBoolean(USERNAME, false);
-                }
+        usernameCheckBox.setOnClickListener(v -> {
+            if (usernameCheckBox.isChecked()) {
+                passwordCheckBox.setEnabled(true);
+                ShareUtil.putBoolean(USERNAME, true);
+            } else {//取消复选框时删除存储在本地的用户名和密码
+                passwordCheckBox.setEnabled(false);
+                UserDataHelper userDataHelper = new UserDataHelper();
+                userDataHelper.setUserColumnNull("username");
+                userDataHelper.setUserColumnNull("password");
+                userDataHelper.close();
+                ShareUtil.putBoolean(USERNAME, false);
             }
         });
 
-        passwordCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (passwordCheckBox.isChecked())
-                    ShareUtil.putBoolean(PASSWORD, true);
-                else {//取消复选框时删除存储在本地的密码
-                    UserDataHelper userDataHelper = new UserDataHelper();
-                    userDataHelper.setUserColumnNull("password");
-                    userDataHelper.close();
-                    ShareUtil.putBoolean(PASSWORD, false);
-                }
+        passwordCheckBox.setOnClickListener(v -> {
+            if (passwordCheckBox.isChecked())
+                ShareUtil.putBoolean(PASSWORD, true);
+            else {//取消复选框时删除存储在本地的密码
+                UserDataHelper userDataHelper = new UserDataHelper();
+                userDataHelper.setUserColumnNull("password");
+                userDataHelper.close();
+                ShareUtil.putBoolean(PASSWORD, false);
             }
         });
 
@@ -174,50 +161,39 @@ public class RegisterActivity extends BaseActivity {
             }
         };
 
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        imageView.setOnClickListener(v -> finish());
 
         usernameEditText.addTextChangedListener(textWatcher);//给三个输入框增加监控
         passwordEditText.addTextChangedListener(textWatcher);
         codeEditText.addTextChangedListener(textWatcher);
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {//注册按钮事件处理
-                progressBar.setVisibility(View.VISIBLE);//显示进度条
-                username = usernameEditText.getText().toString();
-                password = passwordEditText.getText().toString();
-                sendRequestWithOkHttpRegister(username, password);//通过OkHttp发送注册请求
-            }
+        registerButton.setOnClickListener(v -> {//注册按钮事件处理
+            progressBar.setVisibility(View.VISIBLE);//显示进度条
+            username = usernameEditText.getText().toString();
+            password = passwordEditText.getText().toString();
+            sendRequestWithOkHttpRegister(username, password);//通过OkHttp发送注册请求
         });
     }
 
     private void sendRequestWithOkHttpRegister(final String username, final String password) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {//在子线程中进行网络操作
-                try {
-                    SystemUtil systemUtil = new SystemUtil();
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端注册servlet
-                    RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password)
-                            .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
-                            .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
-                            .add("brand", systemUtil.getDeviceBrand()).build();
-                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/RegisterServlet").post(requestBody).build();
-                    Response response = client.newCall(request).execute();
-                    responseData = Objects.requireNonNull(response.body()).string();
-                    parseJSONWithJSONObject(responseData);//处理JSON
-                    Message message = new Message();
-                    message.what = REGISTER;
-                    handler.sendMessage(message);//通过handler发送消息请求toast
-                    response.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {//在子线程中进行网络操作
+            try {
+                SystemUtil systemUtil = new SystemUtil();
+                OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端注册servlet
+                RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password)
+                        .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
+                        .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
+                        .add("brand", systemUtil.getDeviceBrand()).build();
+                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/RegisterServlet").post(requestBody).build();
+                Response response = client.newCall(request).execute();
+                responseData = Objects.requireNonNull(response.body()).string();
+                parseJSONWithJSONObject(responseData);//处理JSON
+                Message message = new Message();
+                message.what = REGISTER;
+                handler.sendMessage(message);//通过handler发送消息请求toast
+                response.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }

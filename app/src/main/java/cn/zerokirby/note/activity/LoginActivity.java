@@ -99,76 +99,63 @@ public class LoginActivity extends BaseActivity {
         bitmap = CodeUtil.getInstance().createBitmap();//获取工具类生成的图片验证码对象
         code = CodeUtil.getInstance().getCode();//获取当前图片验证码的对应内容用于校验
         codeView.setImageBitmap(bitmap);
-        codeView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bitmap = CodeUtil.getInstance().createBitmap();
-                code = CodeUtil.getInstance().getCode();
-                codeView.setImageBitmap(bitmap);
-                codeEditText.setText("");
-                loginButton.setEnabled(false);
-            }
+        codeView.setOnClickListener(v -> {
+            bitmap = CodeUtil.getInstance().createBitmap();
+            code = CodeUtil.getInstance().getCode();
+            codeView.setImageBitmap(bitmap);
+            codeEditText.setText("");
+            loginButton.setEnabled(false);
         });
         setRemember();//初始化复选框
 
-        handler = new Handler(new Handler.Callback() {
+        handler = new Handler(msg -> {//用于异步消息处理
+            if (msg.what == LOGIN) {
+                Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                progressBar.setVisibility(View.GONE);
+                if ("登录成功！".equals(responseData)) {
+                    User user = new User();
+                    user.setUserId(userId);
+                    user.setUsername(username);
+                    user.setPassword(password);
+                    user.setLastUse(System.currentTimeMillis());
+                    user.setRegisterTime(registerTime);
+                    user.setLastSync(syncTime);
+                    userDataHelper.updateLoginStatus(user, false);
 
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
-                if (msg.what == LOGIN) {
-                    Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
-                    progressBar.setVisibility(View.GONE);
-                    if (responseData.equals("登录成功！")) {
-                        User user = new User();
-                        user.setUserId(userId);
-                        user.setUsername(username);
-                        user.setPassword(password);
-                        user.setLastUse(System.currentTimeMillis());
-                        user.setRegisterTime(registerTime);
-                        user.setLastSync(syncTime);
-                        userDataHelper.updateLoginStatus(user, false);
+                    //发送本地广播通知MainActivity改变登录状态
+                    Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
+                    intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
+                    LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(intent);
 
-                        //发送本地广播通知MainActivity改变登录状态
-                        Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
-                        intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
-                        LocalBroadcastManager.getInstance(LoginActivity.this).sendBroadcast(intent);
-
-                        finish();
-                    }
+                    finish();
                 }
-                return false;
             }
+            return false;
         });
 
         //设置复选框的点击事件
-        usernameCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (usernameCheckBox.isChecked()) {
-                    passwordCheckBox.setEnabled(true);
-                    ShareUtil.putBoolean(USERNAME, true);
-                } else {//取消复选框时删除存储在本地的用户名和密码
-                    passwordCheckBox.setEnabled(false);
-                    UserDataHelper userDataHelper = new UserDataHelper();
-                    userDataHelper.setUserColumnNull("username");
-                    userDataHelper.setUserColumnNull("password");
-                    userDataHelper.close();
-                    ShareUtil.putBoolean(USERNAME, false);
-                }
+        usernameCheckBox.setOnClickListener(v -> {
+            if (usernameCheckBox.isChecked()) {
+                passwordCheckBox.setEnabled(true);
+                ShareUtil.putBoolean(USERNAME, true);
+            } else {//取消复选框时删除存储在本地的用户名和密码
+                passwordCheckBox.setEnabled(false);
+                UserDataHelper userDataHelper = new UserDataHelper();
+                userDataHelper.setUserColumnNull("username");
+                userDataHelper.setUserColumnNull("password");
+                userDataHelper.close();
+                ShareUtil.putBoolean(USERNAME, false);
             }
         });
 
-        passwordCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (passwordCheckBox.isChecked())
-                    ShareUtil.putBoolean(PASSWORD, true);
-                else {//取消复选框时删除存储在本地的密码
-                    UserDataHelper userDataHelper = new UserDataHelper();
-                    userDataHelper.setUserColumnNull("password");
-                    userDataHelper.close();
-                    ShareUtil.putBoolean(PASSWORD, false);
-                }
+        passwordCheckBox.setOnClickListener(v -> {
+            if (passwordCheckBox.isChecked())
+                ShareUtil.putBoolean(PASSWORD, true);
+            else {//取消复选框时删除存储在本地的密码
+                UserDataHelper userDataHelper = new UserDataHelper();
+                userDataHelper.setUserColumnNull("password");
+                userDataHelper.close();
+                ShareUtil.putBoolean(PASSWORD, false);
             }
         });
 
@@ -191,83 +178,69 @@ public class LoginActivity extends BaseActivity {
             }
         };
 
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        imageView.setOnClickListener(v -> finish());
 
         usernameEditText.addTextChangedListener(textWatcher);//给三个输入框增加监控
         passwordEditText.addTextChangedListener(textWatcher);
         codeEditText.addTextChangedListener(textWatcher);
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {//登录按钮事件处理
-                progressBar.setVisibility(View.VISIBLE);//显示进度条
-                username = usernameEditText.getText().toString();
-                password = passwordEditText.getText().toString();
-                sendRequestWithOkHttpLogin(username, password);//通过OkHttp发送登录请求
+        loginButton.setOnClickListener(v -> {//登录按钮事件处理
+            progressBar.setVisibility(View.VISIBLE);//显示进度条
+            username = usernameEditText.getText().toString();
+            password = passwordEditText.getText().toString();
+            sendRequestWithOkHttpLogin(username, password);//通过OkHttp发送登录请求
 
-            }
         });
 
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {//注册事件处理
-                Intent it = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(it);
-            }
+        register.setOnClickListener(v -> {//注册事件处理
+            Intent it = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(it);
         });
     }
 
     private void sendRequestWithOkHttpLogin(final String username, final String password) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {//在子线程中进行网络操作
-                try {
-                    //基础登录
-                    SystemUtil systemUtil = new SystemUtil();
-                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
-                    RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password)
-                            .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
-                            .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
-                            .add("brand", systemUtil.getDeviceBrand()).build();
-                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/LoginServlet").post(requestBody).build();
-                    Response response = client.newCall(request).execute();
-                    responseData = Objects.requireNonNull(response.body()).string();
-                    parseJSONWithJSONObject(responseData);//处理JSON
+        new Thread(() -> {//在子线程中进行网络操作
+            try {
+                //基础登录
+                SystemUtil systemUtil = new SystemUtil();
+                OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务端登录servlet
+                RequestBody requestBody = new FormBody.Builder().add("username", username).add("password", password)
+                        .add("language", systemUtil.getSystemLanguage()).add("version", systemUtil.getSystemVersion())
+                        .add("display", systemUtil.getSystemDisplay()).add("model", systemUtil.getSystemModel())
+                        .add("brand", systemUtil.getDeviceBrand()).build();
+                Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/LoginServlet").post(requestBody).build();
+                Response response = client.newCall(request).execute();
+                responseData = Objects.requireNonNull(response.body()).string();
+                parseJSONWithJSONObject(responseData);//处理JSON
 
-                    //获取头像
-                    if (responseData.equals("登录成功！"))//登陆成功的情况下才处理头像
-                    {
-                        client = new OkHttpClient();
-                        requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
-                        request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
-                        response = client.newCall(request).execute();
-                        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+                //获取头像
+                if ("登录成功！".equals(responseData))//登陆成功的情况下才处理头像
+                {
+                    client = new OkHttpClient();
+                    requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
+                    request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet").post(requestBody).build();
+                    response = client.newCall(request).execute();
+                    InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
 
-                        //将用户ID、用户名、密码存储到本地
-                        ByteArrayOutputStream output = new ByteArrayOutputStream();
-                        byte[] buffer = new byte[1024];//缓冲区大小
-                        int n;
-                        while (-1 != (n = inputStream.read(buffer))) {
-                            output.write(buffer, 0, n);
-                        }
-                        inputStream.close();
-                        output.close();
-                        byte[] bytes = output.toByteArray();
-
-                        userDataHelper.saveUserNameAndPassword(bytes);
+                    //将用户ID、用户名、密码存储到本地
+                    ByteArrayOutputStream output = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];//缓冲区大小
+                    int n;
+                    while (-1 != (n = inputStream.read(buffer))) {
+                        output.write(buffer, 0, n);
                     }
-                    Message message = new Message();
-                    message.what = LOGIN;
-                    handler.sendMessage(message);//通过handler发送消息请求toast
-                    response.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    inputStream.close();
+                    output.close();
+                    byte[] bytes = output.toByteArray();
+
+                    userDataHelper.saveUserNameAndPassword(bytes);
                 }
+                Message message = new Message();
+                message.what = LOGIN;
+                handler.sendMessage(message);//通过handler发送消息请求toast
+                response.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -276,7 +249,7 @@ public class LoginActivity extends BaseActivity {
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
             responseData = jsonObject.getString("Result");//取出Result字段
-            if (responseData.equals("登录成功！")) {
+            if ("登录成功！".equals(responseData)) {
                 registerTime = jsonObject.getLong("RegisterTime");
                 syncTime = jsonObject.getLong("SyncTime");
             }
