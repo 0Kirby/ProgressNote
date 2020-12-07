@@ -29,15 +29,11 @@ public class CodeUtil {//生成验证码工具类
     //这是一个单例模式
     private static CodeUtil codeUtil;
     //画布的长宽
-    private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
-    //字体的随机位置
-    private int base_padding_left = BASE_PADDING_LEFT, range_padding_left = RANGE_PADDING_LEFT,
-            base_padding_top = BASE_PADDING_TOP, range_padding_top = RANGE_PADDING_TOP;
-    //验证码个数，线条数，字体大小
-    private int codeLength = CODE_LENGTH, line_number = LINE_NUMBER, font_size = FONT_SIZE;
+    private final int width = DEFAULT_WIDTH;
+    private final int height = DEFAULT_HEIGHT;
     private String code;
     private int padding_left, padding_top;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public static CodeUtil getInstance() {
         if (codeUtil == null) {
@@ -61,7 +57,7 @@ public class CodeUtil {//生成验证码工具类
         Paint paint = new Paint();
         //设置画笔抗锯齿
         paint.setAntiAlias(true);
-        paint.setTextSize(font_size);
+        paint.setTextSize(FONT_SIZE);
 
         for (int i = 0; i < code.length(); i++) {
             randomTextStyle(paint);
@@ -70,7 +66,7 @@ public class CodeUtil {//生成验证码工具类
             c.drawText(code.charAt(i) + "", padding_left, padding_top, paint);
         }
         //画干扰线
-        for (int i = 0; i < line_number; i++) {
+        for (int i = 0; i < LINE_NUMBER; i++) {
             drawLine(c, paint);
         }
         //保存一下画布
@@ -83,7 +79,8 @@ public class CodeUtil {//生成验证码工具类
     private String createCode() {
         StringBuilder sb = new StringBuilder();
         //利用random生成随机下标
-        for (int i = 0; i < codeLength; i++) {
+        //验证码个数，线条数，字体大小
+        for (int i = 0; i < CODE_LENGTH; i++) {
             sb.append(CHARS[random.nextInt(CHARS.length)]);
         }
         return sb.toString();
@@ -126,8 +123,9 @@ public class CodeUtil {//生成验证码工具类
 
     //验证码位置随机
     private void randomPadding() {
-        padding_left += base_padding_left + random.nextInt(range_padding_left);
-        padding_top = base_padding_top + random.nextInt(range_padding_top);
+        //字体的随机位置
+        padding_left += BASE_PADDING_LEFT + random.nextInt(RANGE_PADDING_LEFT);
+        padding_top = BASE_PADDING_TOP + random.nextInt(RANGE_PADDING_TOP);
     }
 
     public String getCode() {

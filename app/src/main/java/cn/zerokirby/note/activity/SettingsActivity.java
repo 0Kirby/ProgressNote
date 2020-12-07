@@ -58,23 +58,20 @@ public class SettingsActivity extends BaseActivity {
     private static LocalBroadcastManager localBroadcastManager;//本地广播管理器
 
     private static void checkUpdate() {//检查更新
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求下载JSON
-                Request request = new Request.Builder().url("https://note.zerokirby.cn/version.json").build();//检测更新地址
-                try {
-                    Response response = client.newCall(request).execute();
-                    String json = Objects.requireNonNull(response.body()).string();
-                    JSONObject jsonObject = new JSONObject(json);
-                    versionName = jsonObject.getString("versionName");//从JSON中解析到版本名称
-                    Message message = new Message();
-                    message.what = UPDATE;
-                    handler.sendMessage(message);
-                    response.close();
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {
+            OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求下载JSON
+            Request request = new Request.Builder().url("https://note.zerokirby.cn/version.json").build();//检测更新地址
+            try {
+                Response response = client.newCall(request).execute();
+                String json = Objects.requireNonNull(response.body()).string();
+                JSONObject jsonObject = new JSONObject(json);
+                versionName = jsonObject.getString("versionName");//从JSON中解析到版本名称
+                Message message = new Message();
+                message.what = UPDATE;
+                handler.sendMessage(message);
+                response.close();
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -102,17 +99,14 @@ public class SettingsActivity extends BaseActivity {
         UserDataHelper userDataHelper = new UserDataHelper();
         userId = userDataHelper.getUserInfo().getUserId();//读取id
         userDataHelper.close();
-        handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {//用于异步消息处理
-                if (msg.what == UPDATE) {
-                    if (Objects.equals(AppUtil.getVersionName(), versionName))//如果从服务器获取的版本名称和本地相等
-                        checkUpdatePref.setSummary(getString(R.string.latest_version));
-                    else
-                        checkUpdatePref.setSummary(getString(R.string.download_new_version));
-                }
-                return false;
+        handler = new Handler(msg -> {//用于异步消息处理
+            if (msg.what == UPDATE) {
+                if (Objects.equals(AppUtil.getVersionName(), versionName))//如果从服务器获取的版本名称和本地相等
+                    checkUpdatePref.setSummary(getString(R.string.latest_version));
+                else
+                    checkUpdatePref.setSummary(getString(R.string.download_new_version));
             }
+            return false;
         });
         checkUpdate();//每次进入设置页面自动检查更新
     }
@@ -189,73 +183,60 @@ public class SettingsActivity extends BaseActivity {
                         builder.setMessage(R.string.delete_note_notice);
                     else
                         builder.setMessage(R.string.delete_note_warning);
-                    builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
-                            SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                            db.execSQL("Delete from Note");//清空笔记表
-                            db.close();
+                    builder.setPositiveButton(R.string.clear, (dialogInterface, i) -> {//点击确定则执行清除操作
+                        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                        db.execSQL("Delete from Note");//清空笔记表
+                        db.close();
 
-                            //发送本地广播通知MainActivity刷新数据
-                            localBroadcastManager.sendBroadcast(intent);
+                        //发送本地广播通知MainActivity刷新数据
+                        localBroadcastManager.sendBroadcast(intent);
 
-                            //清除intent中的extras
-                            Bundle bundle = intent.getExtras();
-                            if (bundle != null) bundle.clear();
+                        //清除intent中的extras
+                        Bundle bundle = intent.getExtras();
+                        if (bundle != null) bundle.clear();
 
-                            Toast.makeText(getContext(), getResources().getString(R.string.clear_successfully), Toast.LENGTH_SHORT).show();//显示成功提示
-                        }
+                        Toast.makeText(getContext(), getResources().getString(R.string.clear_successfully), Toast.LENGTH_SHORT).show();//显示成功提示
                     });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                    //什么也不做
+                    builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
 
-                        }
                     });
                     builder.show();
                     break;
                 case "delete_all":
                     builder.setTitle(R.string.warning);
                     builder.setMessage(R.string.delete_all_notice);
-                    builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行清除操作
-                            SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                            db.execSQL("Delete from Note");//清空笔记表
-                            db.execSQL("Delete from User");//清空用户表
-                            db.close();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    JSONArray jsonArray = new JSONArray();//空的JSON数组
-                                    OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
-                                    RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
-                                            .add("json", Objects.requireNonNull(jsonArray).toString()).build();
-                                    Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
-                                    try {
-                                        Response response = client.newCall(request).execute();
-                                        response.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }).start();
+                    builder.setPositiveButton(R.string.clear, (dialogInterface, i) -> {//点击确定则执行清除操作
+                        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                        db.execSQL("Delete from Note");//清空笔记表
+                        db.execSQL("Delete from User");//清空用户表
+                        db.close();
+                        new Thread(() -> {
+                            JSONArray jsonArray = new JSONArray();//空的JSON数组
+                            OkHttpClient client = new OkHttpClient();//利用OkHttp发送HTTP请求调用服务器到客户端的同步servlet
+                            RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
+                                    .add("json", Objects.requireNonNull(jsonArray).toString()).build();
+                            Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
+                            try {
+                                Response response = client.newCall(request).execute();
+                                response.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
 
-                            //发送本地广播通知MainActivity刷新数据
-                            localBroadcastManager.sendBroadcast(intent);
+                        //发送本地广播通知MainActivity刷新数据
+                        localBroadcastManager.sendBroadcast(intent);
 
-                            //清除intent中的extras
-                            Bundle bundle = intent.getExtras();
-                            if (bundle != null) bundle.clear();
+                        //清除intent中的extras
+                        Bundle bundle = intent.getExtras();
+                        if (bundle != null) bundle.clear();
 
-                            Toast.makeText(getContext(), getResources().getString(R.string.clear_successfully), Toast.LENGTH_SHORT).show();//显示成功提示
-                        }
+                        Toast.makeText(getContext(), getResources().getString(R.string.clear_successfully), Toast.LENGTH_SHORT).show();//显示成功提示
                     });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                    //什么也不做
+                    builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
 
-                        }
                     });
                     builder.show();
                     break;

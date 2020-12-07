@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.KeyEvent;
@@ -13,12 +14,15 @@ import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.Objects;
@@ -77,6 +81,7 @@ public class FeedbackActivity extends BaseActivity {
         webView.getSettings().setJavaScriptEnabled(true);//开启JavaScript
         webView.getSettings().setDomStorageEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
+            @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {//允许重定向，避免在系统浏览器中打开页面
                 try {
@@ -92,6 +97,22 @@ public class FeedbackActivity extends BaseActivity {
                 return true;
             }
 
+            @RequiresApi(Build.VERSION_CODES.N)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                try {
+                    if (url.startsWith("weixin://")) {//允许调起微信
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        view.getContext().startActivity(intent);
+                        return true;
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
+                view.loadUrl(url);
+                return true;
+            }
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
@@ -101,7 +122,29 @@ public class FeedbackActivity extends BaseActivity {
                 uploadMessageAboveL = filePathCallback;
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivityForResult(intent, CHOOSE_PHOTO);
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), (result -> {
+                    Intent data = result.getData();
+                    int resultCode = result.getResultCode();
+                    Uri[] results = null;
+                    if (resultCode == Activity.RESULT_OK) {
+                        if (data != null) {
+                            String dataString = data.getDataString();
+                            ClipData clipData = data.getClipData();
+                            if (clipData != null) {
+                                results = new Uri[clipData.getItemCount()];
+                                for (int i = 0; i < clipData.getItemCount(); i++) {
+                                    ClipData.Item item = clipData.getItemAt(i);
+                                    results[i] = item.getUri();
+                                }
+                            }
+                            if (dataString != null) {
+                                results = new Uri[]{Uri.parse(dataString)};
+                            }
+                        }
+                    }
+                    uploadMessageAboveL.onReceiveValue(results);
+                    uploadMessageAboveL = null;
+                })).launch(intent);
                 return true;
             }
 
@@ -159,32 +202,6 @@ public class FeedbackActivity extends BaseActivity {
             webView.postUrl(url, postData.getBytes());
         }
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-        if (requestCode != CHOOSE_PHOTO || uploadMessageAboveL == null)
-            return;
-        Uri[] results = null;
-        if (resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                String dataString = data.getDataString();
-                ClipData clipData = data.getClipData();
-                if (clipData != null) {
-                    results = new Uri[clipData.getItemCount()];
-                    for (int i = 0; i < clipData.getItemCount(); i++) {
-                        ClipData.Item item = clipData.getItemAt(i);
-                        results[i] = item.getUri();
-                    }
-                }
-                if (dataString != null)
-                    results = new Uri[]{Uri.parse(dataString)};
-            }
-        }
-        uploadMessageAboveL.onReceiveValue(results);
-        uploadMessageAboveL = null;
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

@@ -18,6 +18,8 @@ import cn.zerokirby.note.R;
 import cn.zerokirby.note.activity.EditingActivity;
 import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.data.NoteDataHelper;
+import cn.zerokirby.note.util.YanRenUtilKt;
+import ren.imyan.base.ActivityCollector;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 
@@ -34,10 +36,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder {
-        View dataView;
-        TextView title;
-        TextView content;
-        TextView time;
+        final View dataView;
+        final TextView title;
+        final TextView content;
+        final TextView time;
 
         ViewHolder(View view) {
             super(view);
@@ -54,7 +56,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         return mNoteList.size();
     }
 
-    //获取DataItem的数据
+    /**
+     * 获取DataItem的数据
+     */
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -74,51 +78,36 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         final ViewHolder holder = new ViewHolder(view);
 
         //笔记的点击事件
-        holder.dataView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //传送数据的id并启动EditingActivity
-                int position = holder.getBindingAdapterPosition();
-                Note note = mNoteList.get(position);
-                int id = note.getId();
-                Intent intent = new Intent(mainActivity, EditingActivity.class);
-                intent.putExtra("noteId", id);
-                mainActivity.startActivity(intent);
-            }
+        holder.dataView.setOnClickListener(view12 -> {
+            //传送数据的id并启动EditingActivity
+            int position = holder.getBindingAdapterPosition();
+            Note note = mNoteList.get(position);
+            int id = note.getId();
+            Intent intent = new Intent(mainActivity, EditingActivity.class);
+            intent.putExtra("noteId", id);
+            mainActivity.startActivity(intent);
         });
 
         //笔记的长按事件
-        holder.dataView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                int position = holder.getBindingAdapterPosition();
-                Note note = mNoteList.get(position);
-                int id = note.getId();
+        holder.dataView.setOnLongClickListener(view1 -> {
+            int position = holder.getBindingAdapterPosition();
+            Note note = mNoteList.get(position);
+            int id = note.getId();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
-                builder.setTitle(R.string.notice);
-                builder.setMessage(String.format(getContext().getResources().getString(R.string.delete_format), note.getTitle()));
-                builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        NoteDataHelper noteDataHelper = new NoteDataHelper();
-                        noteDataHelper.deleteNote(id);
-                        noteDataHelper.close();
-                        mainActivity.modifySync();
-                    }
-                });
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-                builder.show();
-
-                return true;
-            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
+            builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
+            builder.setMessage(String.format(YanRenUtilKt.getLocalString(R.string.delete_format), note.getTitle()));
+            builder.setPositiveButton(YanRenUtilKt.getLocalString(R.string.delete), (dialogInterface, i) -> {//点击确定则执行删除操作
+                NoteDataHelper noteDataHelper = new NoteDataHelper();
+                noteDataHelper.deleteNote(id);
+                noteDataHelper.close();
+                mainActivity.modifySync();
+            });
+            //什么也不做
+            builder.setNegativeButton(R.string.cancel, null);
+            builder.show();
+            return true;
         });
-
         return holder;
     }
 

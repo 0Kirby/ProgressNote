@@ -12,8 +12,8 @@ import java.util.List;
 
 public class ThemeListAdapter extends BaseAdapter {
     private int checkItem;
-    private Context context;
-    private List<Integer> theme_list;
+    private final Context context;
+    private final List<Integer> theme_list;
 
     public ThemeListAdapter(Context context, List<Integer> list) {
         this.context = context;

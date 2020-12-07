@@ -24,6 +24,7 @@ import cn.zerokirby.note.R;
 import cn.zerokirby.note.activity.EditingActivity;
 import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.data.NoteDataHelper;
+import cn.zerokirby.note.util.YanRenUtilKt;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 
@@ -44,16 +45,13 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
         RecyclerView recyclerView = mainActivity.findViewById(R.id.recyclerView);//需要回滚的recyclerView
         ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
         //valueAnimator.setDuration(300);//动画时间（默认就是300）
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                //逐渐改变view的高度
-                view.getLayoutParams().height = (int) animation.getAnimatedValue();
-                view.requestLayout();
+        valueAnimator.addUpdateListener(animation -> {
+            //逐渐改变view的高度
+            view.getLayoutParams().height = (int) animation.getAnimatedValue();
+            view.requestLayout();
 
-                //不断地移动回这个item的位置
-                recyclerView.scrollToPosition(position);
-            }
+            //不断地移动回这个item的位置
+            recyclerView.scrollToPosition(position);
         });
         return valueAnimator;
     }
@@ -64,27 +62,24 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
         final ValueAnimator valueAnimator = ValueAnimator.ofFloat(from, to);
         valueAnimator.setInterpolator(new DecelerateInterpolator());//先加速后减速的动画
         //valueAnimator.setDuration(300);//动画时间（默认就是300）
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                //逐渐改变view的旋转角度
-                view.setRotation((float) valueAnimator.getAnimatedValue());
-            }
+        valueAnimator.addUpdateListener(animation -> {
+            //逐渐改变view的旋转角度
+            view.setRotation((float) valueAnimator.getAnimatedValue());
         });
         valueAnimator.start();
     }
 
     //设置item中的View
     static class ViewHolder extends RecyclerView.ViewHolder {
-        View dataView;
-        CardView cardView;
-        TextView yearMonth;
-        TextView titleSpecial;
-        TextView dayTime;
-        LinearLayout layoutDrawer;
-        TextView contentSpecial;
-        ImageButton spreadButton;
-        View extendView;
+        final View dataView;
+        final CardView cardView;
+        final TextView yearMonth;
+        final TextView titleSpecial;
+        final TextView dayTime;
+        final LinearLayout layoutDrawer;
+        final TextView contentSpecial;
+        final ImageButton spreadButton;
+        final View extendView;
 
         ViewHolder(View view) {
             super(view);
@@ -162,76 +157,59 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
         final ViewHolder holder = new ViewHolder(view);
 
         //卡片的点击事件
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //传送数据的id并启动EditingActivity
-                int position = holder.getBindingAdapterPosition();
-                Note note = mNoteList.get(position);
-                int id = note.getId();
-                Intent intent = new Intent(mainActivity, EditingActivity.class);
-                intent.putExtra("noteId", id);
-                mainActivity.startActivity(intent);
-            }
+        holder.cardView.setOnClickListener(view12 -> {
+            //传送数据的id并启动EditingActivity
+            int position = holder.getBindingAdapterPosition();
+            Note note = mNoteList.get(position);
+            int id = note.getId();
+            Intent intent = new Intent(mainActivity, EditingActivity.class);
+            intent.putExtra("noteId", id);
+            mainActivity.startActivity(intent);
         });
 
         //卡片的长按事件
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                int position = holder.getBindingAdapterPosition();
-                Note note = mNoteList.get(position);
-                int id = note.getId();
+        holder.cardView.setOnLongClickListener(view1 -> {
+            int position = holder.getBindingAdapterPosition();
+            Note note = mNoteList.get(position);
+            int id = note.getId();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
-                builder.setTitle(R.string.notice);
-                builder.setMessage(String.format(getContext().getResources().getString(R.string.delete_format), note.getTitle()));
-                builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {//点击确定则执行删除操作
-                        NoteDataHelper noteDataHelper = new NoteDataHelper();
-                        noteDataHelper.deleteNote(id);
-                        noteDataHelper.close();
-                        mainActivity.modifySync();
-                    }
-                });
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {//什么也不做
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);//显示删除提示
+            builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
+            builder.setMessage(String.format(YanRenUtilKt.getLocalString(R.string.delete_format), note.getTitle()));
+            builder.setPositiveButton(YanRenUtilKt.getLocalString(R.string.delete), (dialogInterface, i) -> {//点击确定则执行删除操作
+                NoteDataHelper noteDataHelper = new NoteDataHelper();
+                noteDataHelper.deleteNote(id);
+                noteDataHelper.close();
+                mainActivity.modifySync();
+            });
+            builder.setNegativeButton(YanRenUtilKt.getLocalString(R.string.cancel), null);
+            builder.show();
 
-                    }
-                });
-                builder.show();
-
-                return true;
-            }
+            return true;
         });
 
         //扩展按钮的点击事件
-        holder.spreadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final int position = holder.getBindingAdapterPosition();
-                final Note note = mNoteList.get(position);
-                final ValueAnimator valueAnimator;//伸展动画
-                final int bodyHeight = holder.contentSpecial.getLayout().getHeight();//计算bodySpecial的实际高度
+        holder.spreadButton.setOnClickListener(v -> {
+            final int position = holder.getBindingAdapterPosition();
+            final Note note = mNoteList.get(position);
+            final ValueAnimator valueAnimator;//伸展动画
+            final int bodyHeight = holder.contentSpecial.getLayout().getHeight();//计算bodySpecial的实际高度
 
-                if (note.getFlag()) {//如果状态为展开
-                    holder.contentSpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//文字动画1，消失;
-                    valueAnimator = getValueAnimator(holder.layoutDrawer, bodyHeight, 0, position);//设置抽屉动画为收起
-                    rotateExpandIcon(holder.spreadButton, 180, 0);//伸展按钮的旋转动画
-                    note.setFlag(false);//设置状态为收起
+            if (note.getFlag()) {//如果状态为展开
+                holder.contentSpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha1));//文字动画1，消失;
+                valueAnimator = getValueAnimator(holder.layoutDrawer, bodyHeight, 0, position);//设置抽屉动画为收起
+                rotateExpandIcon(holder.spreadButton, 180, 0);//伸展按钮的旋转动画
+                note.setFlag(false);//设置状态为收起
 
-                } else {//如果状态为收起
-                    holder.contentSpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//文字动画2，出现;
-                    valueAnimator = getValueAnimator(holder.layoutDrawer, 0, bodyHeight, position);//设置抽屉动画为展开
-                    rotateExpandIcon(holder.spreadButton, 0, 180);//伸展按钮的旋转动画
-                    note.setFlag(true);//设置状态为展开
-                }
-
-                valueAnimator.start();//开始抽屉的伸缩动画
-                //rotateExpandIcon(holder.cardView, 0, 360);//卡片的旋转动画（跟你说这个东西贼好玩）
+            } else {//如果状态为收起
+                holder.contentSpecial.startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.adapter_alpha2));//文字动画2，出现;
+                valueAnimator = getValueAnimator(holder.layoutDrawer, 0, bodyHeight, position);//设置抽屉动画为展开
+                rotateExpandIcon(holder.spreadButton, 0, 180);//伸展按钮的旋转动画
+                note.setFlag(true);//设置状态为展开
             }
+
+            valueAnimator.start();//开始抽屉的伸缩动画
+            //rotateExpandIcon(holder.cardView, 0, 360);//卡片的旋转动画（跟你说这个东西贼好玩）
         });
         return holder;
     }

@@ -38,10 +38,11 @@ public class OpeningActivity extends BaseActivity {
             public void run() {
                 try {
                     sleep(1000);//使程序休眠一秒，显示一秒开屏界面
-                    if (isFirst())
+                    if (isFirst()) {
                         startActivity(new Intent(OpeningActivity.this, GuideActivity.class));
-                    else
+                    } else {
                         startActivity(new Intent(OpeningActivity.this, MainActivity.class));
+                    }
                     finish();//关闭当前活动
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -50,12 +51,10 @@ public class OpeningActivity extends BaseActivity {
         };
 
         Handler mHandler = new Handler();
-        mHandler.postDelayed(new Runnable() {//最多等待10秒后强制进入主界面
-            @Override
-            public void run() {
-                startActivity(new Intent(OpeningActivity.this, MainActivity.class));
-                finish();
-            }
+        //最多等待10秒后强制进入主界面
+        mHandler.postDelayed(() -> {
+            startActivity(new Intent(OpeningActivity.this, MainActivity.class));
+            finish();
         }, 10000);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -67,19 +66,17 @@ public class OpeningActivity extends BaseActivity {
             if (modifySync) {
                 boolean launch = sharedPreferences.getBoolean("launch_sync", false);
                 if (launch) {
-                    Handler handler = new Handler(new Handler.Callback() {//用于异步消息处理
-                        @Override
-                        public boolean handleMessage(@NonNull Message msg) {
-                            if (msg.what == SC) {
-                                Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
-                                UserDataHelper userDataHelper = new UserDataHelper();
-                                userDataHelper.updateSyncTime();
-                                userDataHelper.close();
-                                mHandler.removeMessages(0);
-                                myThread.start();
-                            }
-                            return true;
+                    //用于异步消息处理
+                    Handler handler = new Handler(msg -> {
+                        if (msg.what == SC) {
+                            Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                            UserDataHelper userDataHelper1 = new UserDataHelper();
+                            userDataHelper1.updateSyncTime();
+                            userDataHelper1.close();
+                            mHandler.removeMessages(0);
+                            myThread.start();
                         }
+                        return true;
                     });
 
                     userDataHelper.sendRequestWithOkHttpSC(handler);
