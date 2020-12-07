@@ -164,7 +164,10 @@ public class SettingsActivity extends BaseActivity {
                                 }
                                 dialog1.dismiss();
                                 LanguageUtil.setLanguage();
-                                Intent intent = new Intent(requireActivity(), SettingsActivity.class);
+                                requireActivity().finish();
+                                //清空任务栈
+                                Intent intent = new Intent(requireActivity(), MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                             }).create();
                     dialog.show();

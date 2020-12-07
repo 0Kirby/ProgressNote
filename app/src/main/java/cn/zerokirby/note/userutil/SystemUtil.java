@@ -25,7 +25,7 @@ public class SystemUtil {//系统信息工具类
      * @return 系统版本号
      */
     public String getSystemVersion() {
-        return android.os.Build.VERSION.RELEASE;
+        return Build.VERSION.RELEASE;
     }
 
     /**
@@ -43,7 +43,7 @@ public class SystemUtil {//系统信息工具类
      * @return 手机型号
      */
     public String getSystemModel() {
-        return android.os.Build.MODEL;
+        return Build.MODEL;
     }
 
 
@@ -53,7 +53,7 @@ public class SystemUtil {//系统信息工具类
      * @return 手机厂商
      */
     public String getDeviceBrand() {
-        return android.os.Build.BRAND;
+        return Build.BRAND;
     }
 
     //判断是否是手机模式

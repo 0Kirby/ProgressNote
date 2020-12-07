@@ -61,6 +61,7 @@ import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.userutil.IconUtil;
 import cn.zerokirby.note.userutil.UriUtil;
 import cn.zerokirby.note.userutil.User;
+import cn.zerokirby.note.util.LanguageUtil;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
@@ -115,6 +116,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //初始化数据库操作工具类
         noteDataHelper = new NoteDataHelper();
         userDataHelper = new UserDataHelper();
@@ -179,6 +181,7 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);//设置菜单图标
+        LanguageUtil.setLanguage();
 
         //初始化ProgressDialog，这里为AlertDialog+ProgressBar
         AlertDialog.Builder progressBuilder = new AlertDialog.Builder(this);//显示查找提示

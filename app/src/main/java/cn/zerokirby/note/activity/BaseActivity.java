@@ -2,11 +2,8 @@ package cn.zerokirby.note.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -23,16 +20,17 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ThemeUtil.setClassTheme(this);
-        activities.add(this);
         LanguageUtil.setLanguage();
-        Log.d("aaaaa", "onCreate: " + LanguageUtil.getLanguage());
+        activities.add(this);
+
     }
 
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        LanguageUtil.attachBaseContext(this);
-    }
+    /**
+     * @Override public void onConfigurationChanged(@NonNull Configuration newConfig) {
+     * super.onConfigurationChanged(newConfig);
+     * attachBaseContext(this);
+     * }
+     **/
 
     @Override
     protected void attachBaseContext(Context newBase) {

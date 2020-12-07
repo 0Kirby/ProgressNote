@@ -157,8 +157,8 @@ public class Note implements Parcelable {
         dest.writeString(time);
     }
 
-    public static final Parcelable.Creator<Note> CREATOR
-            = new Parcelable.Creator<Note>() {
+    public static final Creator<Note> CREATOR
+            = new Creator<Note>() {
         @Override
         public Note createFromParcel(Parcel source) {
             return new Note(source.readInt(), source.readString(),

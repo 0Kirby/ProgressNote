@@ -17,6 +17,7 @@ public class LanguageUtil {
 
     public static void setLanguage() {
 
+
         //读取SharedPreferences数据，默认选中第一项
         String language = ShareUtil.getString(LANGUAGE_NAME, "auto");
 
@@ -30,10 +31,10 @@ public class LanguageUtil {
                 configuration.setLocale(Locale.getDefault());
                 break;
             case "zh_cn":
-                configuration.setLocale(Locale.CHINA);
+                configuration.setLocale(Locale.CHINESE);
                 break;
             case "ja_jp":
-                configuration.setLocale(Locale.JAPAN);
+                configuration.setLocale(Locale.JAPANESE);
                 break;
             default:
                 break;
