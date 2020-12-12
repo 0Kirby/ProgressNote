@@ -14,6 +14,9 @@
         <Preference
             android:key="language"
             android:title="@string/setting_language_title" />
+        <Preference
+            android:key="privacy_policy"
+            android:title="@string/privacy_title" />
     </PreferenceCategory>
 
     <PreferenceCategory

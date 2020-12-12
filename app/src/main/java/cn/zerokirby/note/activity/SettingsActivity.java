@@ -1,7 +1,6 @@
 package cn.zerokirby.note.activity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -34,13 +32,11 @@ import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
 import cn.zerokirby.note.util.ShareUtil;
-import kotlin.jvm.functions.Function0;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import ren.imyan.language.LanguageUtil;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 
@@ -142,8 +138,11 @@ public class SettingsActivity extends BaseActivity {
             DatabaseHelper databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
 
             switch (preference.getKey()) {
+                case "check_update":
+                    checkUpdatePref.setSummary(getResources().getString(R.string.checking));
+                    checkUpdate();
+                    break;
                 case "language":
-                    //LanguageUtil.showLanguageDialog(getActivity(), getActivity().getResources().getString(R.string.setting_language_title), overLanguage());
                     int itemSelected = ShareUtil.getInt(LANGUAGE_ID, 0);
                     String[] lan = {"Auto", "简体中文", "日本語"};
                     AlertDialog dialog = new AlertDialog.Builder(requireActivity()).setTitle(R.string.setting_language_title)
@@ -171,9 +170,9 @@ public class SettingsActivity extends BaseActivity {
                             }).create();
                     dialog.show();
                     break;
-                case "check_update":
-                    checkUpdatePref.setSummary(getResources().getString(R.string.checking));
-                    checkUpdate();
+                case "privacy_policy":
+                    browser.setData(Uri.parse("https://note.zerokirby.cn/privacy.html"));
+                    startActivity(browser);
                     break;
                 case "delete_note":
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity());
