@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import cn.endureblaze.theme.ThemeUtil;
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.AvatarDataHelper;
 import cn.zerokirby.note.data.NoteDataHelper;
@@ -61,6 +60,9 @@ import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.userutil.IconUtil;
 import cn.zerokirby.note.userutil.UriUtil;
 import cn.zerokirby.note.userutil.User;
+import kotlin.Function;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
@@ -158,7 +160,7 @@ public class MainActivity extends BaseActivity {
 
         //为下拉刷新设置事件
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setColorSchemeColors(getThemeManager().getThemeColorFromId(R.attr.color_nav));
         swipeRefreshLayout.setOnRefreshListener(
                 this::refreshDataLayout);
 
@@ -411,7 +413,12 @@ public class MainActivity extends BaseActivity {
 
             refreshData(searchText);
         } else if (itemId == R.id.theme) {
-            ThemeUtil.showThemeDialog(MainActivity.this, MainActivity.class);
+            getThemeManager().showSwitchDialog(() -> {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                return null;
+            });
         }
         return super.onOptionsItemSelected(item);
     }

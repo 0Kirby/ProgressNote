@@ -1,6 +1,5 @@
 package cn.zerokirby.note.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,23 +8,17 @@ import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cn.endureblaze.theme.ThemeUtil;
-import cn.zerokirby.note.R;
 import ren.imyan.base.ActivityCollector;
 import ren.imyan.language.ContextWrapper;
 import ren.imyan.language.LanguageUtil;
+import ren.imyan.theme.ThemeManager;
 
 public class BaseActivity extends AppCompatActivity {
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ThemeUtil.setClassTheme(this);
+        getThemeManager().setAppTheme();
         ActivityCollector.INSTANCE.addActivity(this);
     }
 
@@ -47,5 +40,9 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityCollector.INSTANCE.removeActivity(this);
+    }
+
+    public ThemeManager getThemeManager(){
+        return new ThemeManager(this);
     }
 }
