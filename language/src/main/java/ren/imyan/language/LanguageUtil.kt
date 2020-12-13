@@ -29,7 +29,7 @@ object LanguageUtil {
                     val lan = when (which) {
                         0 -> "auto"
                         1 -> "zh-rCN"
-                        2 -> "ja_jp"
+                        2 -> "ja-jp"
                         else -> "auto"
                     }
                     setLanguage(context, lan)

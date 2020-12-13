@@ -32,11 +32,16 @@ import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
 import cn.zerokirby.note.util.ShareUtil;
+import cn.zerokirby.note.util.YanRenUtilKt;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import ren.imyan.base.ActivityCollector;
+import ren.imyan.language.LanguageUtil;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 
@@ -143,32 +148,38 @@ public class SettingsActivity extends BaseActivity {
                     checkUpdate();
                     break;
                 case "language":
-                    int itemSelected = ShareUtil.getInt(LANGUAGE_ID, 0);
-                    String[] lan = {"Auto", "简体中文", "日本語"};
-                    AlertDialog dialog = new AlertDialog.Builder(requireActivity()).setTitle(R.string.setting_language_title)
-                            .setSingleChoiceItems(lan, itemSelected, (dialog1, i) -> {
-                                ShareUtil.putInt(LANGUAGE_ID, i);
-
-                                switch (i) {
-                                    case 1:
-                                        ShareUtil.putString(LANGUAGE_NAME, "zh-rCN");
-                                        break;
-                                    case 2:
-                                        ShareUtil.putString(LANGUAGE_NAME, "ja-jp");
-                                        break;
-                                    case 0:
-                                    default:
-                                        ShareUtil.putString(LANGUAGE_NAME, "auto");
-                                        break;
-                                }
-                                dialog1.dismiss();
-                                requireActivity().finish();
-                                //清空任务栈
-                                Intent intent = new Intent(requireActivity(), MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                            }).create();
-                    dialog.show();
+//                    int itemSelected = ShareUtil.getInt(LANGUAGE_ID, 0);
+//                    String[] lan = {"Auto", "简体中文", "日本語"};
+//                    AlertDialog dialog = new AlertDialog.Builder(requireActivity()).setTitle(R.string.setting_language_title)
+//                            .setSingleChoiceItems(lan, itemSelected, (dialog1, i) -> {
+//                                ShareUtil.putInt(LANGUAGE_ID, i);
+//
+//                                switch (i) {
+//                                    case 1:
+//                                        ShareUtil.putString(LANGUAGE_NAME, "zh-rCN");
+//                                        break;
+//                                    case 2:
+//                                        ShareUtil.putString(LANGUAGE_NAME, "ja-jp");
+//                                        break;
+//                                    case 0:
+//                                    default:
+//                                        ShareUtil.putString(LANGUAGE_NAME, "auto");
+//                                        break;
+//                                }
+//                                dialog1.dismiss();
+//                                requireActivity().finish();
+//                                //清空任务栈
+//                                Intent intent = new Intent(requireActivity(), MainActivity.class);
+//                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                startActivity(intent);
+//                            }).create();
+//                    dialog.show();
+                    LanguageUtil.showLanguageDialog(ActivityCollector.INSTANCE.currActivity(), YanRenUtilKt.getLocalString(R.string.setting_language_title), () -> {
+                        Intent intent = new Intent(requireActivity(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        return null;
+                    });
                     break;
                 case "privacy_policy":
                     browser.setData(Uri.parse("https://note.zerokirby.cn/privacy.html"));
