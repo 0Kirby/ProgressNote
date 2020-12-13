@@ -118,4 +118,9 @@
     <string name="sunday">　日曜日</string>
     <string name="not_login_notice">ご利用前にログインしてください！</string>
     <string name="setting_language_title">言語</string>
+    <string name="privacy_title">プライバシーポリシー</string>
+    <string name="privacy_content">「天天ノート」をご利用になる前にプライバシーポリシーをお読みいただき、同意後も引き続きご利用いただけます。</string>
+    <string name="agree">同意</string>
+    <string name="disagree">不同意</string>
+    <string name="read">ご覧</string>
 </resources>
