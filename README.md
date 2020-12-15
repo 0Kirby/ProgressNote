@@ -2,9 +2,13 @@
 使用**Github Actions**自动检查提交、构建APK并发布到Releases  
 ![Android CI](https://github.com/0Kirby/ProgressNote/workflows/Android%20CI/badge.svg)
 ![Create APK Release](https://github.com/0Kirby/ProgressNote/workflows/Create%20APK%20Release/badge.svg)
+# 下载
+[小米应用商店](https://app.mi.com/details?id=cn.zerokirby.note)  
+[天天笔记主页](https://note.zerokirby.cn)  
+[GitHub Releases](https://github.com/0Kirby/ProgressNote/releases/latest)  
 # 简介
-**《天天笔记》** 是我的毕业设计选题《基于Android的云笔记本设计与实现》。  
-本课题要求以Intellij IDEA为集成开发环境，Java为主要编程语言，采用云服务器实现云同步功能，进行基于Android平台的移动APP云笔记本的开发。
+**《天天笔记》** 是我的本科毕业设计选题《基于Android的云笔记本设计与实现》。  
+本课题要求以Android Studio为集成开发环境，Java为主要编程语言，采用云服务器实现云同步功能，进行基于Android平台的移动APP云笔记本的开发。
 # 主要内容
 ## 客户端
 开屏动画：展示软件的logo和介绍语  
