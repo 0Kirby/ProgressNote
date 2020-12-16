@@ -18,7 +18,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -52,6 +51,8 @@ public class LoginActivity extends BaseActivity {
     private static final String PASSWORD = "password";
     private static final int LOGIN = 1;//登录
     private int userId;
+    private int status;
+    private String toastMessage;
     private String responseData;
     private String username;
     private String password;
@@ -110,9 +111,9 @@ public class LoginActivity extends BaseActivity {
 
         handler = new Handler(msg -> {//用于异步消息处理
             if (msg.what == LOGIN) {
-                Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_SHORT).show();//显示解析到的内容
                 progressBar.setVisibility(View.GONE);
-                if ("登录成功！".equals(responseData)) {
+                if (status == 1) {
                     User user = new User();
                     user.setUserId(userId);
                     user.setUsername(username);
@@ -214,7 +215,7 @@ public class LoginActivity extends BaseActivity {
                 parseJSONWithJSONObject(responseData);//处理JSON
 
                 //获取头像
-                if ("登录成功！".equals(responseData))//登陆成功的情况下才处理头像
+                if (status == 1)//登陆成功的情况下才处理头像
                 {
                     client = new OkHttpClient();
                     requestBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
@@ -248,12 +249,23 @@ public class LoginActivity extends BaseActivity {
     private void parseJSONWithJSONObject(String jsonData) {//处理JSON
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
-            responseData = jsonObject.getString("Result");//取出Result字段
-            if ("登录成功！".equals(responseData)) {
-                registerTime = jsonObject.getLong("RegisterTime");
-                syncTime = jsonObject.getLong("SyncTime");
+            status = jsonObject.getInt("Status");//取出Status字段
+            switch (status) {
+                case 1:
+                    registerTime = jsonObject.getLong("RegisterTime");
+                    syncTime = jsonObject.getLong("SyncTime");
+                    userId = Integer.parseInt(jsonObject.getString("Id"));//取出ID字段
+                    toastMessage = getResources().getString(R.string.login_successfully);
+                    break;
+                case 0:
+                    toastMessage = getResources().getString(R.string.wrong_username_or_password);
+                    break;
+                case -1:
+                    toastMessage = getResources().getString(R.string.username_banned);
+                    break;
+                case -2:
+                    toastMessage = getResources().getString(R.string.username_not_exists);
             }
-            userId = Integer.parseInt(jsonObject.getString("Id"));//取出ID字段
         } catch (JSONException e) {
             e.printStackTrace();
         }

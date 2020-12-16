@@ -123,4 +123,10 @@
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
     <string name="read">ご覧</string>
+    <string name="register_successfully">登録しました！</string>
+    <string name="username_already_exists">ユーザー名は既に存在しています！</string>
+    <string name="login_successfully">ログインしました！</string>
+    <string name="wrong_username_or_password">ユーザー名またはパスワードが間違っています！</string>
+    <string name="username_not_exists">該当のユーザーは存在しません！</string>
+    <string name="username_banned">のアカウントは無効になっています！</string>
 </resources>

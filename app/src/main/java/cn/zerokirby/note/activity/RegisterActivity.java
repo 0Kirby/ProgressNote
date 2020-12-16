@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -48,6 +47,8 @@ public class RegisterActivity extends BaseActivity {
     private static final String PASSWORD = "password";
     private static final int REGISTER = 2;//注册
     private int userId;
+    private int status;
+    private String toastMessage;
     private String responseData;
     private String username;
     private String password;
@@ -92,9 +93,9 @@ public class RegisterActivity extends BaseActivity {
 
         handler = new Handler(msg -> {//用于异步消息处理
             if (msg.what == REGISTER) {
-                Toast.makeText(getContext(), responseData, Toast.LENGTH_SHORT).show();//显示解析到的内容
+                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_SHORT).show();//显示解析到的内容
                 progressBar.setVisibility(View.GONE);
-                if (responseData.equals(getString(R.string.register_sucessfully))) {
+                if (status == 1) {
                     User user = new User();
                     user.setUserId(userId);
                     user.setUsername(username);
@@ -102,9 +103,7 @@ public class RegisterActivity extends BaseActivity {
                     user.setLastUse(System.currentTimeMillis());
                     user.setRegisterTime(System.currentTimeMillis());
                     userDataHelper.updateLoginStatus(user, true);
-
                     LoginActivity.loginActivity.finish();
-
                     //发送本地广播通知MainActivity改变登录状态
                     Intent intent = new Intent("cn.zerokirby.note.LOCAL_BROADCAST");
                     intent.putExtra("operation_type", NoteChangeConstant.CHECK_LOGIN_STATUS);
@@ -201,8 +200,12 @@ public class RegisterActivity extends BaseActivity {
     private void parseJSONWithJSONObject(String jsonData) {//处理JSON
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
-            responseData = jsonObject.getString("Result");//取出Result字段
-            userId = jsonObject.getInt("Id");//取出ID字段
+            status = jsonObject.getInt("Status");//取出Status字段
+            if (status == 1) {
+                userId = Integer.parseInt(jsonObject.getString("Id"));//取出ID字段
+                toastMessage = getResources().getString(R.string.register_successfully);
+            } else
+                toastMessage = getResources().getString(R.string.username_already_exists);
         } catch (JSONException e) {
             e.printStackTrace();
         }

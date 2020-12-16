@@ -3,14 +3,13 @@ package cn.zerokirby.note.activity;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -60,9 +59,6 @@ import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.userutil.IconUtil;
 import cn.zerokirby.note.userutil.UriUtil;
 import cn.zerokirby.note.userutil.User;
-import kotlin.Function;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 
 import static cn.zerokirby.note.MyApplication.getContext;
 import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
@@ -465,7 +461,11 @@ public class MainActivity extends BaseActivity {
         } else {//用户已经登录
 
             //显示头像，并启用修改头像按钮
-            avatar.setImageBitmap(avatarDataHelper.readIcon());
+            Bitmap icon = avatarDataHelper.readIcon();
+            if (icon != null)
+                avatar.setImageBitmap(avatarDataHelper.readIcon());
+            else
+                avatar.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
             avatarDataHelper.close();
 
             avatar.setOnClickListener(v -> iconUtil.iconClick());
