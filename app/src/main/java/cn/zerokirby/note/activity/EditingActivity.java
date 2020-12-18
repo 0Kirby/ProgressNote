@@ -1,7 +1,6 @@
 package cn.zerokirby.note.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -36,8 +35,6 @@ public class EditingActivity extends BaseActivity {
 
     private Menu menu;//标题栏菜单
     private ActionBar actionBar;//标题栏
-
-    private NoteDataHelper noteDataHelper;//笔记数据帮助类
 
     private int noteId = 0;//笔记id
     private String title = "";//临时保存的标题
@@ -80,8 +77,6 @@ public class EditingActivity extends BaseActivity {
 
         initView();//初始化控件
 
-        noteDataHelper = new NoteDataHelper();//初始化笔记帮助对象
-
         noteId = getIntent().getIntExtra("noteId", 0);//获取点击的数据id
 
         actionBar = getSupportActionBar();
@@ -97,7 +92,7 @@ public class EditingActivity extends BaseActivity {
             } else {
                 actionBar.setTitle(R.string.editNote);//否则设置为编辑笔记
 
-                Note note = noteDataHelper.getNoteById(noteId);
+                Note note = NoteDataHelper.getNoteById(noteId);
                 title = note.getTitle();
                 content = note.getContent();
                 noteTitle.setText(title);
@@ -160,7 +155,7 @@ public class EditingActivity extends BaseActivity {
 
             String date = simpleDateFormat.format(new Date());
             noteTime.setText(date);
-            noteId = noteDataHelper.saveChange(new Note(noteId, title, content, date));//保存修改
+            noteId = NoteDataHelper.saveChange(new Note(noteId, title, content, date));//保存修改
 
             menu.getItem(0).setVisible(true);//显示删除按钮
             actionBar.setTitle(YanRenUtilKt.getLocalString(R.string.editNote));//设置为编辑笔记
@@ -169,7 +164,7 @@ public class EditingActivity extends BaseActivity {
             builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
             builder.setMessage(R.string.delete_button_notice);
             builder.setPositiveButton(R.string.delete, (dialogInterface, i) -> {
-                noteDataHelper.deleteNote(noteId);
+                NoteDataHelper.deleteNote(noteId);
                 finish();
             });
             builder.setNegativeButton(YanRenUtilKt.getLocalString(R.string.cancel), null);
@@ -200,7 +195,7 @@ public class EditingActivity extends BaseActivity {
             builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
             builder.setMessage(YanRenUtilKt.getLocalString(R.string.unsaved_notice));
             builder.setNeutralButton(R.string.save, (dialogInterface, i) -> {
-                noteDataHelper.saveChange(new Note(noteId,
+                NoteDataHelper.saveChange(new Note(noteId,
                         noteTitle.getText().toString(),
                         mainText.getText().toString(),
                         simpleDateFormat.format(new Date())));//保存修改
@@ -212,9 +207,4 @@ public class EditingActivity extends BaseActivity {
         } else finish();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        noteDataHelper.close();
-    }
 }

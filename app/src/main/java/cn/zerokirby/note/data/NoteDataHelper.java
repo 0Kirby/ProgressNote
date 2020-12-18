@@ -24,22 +24,23 @@ import static cn.zerokirby.note.MyApplication.getContext;
 
 public class NoteDataHelper {
 
-    private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase db;
-    private Cursor cursor;
-    private final ContentValues values;
+    private static DatabaseHelper databaseHelper;
+    private static SQLiteDatabase db;
+    private static Cursor cursor;
+    private static ContentValues values;
 
-    private final SimpleDateFormat simpleDateFormat;//简化日期
+    private static SimpleDateFormat simpleDateFormat;//简化日期
 
     private final static String LOCAL_BROADCAST = "cn.zerokirby.note.LOCAL_BROADCAST";
-    private final LocalBroadcastManager localBroadcastManager;//本地广播管理器
+    private static LocalBroadcastManager localBroadcastManager;//本地广播管理器
 
-    public NoteDataHelper() {
+    /**
+     * 初始化笔记数据库
+     */
+    public static void initNoteDataHelper() {
         databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
         values = new ContentValues();
-
         simpleDateFormat = new SimpleDateFormat(getContext().getString(R.string.formatDate), Locale.getDefault());
-
         localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
     }
 
@@ -48,7 +49,7 @@ public class NoteDataHelper {
      *
      * @param str 搜索的字符串，如果没有内容则查找全部
      */
-    public List<Note> initNote(String str) {
+    public static List<Note> initNote(String str) {
         try {
             List<Note> dataList = new ArrayList<>();
 
@@ -90,7 +91,7 @@ public class NoteDataHelper {
      * @param noteId 笔记id
      * @return Note 笔记对象
      */
-    public Note getNoteById(int noteId) {
+    public static Note getNoteById(int noteId) {
         try {
             db = databaseHelper.getReadableDatabase();
             cursor = db.query("Note", null,
@@ -116,7 +117,7 @@ public class NoteDataHelper {
      *
      * @param note 要添加或修改的笔记
      */
-    public int saveChange(Note note) {
+    public static int saveChange(Note note) {
         int noteId = note.getId();
         try {
             db = databaseHelper.getWritableDatabase();
@@ -164,7 +165,7 @@ public class NoteDataHelper {
      *
      * @param noteId 要删除的笔记id
      */
-    public void deleteNote(int noteId) {
+    public static void deleteNote(int noteId) {
         try {
             db = databaseHelper.getWritableDatabase();
             db.delete("Note", "id = ?", new String[]{String.valueOf(noteId)});
@@ -184,7 +185,7 @@ public class NoteDataHelper {
     /**
      * 关闭数据库，防止内存泄漏
      */
-    public void close() {
+    public static void close() {
         if (databaseHelper != null) databaseHelper.close();
     }
 

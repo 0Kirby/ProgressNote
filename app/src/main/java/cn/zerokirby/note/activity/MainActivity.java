@@ -65,9 +65,6 @@ import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
 
 public class MainActivity extends BaseActivity {
 
-    private NoteDataHelper noteDataHelper;
-    private UserDataHelper userDataHelper;
-
     public List<Note> noteList;
     private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
@@ -111,10 +108,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //初始化数据库操作工具类
-        noteDataHelper = new NoteDataHelper();
-        userDataHelper = new UserDataHelper();
 
         //获取动画
         adapterAlpha1 = AnimationUtils.loadAnimation(getContext(), R.anim.adapter_alpha1);
@@ -188,7 +181,7 @@ public class MainActivity extends BaseActivity {
                     progressDialog.dismiss();
                     drawerLayout.closeDrawers();
                     Toast.makeText(getContext(), getResources().getString(R.string.sync_successfully), Toast.LENGTH_SHORT).show();//显示解析到的内容
-                    userDataHelper.updateSyncTime();
+                    UserDataHelper.updateSyncTime();
                     refreshData();
                     break;
                 case UPLOAD:
@@ -213,7 +206,7 @@ public class MainActivity extends BaseActivity {
                 builder.setMessage(R.string.sync_SC_notice);
                 builder.setPositiveButton(R.string.sync, (dialogInterface, i) -> {//点击确定则执行同步操作
                     progressDialog.show();
-                    userDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
+                    UserDataHelper.sendRequestWithOkHttpSC(handler);//根据已登录的ID发送查询请求
                 });
                 //什么也不做
                 builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
@@ -226,7 +219,7 @@ public class MainActivity extends BaseActivity {
                 builder.setMessage(R.string.sync_CS_notice);
                 builder.setPositiveButton(R.string.sync, (dialogInterface, i) -> {//点击确定则执行同步操作
                     progressDialog.show();
-                    userDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
+                    UserDataHelper.sendRequestWithOkHttpCS(handler);//根据已登录的ID发送查询请求
                 });
                 //什么也不做
                 builder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
@@ -242,7 +235,7 @@ public class MainActivity extends BaseActivity {
                 builder.setTitle(R.string.notice);
                 builder.setMessage(R.string.exit_notice);
                 builder.setPositiveButton(R.string.exit, (dialogInterface, i) -> {
-                    userDataHelper.exitLogin();
+                    UserDataHelper.exitLogin();
                     Toast.makeText(getContext(), getResources().getString(R.string.exit_login_notice), Toast.LENGTH_SHORT).show();
                     drawerLayout.closeDrawers();
                     checkLoginStatus();//再次检查登录状态，调整按钮的显示状态
@@ -259,7 +252,7 @@ public class MainActivity extends BaseActivity {
             return true;
         });
 
-        userDataHelper.getInfo();
+        UserDataHelper.getInfo();
         refreshData();
     }
 
@@ -272,7 +265,7 @@ public class MainActivity extends BaseActivity {
         recyclerView.startAnimation(adapterAlpha1);
         //初始化笔记数据
         noteList.clear();
-        noteList.addAll(noteDataHelper.initNote(s));
+        noteList.addAll(NoteDataHelper.initNote(s));
 
         if (arrangement == GRID)
             noteAdapter.notifyDataSetChanged();//通知adapter更新
@@ -422,7 +415,7 @@ public class MainActivity extends BaseActivity {
     @SuppressLint("UseCompatLoadingForDrawables")
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
         AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
-        isLogin = userDataHelper.getUserInfo().getUserId();
+        isLogin = UserDataHelper.getUserInfo().getUserId();
 
         avatar = headView.findViewById(R.id.user_avatar);
 
@@ -485,7 +478,6 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         localBroadcastManager.unregisterReceiver(localReceiver);
-        noteDataHelper.close();
     }
 
     @Override
@@ -536,7 +528,7 @@ public class MainActivity extends BaseActivity {
 
     //自动同步数据
     public void modifySync() {
-        int userId = userDataHelper.getUserInfo().getUserId();//检测用户是否登录
+        int userId = UserDataHelper.getUserInfo().getUserId();//检测用户是否登录
         if (userId != 0) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
@@ -544,20 +536,20 @@ public class MainActivity extends BaseActivity {
                 //用于异步消息处理
                 Handler handler = new Handler(msg -> {
                     if (msg.what == CS) {
-                        userDataHelper.updateSyncTime();
+                        UserDataHelper.updateSyncTime();
                         updateTextView();
                         Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
                     }
                     return true;
                 });
-                userDataHelper.sendRequestWithOkHttpCS(handler);
+                UserDataHelper.sendRequestWithOkHttpCS(handler);
             }
         }
     }
 
     private void updateTextView() {//更新TextView显示用户信息
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(getString(R.string.formatDate_User), Locale.getDefault());
-        User user = userDataHelper.getUserInfo();
+        User user = UserDataHelper.getUserInfo();
         userId.setVisibility(View.VISIBLE);//显示“用户ID”
         username.setVisibility(View.VISIBLE);//显示“用户名”
         lastSync.setVisibility(View.VISIBLE);//显示“上次同步”

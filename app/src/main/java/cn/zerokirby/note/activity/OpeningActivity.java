@@ -82,9 +82,7 @@ public class OpeningActivity extends BaseActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean modifySync = sharedPreferences.getBoolean("modify_sync", false);
-        UserDataHelper userDataHelper = new UserDataHelper();
-        int userId = userDataHelper.getUserInfo().getUserId();
-        userDataHelper.close();
+        int userId = UserDataHelper.getUserInfo().getUserId();
         if (userId != 0) {
             if (modifySync) {
                 boolean launch = sharedPreferences.getBoolean("launch_sync", false);
@@ -93,16 +91,14 @@ public class OpeningActivity extends BaseActivity {
                     Handler handler = new Handler(msg -> {
                         if (msg.what == SC) {
                             Toast.makeText(getContext(), R.string.sync_successfully, Toast.LENGTH_SHORT).show();//显示解析到的内容
-                            UserDataHelper userDataHelper1 = new UserDataHelper();
-                            userDataHelper1.updateSyncTime();
-                            userDataHelper1.close();
+                            UserDataHelper.updateSyncTime();
                             mHandler.removeMessages(0);
                             myThread.start();
                         }
                         return true;
                     });
 
-                    userDataHelper.sendRequestWithOkHttpSC(handler);
+                    UserDataHelper.sendRequestWithOkHttpSC(handler);
                 } else {
                     myThread.start();
                     mHandler.removeMessages(0);

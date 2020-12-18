@@ -81,7 +81,6 @@ public class FeedbackActivity extends BaseActivity {
         webView.getSettings().setJavaScriptEnabled(true);//开启JavaScript
         webView.getSettings().setDomStorageEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
-            @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {//允许重定向，避免在系统浏览器中打开页面
                 try {
@@ -157,9 +156,7 @@ public class FeedbackActivity extends BaseActivity {
                     //加载完毕让进度条消失
                     progressBar.setVisibility(View.GONE);
                     boolean isCookieSaved = ShareUtil.getBoolean(IS_FIRST_LOGOUT, false);
-                    UserDataHelper userDataHelper = new UserDataHelper();
-                    int userId = userDataHelper.getUserInfo().getUserId();
-                    userDataHelper.close();
+                    int userId = UserDataHelper.getUserInfo().getUserId();
                     if (userId == 0 && !isCookieSaved && CookieManager.getInstance().hasCookies()) {
                         ShareUtil.putBoolean(IS_COOKIE_SAVED, true);
                         String cookie = CookieManager.getInstance().getCookie(getDomain(url));//取出cookie
@@ -180,16 +177,13 @@ public class FeedbackActivity extends BaseActivity {
         String osVersion = systemUtil.getSystemVersion();//获取系统版本
         String netType = NetworkUtil.getNetworkType();//获取网络类型
         String clientVersion = AppUtil.getVersionName();//获取版本号
-        UserDataHelper userDataHelper = new UserDataHelper();
 
-
-        int userId = userDataHelper.getUserInfo().getUserId();
+        int userId = UserDataHelper.getUserInfo().getUserId();
         if (userId != 0) {
             //用户的openid
             String openid = String.valueOf(userId); // 用户的openid
             //用户的nickname
-            String nickname = userDataHelper.getUserInfo().getUsername(); // 用户的nickname
-            userDataHelper.close();
+            String nickname = UserDataHelper.getUserInfo().getUsername(); // 用户的nickname
             //用户的头像url
             String headimgurl = "https://zerokirby.cn:8443/progress_note_server/DownloadAvatarServlet?userId=" + openid;  // 用户的头像url
             //post的数据

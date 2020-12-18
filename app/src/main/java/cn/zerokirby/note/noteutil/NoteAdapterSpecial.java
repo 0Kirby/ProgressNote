@@ -26,8 +26,6 @@ import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.data.NoteDataHelper;
 import cn.zerokirby.note.util.YanRenUtilKt;
 
-import static cn.zerokirby.note.MyApplication.getContext;
-
 public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.ViewHolder> {
 
     private final MainActivity mainActivity;
@@ -177,9 +175,7 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
             builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
             builder.setMessage(String.format(YanRenUtilKt.getLocalString(R.string.delete_format), note.getTitle()));
             builder.setPositiveButton(YanRenUtilKt.getLocalString(R.string.delete), (dialogInterface, i) -> {//点击确定则执行删除操作
-                NoteDataHelper noteDataHelper = new NoteDataHelper();
-                noteDataHelper.deleteNote(id);
-                noteDataHelper.close();
+                NoteDataHelper.deleteNote(id);
                 mainActivity.modifySync();
             });
             builder.setNegativeButton(YanRenUtilKt.getLocalString(R.string.cancel), null);

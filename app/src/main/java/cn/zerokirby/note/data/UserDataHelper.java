@@ -25,13 +25,16 @@ public class UserDataHelper {
     private final static int SC = 1;//服务器同步到客户端
     private final static int CS = 2;//客户端同步到服务器
 
-    private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase db;
-    private Cursor cursor;
+    private static DatabaseHelper databaseHelper;
+    private static SQLiteDatabase db;
+    private static Cursor cursor;
 
-    private String responseData;
+    private static String responseData;
 
-    public UserDataHelper() {
+    /**
+     * 初始化用户数据库
+     */
+    public static void initUserDataHelper() {
         databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
     }
 
@@ -40,7 +43,7 @@ public class UserDataHelper {
      *
      * @param handler 主线程处理器
      */
-    public void sendRequestWithOkHttpSC(Handler handler) {
+    public static void sendRequestWithOkHttpSC(Handler handler) {
         new Thread(() -> {//在子线程中进行网络操作
             Response response = null;
             try {
@@ -70,7 +73,7 @@ public class UserDataHelper {
      *
      * @param handler 主线程处理器
      */
-    public void sendRequestWithOkHttpCS(Handler handler) {
+    public static void sendRequestWithOkHttpCS(Handler handler) {
         new Thread(() -> {//在子线程中进行网络操作
             Response response = null;
             try {
@@ -95,7 +98,7 @@ public class UserDataHelper {
      *
      * @param jsonData 接收到的JSON字符串
      */
-    private void parseJSONWithJSONArray(String jsonData) {//处理JSON
+    private static void parseJSONWithJSONArray(String jsonData) {//处理JSON
         try {
             db = databaseHelper.getWritableDatabase();
             db.execSQL("Delete from Note");//清空笔记表
@@ -128,7 +131,7 @@ public class UserDataHelper {
      *
      * @return String 生成的JSON字符串
      */
-    private String makeJSONArray() {
+    private static String makeJSONArray() {
         try {
             db = databaseHelper.getReadableDatabase();
             cursor = db.query("Note", null, null,
@@ -163,7 +166,7 @@ public class UserDataHelper {
      *
      * @return String[] 用户名和密码
      */
-    public String[] getLogin() {
+    public static String[] getLogin() {
         try {
             db = databaseHelper.getReadableDatabase();
             cursor = db.query("User", new String[]{"username", "password"}, null,
@@ -188,7 +191,7 @@ public class UserDataHelper {
      *
      * @param column 列名
      */
-    public void setUserColumnNull(String column) {
+    public static void setUserColumnNull(String column) {
         try {
             db = databaseHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -202,7 +205,7 @@ public class UserDataHelper {
     /**
      * 更新同步时间
      */
-    public void updateSyncTime() {
+    public static void updateSyncTime() {
         try {
             db = databaseHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -216,7 +219,7 @@ public class UserDataHelper {
     /**
      * 退出登录，设置用户ID和上次同步时间为0
      */
-    public void exitLogin() {
+    public static void exitLogin() {
         try {
             db = databaseHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -231,7 +234,7 @@ public class UserDataHelper {
     /**
      * 获取手机信息
      */
-    public void getInfo() {
+    public static void getInfo() {
         try {
             db = databaseHelper.getWritableDatabase();
             SystemUtil systemUtil = new SystemUtil();//获取手机信息
@@ -263,7 +266,7 @@ public class UserDataHelper {
      *
      * @return User 用户对象
      */
-    public User getUserInfo() {
+    public static User getUserInfo() {
         try {
             db = databaseHelper.getReadableDatabase();
             cursor = db.query("User", null, "rowid = ?",
@@ -297,7 +300,7 @@ public class UserDataHelper {
      *
      * @param user 用户类
      */
-    public void updateLoginStatus(User user, boolean isFirstLogin) {
+    public static void updateLoginStatus(User user, boolean isFirstLogin) {
         try {
             db = databaseHelper.getWritableDatabase();
             ContentValues values = new ContentValues();//将用户ID、用户名、密码存储到本地
@@ -319,7 +322,7 @@ public class UserDataHelper {
      *
      * @param bytes 带有用户id、用户名和密码的比特串
      */
-    public void saveUserNameAndPassword(byte[] bytes) {
+    public static void saveUserNameAndPassword(byte[] bytes) {
         try {
             db = databaseHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -336,7 +339,7 @@ public class UserDataHelper {
     /**
      * 关闭数据库，防止内存泄漏
      */
-    public void close() {
+    public static void close() {
         databaseHelper.close();
     }
 

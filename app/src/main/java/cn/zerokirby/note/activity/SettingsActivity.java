@@ -97,9 +97,7 @@ public class SettingsActivity extends BaseActivity {
         intent.putExtra("operation_type", NoteChangeConstant.REFRESH_DATA);
         localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
 
-        UserDataHelper userDataHelper = new UserDataHelper();
-        userId = userDataHelper.getUserInfo().getUserId();//读取id
-        userDataHelper.close();
+        userId = UserDataHelper.getUserInfo().getUserId();//读取id
         handler = new Handler(msg -> {//用于异步消息处理
             if (msg.what == UPDATE) {
                 if (Objects.equals(AppUtil.getVersionName(), versionName))//如果从服务器获取的版本名称和本地相等

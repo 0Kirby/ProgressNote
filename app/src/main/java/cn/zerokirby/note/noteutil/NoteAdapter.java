@@ -1,7 +1,6 @@
 package cn.zerokirby.note.noteutil;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +18,6 @@ import cn.zerokirby.note.activity.EditingActivity;
 import cn.zerokirby.note.activity.MainActivity;
 import cn.zerokirby.note.data.NoteDataHelper;
 import cn.zerokirby.note.util.YanRenUtilKt;
-import ren.imyan.base.ActivityCollector;
-
-import static cn.zerokirby.note.MyApplication.getContext;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
@@ -98,9 +94,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             builder.setTitle(YanRenUtilKt.getLocalString(R.string.notice));
             builder.setMessage(String.format(YanRenUtilKt.getLocalString(R.string.delete_format), note.getTitle()));
             builder.setPositiveButton(YanRenUtilKt.getLocalString(R.string.delete), (dialogInterface, i) -> {//点击确定则执行删除操作
-                NoteDataHelper noteDataHelper = new NoteDataHelper();
-                noteDataHelper.deleteNote(id);
-                noteDataHelper.close();
+                NoteDataHelper.deleteNote(id);
                 mainActivity.modifySync();
             });
             //什么也不做
