@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.AvatarDataHelper;
+import cn.zerokirby.note.data.UserDataHelper;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -109,9 +110,7 @@ public class IconUtil {//关于操作图标的方法
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//解码位图
             avatar.setImageBitmap(bitmap);//给ImageView设置头像
-            AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
-            avatarDataHelper.saveImage(bitmap);
-            avatarDataHelper.close();
+            AvatarDataHelper.saveImage(bitmap);
         } else
             Toast.makeText(activity, activity.getResources().getString(R.string.open_failed), Toast.LENGTH_SHORT).show();
     }
@@ -120,9 +119,7 @@ public class IconUtil {//关于操作图标的方法
         new Thread(() -> {
             File file = new File(Objects.requireNonNull(UriUtil.getPath(cropImageUri)));
             final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");//设置媒体类型
-            AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
-            final int id = avatarDataHelper.getUserId();//获取用户id
-            avatarDataHelper.close();
+            final int id = UserDataHelper.getUserInfo().getUserId();//获取用户id
             OkHttpClient client = new OkHttpClient();
             RequestBody fileBody = RequestBody.create(MEDIA_TYPE_JPEG, file);//媒体类型为jpg
             RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)

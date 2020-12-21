@@ -414,9 +414,7 @@ public class MainActivity extends BaseActivity {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     public void checkLoginStatus() {//检查登录状态，以调整文字并确定按钮是否显示
-        AvatarDataHelper avatarDataHelper = new AvatarDataHelper();
         isLogin = UserDataHelper.getUserInfo().getUserId();
-
         avatar = headView.findViewById(R.id.user_avatar);
 
         //实例化TextView，以便填入具体数据
@@ -454,12 +452,11 @@ public class MainActivity extends BaseActivity {
         } else {//用户已经登录
 
             //显示头像，并启用修改头像按钮
-            Bitmap icon = avatarDataHelper.readIcon();
+            Bitmap icon = AvatarDataHelper.readIcon();
             if (icon != null)
-                avatar.setImageBitmap(avatarDataHelper.readIcon());
+                avatar.setImageBitmap(AvatarDataHelper.readIcon());
             else
                 avatar.setImageDrawable(getDrawable(R.drawable.ic_person_add_black_24dp));
-            avatarDataHelper.close();
 
             avatar.setOnClickListener(v -> iconUtil.iconClick());
 

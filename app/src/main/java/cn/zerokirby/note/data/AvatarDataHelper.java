@@ -11,13 +11,15 @@ import java.io.IOException;
 
 public class AvatarDataHelper {
 
-    private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase db;
-    private Cursor cursor;
+    private static DatabaseHelper databaseHelper;
+    private static SQLiteDatabase db;
+    private static Cursor cursor;
 
-    //要操作数据库操作实例首先得得到数据库操作实例
-    public AvatarDataHelper() {
-        this.databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
+    /**
+     * 初始化头像数据库
+     */
+    public static void initAvatarDataHelper() {
+        databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
     }
 
     /**
@@ -25,7 +27,7 @@ public class AvatarDataHelper {
      *
      * @param bitmap 图片对象
      */
-    public void saveImage(Bitmap bitmap) {
+    public static void saveImage(Bitmap bitmap) {
         try {
             db = databaseHelper.getWritableDatabase();
             ContentValues cv = new ContentValues();
@@ -41,7 +43,7 @@ public class AvatarDataHelper {
      *
      * @return byte[]
      */
-    public byte[] readImage() {
+    public static byte[] readImage() {
         try {
             db = databaseHelper.getReadableDatabase();
             cursor = db.query("User", new String[]{"avatar"}, null, null, null, null, null);
@@ -62,7 +64,7 @@ public class AvatarDataHelper {
      *
      * @return Bitmap
      */
-    public Bitmap readIcon() {
+    public static Bitmap readIcon() {
         byte[] imgData = readImage();
         if (imgData != null) {
             //将字节数组转化为位图，将位图显示为图片
@@ -72,7 +74,7 @@ public class AvatarDataHelper {
     }
 
     //图片转为二进制数据
-    private byte[] bitmapToBytes(Bitmap bitmap) {
+    private static byte[] bitmapToBytes(Bitmap bitmap) {
         //将图片转化为位图
         int size = bitmap.getWidth() * bitmap.getHeight();
         //创建一个字节数组输出流,流的大小为size
@@ -95,31 +97,9 @@ public class AvatarDataHelper {
     }
 
     /**
-     * 获取用户id
-     *
-     * @return int 用户id
-     */
-    public int getUserId() {
-        try {
-            db = databaseHelper.getReadableDatabase();
-            cursor = db.query("User", new String[]{"userId"},
-                    null, null, null, null, null);
-
-            int id = 0;
-            if (cursor.moveToNext()) {
-                id = cursor.getInt(cursor.getColumnIndex("userId"));
-            }
-            return id;
-        } finally {
-            if (cursor != null) cursor.close();
-            if (db != null) db.close();
-        }
-    }
-
-    /**
      * 关闭数据库，防止内存泄漏
      */
-    public void close() {
+    public static void close() {
         databaseHelper.close();
     }
 
