@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ProgressNote</string>
     <string name="chinese_name">天天ノート</string>
     <string name="title">（なし）</string>
     <string name="body">（なし）</string>
@@ -13,7 +12,6 @@
     <string name="newNote">ノートの作成</string>
     <string name="editNote">ノートの編集</string>
     <string name="please_title">ここでタイトルを入力してください</string>
-    <string name="filter_username">0123456789abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <string name="action_sign_in">ログイン</string>
     <string name="register">登録</string>
     <string name="exitApp">もう一度押すとアプリが終了します</string>
@@ -128,5 +126,5 @@
     <string name="login_successfully">ログインしました！</string>
     <string name="wrong_username_or_password">ユーザー名またはパスワードが間違っています！</string>
     <string name="username_not_exists">該当のユーザーは存在しません！</string>
-    <string name="username_banned">のアカウントは無効になっています！</string>
+    <string name="username_banned">このアカウントは無効になっています！</string>
 </resources>

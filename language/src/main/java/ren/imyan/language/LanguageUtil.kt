@@ -18,7 +18,7 @@ object LanguageUtil {
     @JvmStatic
     fun showLanguageDialog(context: Context, title: String, callback: () -> Unit) {
         val lanList = arrayOf(
-                "Auto", "简体中文", "日本語"
+                "Auto", "简体中文", "日本語", "English"
         )
         AlertDialog.Builder(context)
                 .setTitle(title)
@@ -30,6 +30,7 @@ object LanguageUtil {
                         0 -> "auto"
                         1 -> "zh-rCN"
                         2 -> "ja-jp"
+                        3 -> "en-rUS"
                         else -> "auto"
                     }
                     setLanguage(context, lan)
@@ -62,6 +63,7 @@ object LanguageUtil {
                 "auto" -> 0
                 "zh-rCN" -> 1
                 "ja-jp" -> 2
+                "en-rUS" -> 3
                 else -> 0
             }
 
@@ -70,12 +72,13 @@ object LanguageUtil {
      */
     @JvmStatic
     fun getLocale(context: Context): Locale =
-        when (context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("langName", "cn")) {
-            "auto" -> getSysLocale()
-            "zh-rCN" -> Locale("zh", "CN")
-            "ja-jp" -> Locale.JAPANESE
-            else -> getSysLocale()
-        }
+            when (context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("langName", "cn")) {
+                "auto" -> getSysLocale()
+                "zh-rCN" -> Locale("zh", "CN")
+                "ja-jp" -> Locale("ja", "JP")
+                "en-rUS" -> Locale("en", "US")
+                else -> getSysLocale()
+            }
 
     /**
      * 获取当前系统的 Locale

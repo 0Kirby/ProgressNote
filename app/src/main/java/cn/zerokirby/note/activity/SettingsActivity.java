@@ -31,10 +31,7 @@ import cn.zerokirby.note.data.DatabaseHelper;
 import cn.zerokirby.note.data.UserDataHelper;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
 import cn.zerokirby.note.util.AppUtil;
-import cn.zerokirby.note.util.ShareUtil;
 import cn.zerokirby.note.util.YanRenUtilKt;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -265,7 +262,7 @@ public class SettingsActivity extends BaseActivity {
                     requireActivity().startActivity(browser);
                     break;
                 case "feedback":
-                    startActivity(new Intent(getActivity(), FeedbackActivity.class));
+                    requireActivity().startActivity(new Intent(getActivity(), FeedbackActivity.class));
                     break;
                 case "code":
                     browser.setData(Uri.parse("https://github.com/0Kirby"));
