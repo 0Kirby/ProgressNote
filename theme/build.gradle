@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion = '31.0.0-rc2'
+    buildToolsVersion = '30.0.3'
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
