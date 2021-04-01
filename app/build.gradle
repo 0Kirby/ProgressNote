@@ -12,7 +12,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode Integer.valueOf(getDate())
-        versionName "3.0.5"
+        versionName "3.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -69,17 +70,19 @@ public class IconUtil {//关于操作图标的方法
     }
 
     private void startPhotoZoom(Uri uri) {//图片缩放
-        File cropPhoto = new File(activity.getExternalCacheDir(), "crop.jpg");//创建临时文件
+        //创建临时文件，Android11后必须使用公共目录
+        File cropImagePath = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "ProgressNote");
+        if (!cropImagePath.exists()) cropImagePath.mkdir();
+        File cropImageFile = new File(cropImagePath, "crop_image.png");
+        if (cropImageFile.exists()) cropImageFile.delete();
         try {
-            if (cropPhoto.exists()) {//如果临时文件存在则删除，否则新建
-                cropPhoto.delete();
-            }
-            cropPhoto.createNewFile();
+            cropImageFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        cropImageUri = Uri.fromFile(cropPhoto);//获取裁剪图片的地址
+        cropImageUri = Uri.fromFile(cropImageFile);//获取裁剪图片的地址
         Intent intent = new Intent("com.android.camera.action.CROP");//设置intent类型为裁剪图片
         intent.setDataAndType(uri, "image/*");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
