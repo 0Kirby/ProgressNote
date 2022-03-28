@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode Integer.valueOf(getDate())
-        versionName "3.0.8"
+        versionName "3.1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -60,10 +60,9 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
     implementation 'androidx.preference:preference-ktx:1.1.1'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'
     implementation 'org.conscrypt:conscrypt-android:2.5.2'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:core:1.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

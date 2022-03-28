@@ -67,7 +67,7 @@
     <string name="data">Data</string>
     <string name="launch_sync_summary">Using multiple devices at the same time</string>
     <string name="delete_note_summary">Delete all notes</string>
-    <string name="delete_all_summary">Delete all data</string>
+    <string name="delete_all_summary">Deactivate account</string>
     <string name="developer">Developer</string>
     <string name="code_settings">Code</string>
     <string name="icon">Icon</string>
@@ -76,7 +76,7 @@
     <string name="blog">Blog</string>
     <string name="feedback_summary">Please tell us about bugs or advice</string>
     <string name="warning">Warning</string>
-    <string name="delete_all_notice">All data form client and server will be cleared and exit login\nThis operation cannot be resumed\nContinue?</string>
+    <string name="delete_all_notice">All data form client and server will be cleared and exit login\nUnable to register with the current username agian\nThis operation cannot be resumed\nContinue?</string>
     <string name="clear">Clear</string>
     <string name="cancel">Cancel</string>
     <string name="clear_successfully">Cleared Successfully!</string>

@@ -67,7 +67,7 @@
     <string name="launch_sync_summary">複数端末の場合</string>
     <string name="data">データ</string>
     <string name="delete_note_summary">すべてのノートを削除する</string>
-    <string name="delete_all_summary">すべてのデータを削除する</string>
+    <string name="delete_all_summary">アカウントを削除する</string>
     <string name="developer">開発者</string>
     <string name="code_settings">コード</string>
     <string name="icon">アイコン</string>
@@ -76,7 +76,7 @@
     <string name="blog">ブログ</string>
     <string name="feedback_summary">バグやアドバイスを教えてください</string>
     <string name="warning">警告</string>
-    <string name="delete_all_notice">すべてのデータが削除され、ログアウトされます\nこの操作は再開できません\n続行するかどうか？</string>
+    <string name="delete_all_notice">すべてのデータが削除され、ログアウトされます\nこのユーザー名を再登録できません\nこの操作は再開できません\n続行するかどうか？</string>
     <string name="clear">削除</string>
     <string name="cancel">キャンセル</string>
     <string name="clear_successfully">削除完了！</string>

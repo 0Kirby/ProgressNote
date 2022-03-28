@@ -68,7 +68,7 @@
     <string name="launch_sync_summary">适用于多台设备的场景</string>
     <string name="data">数据</string>
     <string name="delete_note_summary">清除所有笔记</string>
-    <string name="delete_all_summary">清除所有数据</string>
+    <string name="delete_all_summary">注销用户</string>注销用户/string>
     <string name="developer">开发者</string>
     <string name="code_settings">代码</string>
     <string name="icon">图标</string>
@@ -77,7 +77,7 @@
     <string name="blog">博客</string>
     <string name="feedback_summary">遇到bug或者有建议请告诉我们</string>
     <string name="warning">警告</string>
-    <string name="delete_all_notice">这将清除本地和云端所有数据并退出登录\n此操作无法恢复\n是否继续？</string>
+    <string name="delete_all_notice">这将清除本地和云端所有数据并退出登录\n无法重新使用该用户名注册\n此操作无法恢复\n是否继续？</string>
     <string name="clear">清除</string>
     <string name="cancel">取消</string>
     <string name="clear_successfully">清除完毕！</string>

@@ -1,5 +1,7 @@
 package cn.zerokirby.note.activity;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,8 +41,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import ren.imyan.base.ActivityCollector;
 import ren.imyan.language.LanguageUtil;
-
-import static cn.zerokirby.note.MyApplication.getContext;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -124,10 +124,12 @@ public class SettingsActivity extends BaseActivity {
             }
 
             checkUpdatePref = findPreference("check_update");
-            if (userId == 0)//如果用户没有登录，不能使用同步功能
+            if (userId == 0)//如果用户没有登录，不能使用同步和注销用户功能
             {
                 SwitchPreferenceCompat modifySync = findPreference("modify_sync");
+                Preference deleteAll = findPreference("delete_all");
                 Objects.requireNonNull(modifySync).setEnabled(false);
+                Objects.requireNonNull(deleteAll).setEnabled(false);
             }
         }
 
@@ -222,9 +224,12 @@ public class SettingsActivity extends BaseActivity {
                             RequestBody requestBody = new FormBody.Builder().add("userId", String.valueOf(userId))
                                     .add("json", Objects.requireNonNull(jsonArray).toString()).build();
                             Request request = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/SyncServlet_CS").post(requestBody).build();
+                            Request request2 = new Request.Builder().url("https://zerokirby.cn:8443/progress_note_server/InvalidateUserServlet").post(requestBody).build();
                             try {
                                 Response response = client.newCall(request).execute();
+                                Response response2 = client.newCall(request2).execute();
                                 response.close();
+                                response2.close();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

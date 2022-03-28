@@ -9,8 +9,6 @@
         <item name="text_error">#FFB00020</item>
         <item name="icon_color">#FF202020</item>
         <item name="titleTextColor">@android:color/white</item>
-        <item name="android:textColorSecondary">?attr/text_medium</item>
-        <item name="android:textColorPrimary">?attr/text_high</item>
         <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
         <item name="toolbar_icon_color">#FFFEFEFE</item>
         <item name="fab_color">?attr/colorAccent</item>
@@ -28,7 +26,6 @@
 
     <style name="BaseDarkTheme" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">#FF303030</item>
-        <item name="android:textColor">#FFFFFFFF</item>
         <item name="color_view_background">#FF303030</item>
         <item name="color_windows_background">#FF000000</item>
         <item name="text_high">#85FFFFFF</item>
@@ -41,8 +38,6 @@
         </item>
         <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
         <item name="toolbar_icon_color">#FFFEFEFE</item>
-        <item name="android:textColorSecondary">?attr/text_medium</item>
-        <item name="android:textColorPrimary">?attr/text_high</item>
         <item name="fab_color">?attr/color_view_background</item>
         <item name="alertDialogTheme">@style/DarkAlertDialog</item>
         <item name="btn_text_color">#FFFFFFFF</item>
@@ -65,8 +60,6 @@
         <item name="dialog_button_color">@color/whiteColorAccent</item>
         <item name="toolbar_theme">@style/ThemeOverlay.AppCompat.ActionBar</item>
         <item name="toolbar_icon_color">#FF606060</item>
-        <item name="android:textColorSecondary">#FF606060</item>
-        <item name="android:textColorPrimary">#FF606060</item>
         <item name="btn_text_color">#CC000000</item>
         <item name="m_calendar_background_color">?attr/colorPrimary</item>
         <item name="m_calendar_text_color">#000000</item>
