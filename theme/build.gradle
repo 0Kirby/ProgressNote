@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion = '32.0.0'
+    compileSdkVersion 33
+    buildToolsVersion = '33.0.0'
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -26,12 +26,14 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    namespace 'ren.imyan.theme'
 
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.material:material:1.5.0-alpha01'
-    implementation 'androidx.appcompat:appcompat:1.4.0-alpha03'
-    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'com.google.android.material:material:1.6.0-beta01'
+    implementation 'androidx.appcompat:appcompat:1.6.0-alpha01'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="cn.zerokirby.note">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
@@ -12,7 +11,6 @@
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="false"
         android:icon="@mipmap/icon"
         android:label="@string/chinese_name"
         android:requestLegacyExternalStorage="true"
@@ -57,7 +55,7 @@
         <activity
             android:name=".activity.OpeningActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
