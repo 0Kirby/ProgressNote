@@ -1,5 +1,8 @@
 package cn.zerokirby.note.activity;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
+
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,8 +37,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -60,14 +63,11 @@ import cn.zerokirby.note.userutil.IconUtil;
 import cn.zerokirby.note.userutil.UriUtil;
 import cn.zerokirby.note.userutil.User;
 
-import static cn.zerokirby.note.MyApplication.getContext;
-import static cn.zerokirby.note.userutil.SystemUtil.isMobile;
-
 public class MainActivity extends BaseActivity {
 
     public List<Note> noteList;
     private RecyclerView recyclerView;
-    private StaggeredGridLayoutManager layoutManager;
+    private GridLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
     private NoteAdapterSpecial noteAdapterSpecial;
     private Animation adapterAlpha1;//动画1，消失
@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity {
         noteList = new ArrayList<>();
         noteAdapter = new NoteAdapter(this, noteList);//初始化适配器
         noteAdapterSpecial = new NoteAdapterSpecial(this, noteList);//初始化适配器Special
-        layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new GridLayoutManager(this, 1);//初始化布局管理器
         if (arrangement == GRID) {
             if (isMobile())//手机模式
                 layoutManager.setSpanCount(2);//设置列数为2
@@ -478,7 +478,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
