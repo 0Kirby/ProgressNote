@@ -5,13 +5,13 @@ plugins {
 
 android {
     compileSdkVersion 33
-    buildToolsVersion = "33.0.0"
+    buildToolsVersion = "33.0.1"
     defaultConfig {
         applicationId "cn.zerokirby.note"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode Integer.valueOf(getDate())
-        versionName "3.1.1"
+        versionName "3.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -34,16 +34,36 @@ android {
     lint {
         abortOnError false
     }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a' //select ABIs to build APKs for
+            universalApk true //generate an additional APK that contains all the ABIs
+        }
+    }
     namespace 'cn.zerokirby.note'
 
 
-    android.applicationVariants.all {
-        variant ->
-            variant.outputs.all {
-                outputFileName = "ProgressNote-v${variant.versionName}.apk"
-            }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def aid = variant.applicationId.split("\\.")
+            def name = aid[aid.length - 1]
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
+            if (abi == null) abi = "all"//兼容
+            def version = variant.versionName
+            def versionCode = variant.versionCode
+            def date = new Date()
+            def formattedDate = date.format('yyyyMMdd_HHmm')
+            outputFileName = "ProgressNote" +
+                    "_${abi}" +
+                    "_${"v"}${version}" +
+                    "_${formattedDate}.apk"
+
+        }
     }
 }
+
 
 static def getDate() {
     return new Date().format("yyyyMMdd")

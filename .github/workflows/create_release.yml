@@ -17,27 +17,33 @@ jobs:
           java-version: 11
       - name: Assemble release with Gradle
         run: chmod +x gradlew &&./gradlew assembleRelease
-      - name: Find filename and set env
-        run: echo "FILENAME=`basename app/build/outputs/apk/release/*.apk`" >> $GITHUB_ENV
-      - name: Sign APK
-        run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} app/build/outputs/apk/release/${{ env.FILENAME }} zerokirby
+      - name: Find FILENAME1 and set env
+        run: echo "FILENAME1=`basename app/build/outputs/apk/release/*all*`" >> $GITHUB_ENV
+      - name: Find FILENAME2 and set env
+        run: echo "FILENAME2=`basename app/build/outputs/apk/release/*arm64*`" >> $GITHUB_ENV
+      - name: Find FILENAME3 and set env
+        run: echo "FILENAME3=`basename app/build/outputs/apk/release/*armeabi*`" >> $GITHUB_ENV
+      - name: Sign APK1
+        run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} app/build/outputs/apk/release/${{ env.FILENAME1 }} zerokirby
+      - name: Sign APK2
+        run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} app/build/outputs/apk/release/${{ env.FILENAME2 }} zerokirby
+      - name: Sign APK3
+        run: jarsigner -verbose -keystore jtykey.jks -storepass ${{ secrets.STORE_PASS }} app/build/outputs/apk/release/${{ env.FILENAME3 }} zerokirby
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            tag_name: ${{ github.ref }}
-            release_name: Release ${{ github.ref }}
-            draft: false
-            prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Assets
+        id: upload-release-assets
+        uses: dwenegar/upload-release-assets@v1
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-         upload_url: ${{ steps.create_release.outputs.upload_url }}
-         asset_path: app/build/outputs/apk/release/${{ env.FILENAME }}
-         asset_name: ${{ env.FILENAME }}
-         asset_content_type: application/vnd.android.package-archive
+          release_id: ${{ steps.create_release.outputs.id }}
+          assets_path: app/build/outputs/apk/release

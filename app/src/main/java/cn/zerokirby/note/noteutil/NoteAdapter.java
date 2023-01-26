@@ -61,8 +61,12 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         Note note = mNoteList.get(position);
         holder.title.setText(note.getTitle());//设置标题
         holder.content.setText(note.getContent());//设置内容
-        holder.time.setText(note.getYear() + note.getMonth() + note.getDay() +
-                "\n" + note.getHMS());//设置标准化日期时间
+        if (note.getTime().contains("年"))
+            holder.time.setText(note.getYear() + note.getMonth() + note.getDay() +
+                    "\n" + note.getHMS());//设置标准化日期时间
+        else
+            holder.time.setText(note.getMonth() + "/" + note.getDay() + "/" + note.getYear() +
+                    "\n" + note.getHMS());//设置标准化日期时间
     }
 
     //为recyclerView的每一个item设置点击事件

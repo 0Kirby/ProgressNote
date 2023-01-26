@@ -2,7 +2,6 @@ package cn.zerokirby.note.noteutil;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,7 +105,7 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
         Note note = mNoteList.get(position);//此item
 
         //相同的年月只显示一次
-        String year_month0 = note.getYear() + note.getMonth();//此item的年月
+        String year_month0 = note.getYear() + "/" + note.getMonth();//此item的年月
 
         holder.yearMonth.setText(year_month0);//设置年月
         holder.titleSpecial.setText(String.valueOf(note.getTitle()));//设置标题
@@ -117,7 +116,7 @@ public class NoteAdapterSpecial extends RecyclerView.Adapter<NoteAdapterSpecial.
         boolean flag = true;
         for (int i = 0; i < mNoteList.size(); i++) {//列表的所有item
             //如果年月相同 且 不是列表中最上面的一个
-            if ((mNoteList.get(i).getYear() + mNoteList.get(i).getMonth()).equals(year_month0)
+            if ((mNoteList.get(i).getYear() + "/" + mNoteList.get(i).getMonth()).equals(year_month0)
                     && position > i) {
                 flag = false;
                 break;

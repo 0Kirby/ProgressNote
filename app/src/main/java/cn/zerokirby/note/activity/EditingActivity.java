@@ -1,5 +1,7 @@
 package cn.zerokirby.note.activity;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,14 +19,12 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.data.NoteDataHelper;
 import cn.zerokirby.note.noteutil.Note;
 import cn.zerokirby.note.util.YanRenUtilKt;
-
-import static cn.zerokirby.note.MyApplication.getContext;
+import ren.imyan.language.LanguageUtil;
 
 public class EditingActivity extends BaseActivity {
 
@@ -78,7 +78,7 @@ public class EditingActivity extends BaseActivity {
         initView();//初始化控件
 
         noteId = getIntent().getIntExtra("noteId", 0);//获取点击的数据id
-
+        simpleDateFormat = new SimpleDateFormat(YanRenUtilKt.getLocalString(R.string.formatDate), LanguageUtil.getLocale(getContext()));
         actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);//设置为可以返回
@@ -86,8 +86,7 @@ public class EditingActivity extends BaseActivity {
             if (noteId == 0) {//如果没有获取到，则设置标题为新建笔记
                 actionBar.setTitle(R.string.newNote);
 
-                noteTime.setText(new SimpleDateFormat(getContext().getString(R.string.formatDate),
-                        Locale.getDefault()).format(new Date()));
+                noteTime.setText(simpleDateFormat.format(new Date()));
 
             } else {
                 actionBar.setTitle(R.string.editNote);//否则设置为编辑笔记
@@ -101,7 +100,6 @@ public class EditingActivity extends BaseActivity {
             }
         }
 
-        simpleDateFormat = new SimpleDateFormat(getContext().getString(R.string.formatDate), Locale.getDefault());
     }
 
     //初始化控件

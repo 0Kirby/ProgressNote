@@ -25,7 +25,7 @@
 头像存取：通过Java字节流方式进行头像的上传与下载，根据UUID生成唯一的文件名，确保同一用户多次上传的头像不会因重名而被覆盖，并将头像的路径存入数据库以便用户登录时读取头像
 # 联系我
 QQ：[623768813](http://wpa.qq.com/msgrd?v=3&uin=623768813&site=qq&menu=yes)  
-E-mail：jty.1234567890@163.com  
+E-mail：[jty.1234567890@163.com](mailto:jty.1234567890@163.com)  
 个人主页：https://zerokirby.cn  
 天天笔记主页：https://note.zerokirby.cn  
 博客：https://blog.zerokirby.cn

@@ -1,10 +1,11 @@
 package cn.zerokirby.note.data;
 
+import static cn.zerokirby.note.MyApplication.getContext;
+
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -14,13 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import cn.zerokirby.note.R;
 import cn.zerokirby.note.noteutil.Note;
 import cn.zerokirby.note.noteutil.NoteChangeConstant;
-
-import static cn.zerokirby.note.MyApplication.getContext;
+import cn.zerokirby.note.util.YanRenUtilKt;
+import ren.imyan.language.LanguageUtil;
 
 public class NoteDataHelper {
 
@@ -40,7 +40,7 @@ public class NoteDataHelper {
     public static void initNoteDataHelper() {
         databaseHelper = new DatabaseHelper("ProgressNote.db", null, 1);
         values = new ContentValues();
-        simpleDateFormat = new SimpleDateFormat(getContext().getString(R.string.formatDate), Locale.getDefault());
+
         localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
     }
 
@@ -52,7 +52,7 @@ public class NoteDataHelper {
     public static List<Note> initNote(String str) {
         try {
             List<Note> dataList = new ArrayList<>();
-
+            simpleDateFormat = new SimpleDateFormat(YanRenUtilKt.getLocalString(R.string.formatDate), LanguageUtil.getLocale(getContext()));
             db = databaseHelper.getReadableDatabase();
             cursor = db.query("Note", null, null,
                     null, null, null, "time desc",
@@ -151,7 +151,7 @@ public class NoteDataHelper {
             intent.putExtra("note_data", note);
 
             localBroadcastManager.sendBroadcast(intent);
-            Toast.makeText(getContext(), R.string.saveSuccess, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), YanRenUtilKt.getLocalString(R.string.saveSuccess), Toast.LENGTH_SHORT).show();
         } finally {
             if (values != null) values.clear();
             if (cursor != null) cursor.close();
@@ -159,6 +159,7 @@ public class NoteDataHelper {
         }
         return noteId;
     }
+
 
     /**
      * 删除笔记
@@ -176,7 +177,7 @@ public class NoteDataHelper {
             intent.putExtra("note_id", noteId);
             localBroadcastManager.sendBroadcast(intent);
 
-            Toast.makeText(getContext(), R.string.deleteSuccess, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), YanRenUtilKt.getLocalString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show();
         } finally {
             if (db != null) db.close();
         }
