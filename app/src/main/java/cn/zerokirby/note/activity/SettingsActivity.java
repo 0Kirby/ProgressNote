@@ -278,7 +278,7 @@ public class SettingsActivity extends BaseActivity {
                     requireActivity().startActivity(browser);
                     break;
                 case "theme":
-                    browser.setData(Uri.parse("https://github.com/EndureBlaze"));
+                    browser.setData(Uri.parse("https://github.com/Yanren1225"));
                     requireActivity().startActivity(browser);
                     break;
                 case "icon":
