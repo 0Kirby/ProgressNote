@@ -149,7 +149,7 @@ public class MainActivity extends BaseActivity {
 
         //为下拉刷新设置事件
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeColors(getThemeManager().getThemeColorFromId(R.attr.color_nav));
+        swipeRefreshLayout.setColorSchemeColors(getThemeManager().getThemeColorFromId(ren.imyan.theme.R.attr.color_nav));
         swipeRefreshLayout.setOnRefreshListener(
                 this::refreshDataLayout);
 
